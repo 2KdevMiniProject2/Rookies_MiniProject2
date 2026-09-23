@@ -15,7 +15,7 @@ function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<div>홈 화면 (추후 각자 페이지로 교체)</div>} />
+        <Route path="/" element={<div>홈 화면(본영) (추후 각자 페이지로 교체)</div>} />
 
         {/* 로그인 없이 접근 가능한 라우트는 여기에 추가 */}
 
