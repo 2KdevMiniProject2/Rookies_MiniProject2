@@ -1,28 +1,94 @@
 .page {
+  /*
+   * 흑백(무채색) 로컬 색상 변수 — 팀 공통 루트 변수(--accent 등)와 분리
+   * 라이트: 흰 배경 · 검정 텍스트 · 검정 버튼
+   * 다크 모드 블록은 아래에 주석으로 보관 중 → 현재는 OS 테마와 무관하게 항상 라이트로 고정
+   */
+  --auth-bg: #ffffff;
+  --auth-surface: #ffffff;
+  --auth-text: #111111;
+  --auth-text-muted: #666666;
+  --auth-border: #e0e0e0;
+  --auth-border-strong: #9e9e9e;
+  --auth-primary: #1a1a1a;
+  --auth-on-primary: #ffffff;
+  --auth-soft: rgba(0, 0, 0, 0.06);
+  --auth-glow: rgba(0, 0, 0, 0.04);
+  --auth-shadow:
+    rgba(0, 0, 0, 0.08) 0 10px 15px -3px, rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+  /* 입력칸 테두리 — 흰 배경 대비 약 3.4:1로 경계가 분명하게 보이는 회색, 포커스는 검정 */
+  --auth-input-border: #8c8c8c;
+  --auth-input-border-focus: #000000;
+  /* 모의 로그인 버튼 — 카드 배경과 구분되는 회색 면 + 얇은 테두리 */
+  --auth-mock-bg: #ececec;
+  --auth-mock-bg-hover: #e0e0e0;
+  --auth-mock-border: #bdbdbd;
+
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 48px 16px;
   text-align: left;
+  /* 루트(:root)의 보라빛 회색 글자색이 상속되지 않도록 무채색으로 고정 */
+  color: var(--auth-text);
 
   /*
    * breakout: #root(최대 1126px) 박스를 벗어나 배경을 화면 전체 폭으로 (StoreListPage와 같은 방식)
    * border-box: 좌우 padding이 100vw에 더해지면 카드가 가운데에서 밀리므로 폭 안에 포함
-   * 마지막 var(--bg) 레이어는 #root의 좌우 테두리 선이 비치지 않도록 덮는 용도
+   * 마지막 var(--auth-bg) 레이어는 #root의 좌우 테두리 선이 비치지 않도록 덮는 용도
    */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   box-sizing: border-box;
   background:
-    radial-gradient(circle at 20% 10%, var(--accent-bg), transparent 45%),
-    radial-gradient(circle at 85% 90%, var(--accent-bg), transparent 40%),
-    var(--bg);
+    radial-gradient(circle at 20% 10%, var(--auth-glow), transparent 45%),
+    radial-gradient(circle at 85% 90%, var(--auth-glow), transparent 40%),
+    var(--auth-bg);
 }
 
-/* 100vw의 스크롤바 폭만큼 생기는 가로 넘침을 로그인/회원가입 화면이 떠 있는 동안에만 잘라냄 */
+/*
+ * [비활성] 다크 모드 — 다시 쓰려면 이 주석을 풀고, 아래 html 규칙의 `color-scheme: light`도 제거할 것
+ *
+ * @media (prefers-color-scheme: dark) {
+ *   .page {
+ *     --auth-bg: #111111;
+ *     --auth-surface: #1a1a1a;
+ *     --auth-text: #f2f2f2;
+ *     --auth-text-muted: #a0a0a0;
+ *     --auth-border: #333333;
+ *     --auth-border-strong: #777777;
+ *     --auth-primary: #e6e6e6;
+ *     --auth-on-primary: #111111;
+ *     --auth-soft: rgba(255, 255, 255, 0.08);
+ *     --auth-glow: rgba(255, 255, 255, 0.05);
+ *     --auth-shadow:
+ *       rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
+ *     --auth-input-border: #6e6e6e;
+ *     --auth-input-border-focus: #ffffff;
+ *     --auth-mock-bg: #262626;
+ *     --auth-mock-bg-hover: #303030;
+ *     --auth-mock-border: #4a4a4a;
+ *   }
+ * }
+ */
+
+/*
+ * 로그인/회원가입 화면이 떠 있는 동안에만 적용
+ * - overflow-x: 100vw의 스크롤바 폭만큼 생기는 가로 넘침을 잘라냄
+ * - color-scheme: 루트의 `light dark` 때문에 OS 다크 모드에서 스크롤바·입력칸 등
+ *   브라우저 기본 요소가 어둡게 그려지는 것을 막고 라이트로 고정
+ */
 :global(html):has(.page) {
   overflow-x: clip;
+  color-scheme: light;
+}
+
+/* 버튼·링크의 브라우저 기본 포커스 테두리(파란색) 대신 무채색 테두리 */
+.page button:focus-visible,
+.page a:focus-visible {
+  outline: 2px solid var(--auth-text);
+  outline-offset: 2px;
 }
 
 .card {
@@ -30,10 +96,10 @@
   max-width: 520px;
   padding: 48px 48px 42px;
   box-sizing: border-box;
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--auth-surface);
+  border: 1px solid var(--auth-border);
   border-radius: 20px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--auth-shadow);
 }
 
 .header {
@@ -52,13 +118,13 @@
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: var(--accent);
+  color: var(--auth-text);
 }
 
 .subtitle {
   margin-top: 6px;
   font-size: 14px;
-  color: var(--text);
+  color: var(--auth-text-muted);
 }
 
 .form {
@@ -76,7 +142,7 @@
 .label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-h);
+  color: var(--auth-text);
 }
 
 .input {
@@ -84,22 +150,25 @@
   padding: 0 14px;
   font: inherit;
   font-size: 15px;
-  color: var(--text-h);
-  background: var(--bg);
-  border: 1px solid var(--border);
+  color: var(--auth-text);
+  background: var(--auth-surface);
+  border: 1px solid var(--auth-input-border);
   border-radius: 10px;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .input::placeholder {
-  color: var(--text);
+  color: var(--auth-text-muted);
   opacity: 0.6;
 }
 
+/* 포커스: 검정 테두리 + 안쪽 1px 그림자로 2px처럼 두껍게 (레이아웃 흔들림 없이) + 바깥 옅은 링 */
 .input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
+  border-color: var(--auth-input-border-focus);
+  box-shadow:
+    0 0 0 1px var(--auth-input-border-focus),
+    0 0 0 4px var(--auth-soft);
 }
 
 .input:disabled {
@@ -132,8 +201,8 @@
   font: inherit;
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
-  background: var(--accent);
+  color: var(--auth-on-primary);
+  background: var(--auth-primary);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -157,12 +226,12 @@
   margin-top: 20px;
   font-size: 14px;
   text-align: center;
-  color: var(--text);
+  color: var(--auth-text-muted);
 }
 
 .signupLink {
   font-weight: 600;
-  color: var(--accent);
+  color: var(--auth-text);
   text-decoration: none;
 }
 
@@ -173,13 +242,13 @@
 .mock {
   margin-top: 28px;
   padding-top: 20px;
-  border-top: 1px dashed var(--border);
+  border-top: 1px dashed var(--auth-border);
   text-align: center;
 }
 
 .mockLabel {
   font-size: 12px;
-  color: var(--text);
+  color: var(--auth-text-muted);
 }
 
 .mockButtons {
@@ -193,16 +262,17 @@
   height: 38px;
   font: inherit;
   font-size: 13px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 1px solid transparent;
+  color: var(--auth-text);
+  background: var(--auth-mock-bg);
+  border: 1px solid var(--auth-mock-border);
   border-radius: 8px;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 
 .mockButton:hover {
-  border-color: var(--accent-border);
+  background: var(--auth-mock-bg-hover);
+  border-color: var(--auth-input-border);
 }
 
 /* ---------- 회원가입: 역할 선택 ---------- */
@@ -222,14 +292,14 @@
   flex-direction: column;
   gap: 2px;
   padding: 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--auth-border);
   border-radius: 12px;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 
 .roleOption:hover {
-  border-color: var(--accent-border);
+  border-color: var(--auth-border-strong);
 }
 
 .roleOption input {
@@ -239,26 +309,26 @@
 }
 
 .roleOption:has(input:checked) {
-  border-color: var(--accent);
-  background: var(--accent-bg);
+  border-color: var(--auth-primary);
+  background: var(--auth-soft);
 }
 
 .roleOption:has(input:focus-visible) {
-  box-shadow: 0 0 0 3px var(--accent-bg);
+  box-shadow: 0 0 0 3px var(--auth-soft);
 }
 
 .roleTitle {
   font-size: 15px;
   font-weight: 600;
-  color: var(--text-h);
+  color: var(--auth-text);
 }
 
 .roleDesc {
   font-size: 12px;
-  color: var(--text);
+  color: var(--auth-text-muted);
 }
 
 .hint {
   font-size: 12px;
-  color: var(--text);
+  color: var(--auth-text-muted);
 }
