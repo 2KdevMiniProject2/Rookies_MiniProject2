@@ -197,3 +197,23 @@
 .order-history-info span {
     color: #777777;
 }
+
+
+/* 사장님 화면 */
+
+.owner-guide-section {
+  margin: 25px;
+  padding: 22px;
+  border: 1px solid #dddddd;
+}
+
+.owner-guide-section h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.owner-guide-section p {
+  margin: 0;
+  color: #666666;
+  font-size: 14px;
+}

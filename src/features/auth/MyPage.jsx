@@ -1,18 +1,19 @@
+import { useNavigate } from 'react-router-dom';
 import './MyPage.css';
 
 function MyPage() {
-    // 임시 회원 데이터
-    // 나중에 로그인 사용자 API 데이터로 교체
+    const navigate = useNavigate();
+
+    // 임시 사용자 데이터
+    // 나중에 로그인 사용자 정보로 교체
     const user = {
         id: 1,
         name: '김민수',
         email: 'user@example.com',
         phone: '010-0000-0000',
-        role: 'USER',
+        role: 'OWNER',
     };
 
-    // 임시 주문 내역
-    // 나중에 백엔드 주문 API 데이터로 교체
     const orders = [
         {
             id: 5001,
@@ -48,38 +49,76 @@ function MyPage() {
 
     return (
         <main className="mypage">
-
             <div className="mypage-layout">
-
-                {/* 왼쪽 메뉴 */}
                 <aside className="mypage-sidebar">
-                    <strong>마이페이지</strong>
+                    <strong>
+                        {user.role === 'OWNER' ? '사장님 마이페이지' : '마이페이지'}
+                    </strong>
 
                     <nav>
-                        <button type="button">이용내역</button>
-                        <button type="button">회원정보</button>
-                        <button type="button">로그아웃</button>
+                        {user.role === 'OWNER' ? (
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/stores/register')}
+                                >
+                                    가게 등록/관리
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/owner/stores/1/menus')}
+                                >
+                                    메뉴 관리
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/owner/stores/1/orders')}
+                                >
+                                    실시간 주문 확인
+                                </button>
+
+                                <button type="button">
+                                    회원정보
+                                </button>
+
+                                <button type="button">
+                                    로그아웃
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button type="button">
+                                    이용내역
+                                </button>
+
+                                <button type="button">
+                                    회원정보
+                                </button>
+
+                                <button type="button">
+                                    로그아웃
+                                </button>
+                            </>
+                        )}
                     </nav>
                 </aside>
 
-                {/* 오른쪽 내용 */}
                 <section className="mypage-main">
-
                     <div className="mypage-main-title">
                         마이페이지
                     </div>
 
-                    {/* 회원 정보 */}
                     <section className="profile-section">
-
                         <div className="profile-image">
-                            <span>
-                                {user.name.charAt(0)}
-                            </span>
+                            <span>{user.name.charAt(0)}</span>
                         </div>
 
                         <div className="profile-info">
-                            <strong>{user.role}</strong>
+                            <strong>
+                                {user.role === 'OWNER' ? 'OWNER' : 'USER'}
+                            </strong>
                             <p>{user.name}</p>
                             <p>{user.email}</p>
                             <p>{user.phone}</p>
@@ -91,60 +130,65 @@ function MyPage() {
                         >
                             정보 수정
                         </button>
-
                     </section>
 
-                    {/* 주문 내역 */}
-                    <section className="order-history-section">
-                        <div className="section-title">
-                            <h2>주문 내역</h2>
-                            <span>{orders.length}건</span>
-                        </div>
+                    {user.role === 'USER' && (
+                        <section className="order-history-section">
+                            <div className="section-title">
+                                <h2>주문 내역</h2>
+                                <span>{orders.length}건</span>
+                            </div>
 
-                        <div className="order-history-list">
+                            <div className="order-history-list">
+                                {orders.map((order) => (
+                                    <article
+                                        className="order-history-card"
+                                        key={order.id}
+                                    >
+                                        <div className="order-history-top">
+                                            <div>
+                                                <span className="order-number">
+                                                    주문 #{order.id}
+                                                </span>
 
-                            {orders.map((order) => (
-                                <article
-                                    className="order-history-card"
-                                    key={order.id}
-                                >
+                                                <h3>{order.storeName}</h3>
+                                            </div>
 
-                                    <div className="order-history-top">
-                                        <div>
-                                            <span className="order-number">
-                                                주문 #{order.id}
+                                            <span
+                                                className={`order-status ${order.status.toLowerCase()}`}
+                                            >
+                                                {getStatusText(order.status)}
                                             </span>
-
-                                            <h3>{order.storeName}</h3>
                                         </div>
 
-                                        <span
-                                            className={`order-status ${order.status.toLowerCase()}`}
-                                        >
-                                            {getStatusText(order.status)}
-                                        </span>
-                                    </div>
+                                        <div className="order-history-info">
+                                            <p>
+                                                <span>픽업 시간</span>
+                                                <strong>{order.pickupTime}</strong>
+                                            </p>
 
-                                    <div className="order-history-info">
-                                        <p>
-                                            <span>픽업 시간</span>
-                                            <strong>{order.pickupTime}</strong>
-                                        </p>
+                                            <p>
+                                                <span>총 금액</span>
+                                                <strong>
+                                                    {order.totalPrice.toLocaleString()}원
+                                                </strong>
+                                            </p>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
-                                        <p>
-                                            <span>총 금액</span>
-                                            <strong>
-                                                {order.totalPrice.toLocaleString()}원
-                                            </strong>
-                                        </p>
-                                    </div>
-
-                                </article>
-                            ))}
-
-                        </div>
-                    </section>
-
+                    {user.role === 'OWNER' && (
+                        <section className="owner-guide-section">
+                            <h2>가게 관리</h2>
+                            <p>
+                                왼쪽 메뉴에서 가게 등록, 메뉴 관리,
+                                실시간 주문 확인 기능을 이용할 수 있습니다.
+                            </p>
+                        </section>
+                    )}
                 </section>
             </div>
         </main>

@@ -51,7 +51,7 @@ function MenuRegisterPage() {
                             type="button"
                             className="active"
                         >
-                            메뉴 등록
+                            메뉴 관리
                         </button>
 
                         <button type="button">
@@ -66,7 +66,7 @@ function MenuRegisterPage() {
 
                 <section className="menu-register-main">
                     <div className="menu-register-title">
-                        메뉴 등록
+                        메뉴 관리
                     </div>
 
                     <div className="menu-register-content">
