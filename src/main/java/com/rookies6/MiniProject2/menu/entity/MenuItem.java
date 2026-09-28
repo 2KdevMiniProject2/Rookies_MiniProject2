@@ -1,6 +1,7 @@
 package com.rookies6.MiniProject2.menu.entity;
 
 import com.rookies6.MiniProject2.common.entity.BaseEntity;
+import com.rookies6.MiniProject2.user.entity.Store;
 import jakarta.persistence.*;
 import lombok.*;
 

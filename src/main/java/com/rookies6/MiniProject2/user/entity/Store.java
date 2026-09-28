@@ -1,4 +1,4 @@
-package com.rookies6.MiniProject2.menu.entity;
+package com.rookies6.MiniProject2.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
