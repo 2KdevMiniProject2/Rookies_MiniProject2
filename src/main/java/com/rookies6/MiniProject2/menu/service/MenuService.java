@@ -5,7 +5,7 @@ import com.rookies6.MiniProject2.common.exception.ErrorCode;
 import com.rookies6.MiniProject2.menu.dto.MenuItemCreateRequest;
 import com.rookies6.MiniProject2.menu.dto.MenuItemResponse;
 import com.rookies6.MiniProject2.menu.entity.MenuItem;
-import com.rookies6.MiniProject2.menu.entity.Store;
+import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.menu.repository.MenuItemRepository;
 import com.rookies6.MiniProject2.menu.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
