@@ -65,4 +65,31 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, userId));
         return UserDTO.UserResponse.from(user);
     }
+
+    // 4. 회원 정보 수정
+    @Transactional
+    public UserDTO.UserResponse updateUser(Long userId, UserDTO.UpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, userId));
+
+        if (request.getName() != null && !request.getName().isBlank()) {
+            user.setName(request.getName());
+        }
+        if (request.getPhone() != null && !request.getPhone().isBlank()) {
+            user.setPhone(request.getPhone());
+        }
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        return UserDTO.UserResponse.from(user);
+    }
+
+    // 5. 회원 탈퇴
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, userId));
+        userRepository.delete(user);
+    }
 }
