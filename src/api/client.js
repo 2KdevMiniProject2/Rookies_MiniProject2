@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 /**
  * 백엔드(reservation-backend)와 통신하는 axios 인스턴스입니다.
@@ -17,8 +18,13 @@ const apiClient = axios.create({
   },
 });
 
-// 인증 담당자가 JWT를 도입하면, 여기에 요청 인터셉터를 추가해서
-// 저장된 토큰을 Authorization 헤더에 자동으로 실어보내는 로직을 넣으면 됩니다.
-// apiClient.interceptors.request.use((config) => { ... });
+// authStore에 저장된 JWT를 모든 요청의 Authorization 헤더에 자동으로 실어 보냅니다.
+apiClient.interceptors.request.use((config) => {
+  const { token } = useAuthStore.getState();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export default apiClient;

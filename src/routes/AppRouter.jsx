@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
+import LoginPage from '../features/auth/LoginPage';
+import SignupForm from '../features/auth/SignupForm';
 
 /**
  * 전체 라우팅을 한 곳에 모아두는 파일입니다.
@@ -18,7 +20,9 @@ function AppRouter() {
         <Route path="/" element={<div>홈 화면 (추후 각자 페이지로 교체)</div>} />
 
         {/* 로그인 없이 접근 가능한 라우트는 여기에 추가 */}
-
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupForm />} />
+        
         {/* 로그인만 하면 접근 가능한 라우트 예시 */}
         <Route element={<ProtectedRoute />}>
           {/* <Route path="/mypage" element={<MyPage />} /> */}
