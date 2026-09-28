@@ -1,21 +1,22 @@
 package com.rookies6.MiniProject2.menu.entity;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import com.rookies6.MiniProject2.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+//Store
 @Entity
 @Table(name = "stores")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
 public class Store extends BaseEntity {
+
     @Column(nullable = false)
     private String name;
 
@@ -28,10 +29,14 @@ public class Store extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Builder
-    private Store(String name, String address, String category){
-        this.name = name;
-        this.address = address;
-        this.category = category;
-    }
+    //1:1 지연로딩 - 양방향 Store에서 StoreDetail 참조할 수 있도록 설정
+    @OneToOne(fetch = FetchType.LAZY,
+            mappedBy = "store",
+            cascade = CascadeType.ALL)
+    private StoreDetail storeDetail;
+
+    //N:1 Store와 User 관계에서 N쪽에 해당하는 Store가 Owner이다.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 }
