@@ -8,14 +8,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    // 1. 회원가입 API
-    @PostMapping("/api/auth/signup")
+    // 0. 회원 전체 목록 조회 API
+    @GetMapping("/api/users")
+    public ResponseEntity<List<UserDTO.UserResponse>> getAllUsers() {
+        List<UserDTO.UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    // 1. 회원가입 / 회원 추가 API (/api/auth/signup 및 /api/users 둘 다 지원)
+    @PostMapping({"/api/auth/signup", "/api/users"})
     public ResponseEntity<UserDTO.UserResponse> signup(@Valid @RequestBody UserDTO.SignupRequest request) {
         UserDTO.UserResponse response = userService.signup(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -35,8 +44,8 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // 4. 회원 정보 수정 API
-    @PatchMapping("/api/users/{id}")
+    // 4. 회원 정보 수정 API (PUT, PATCH 모두 지원)
+    @RequestMapping(value = "/api/users/{id}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<UserDTO.UserResponse> updateUser(
             @PathVariable Long id,
             @RequestBody UserDTO.UpdateRequest request) {
