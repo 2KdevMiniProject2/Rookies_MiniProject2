@@ -1,0 +1,199 @@
+.mypage {
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 40px 20px 70px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.mypage-layout {
+    display: flex;
+    min-height: 580px;
+    border: 1px solid #cccccc;
+    background: white;
+}
+
+/* 왼쪽 메뉴 */
+
+.mypage-sidebar {
+    width: 180px;
+    padding: 28px 22px;
+    box-sizing: border-box;
+    border-right: 1px solid #cccccc;
+    background: #f4f4f4;
+}
+
+.mypage-sidebar strong {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+.mypage-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.mypage-sidebar button {
+    padding: 7px 0;
+    border: none;
+    background: transparent;
+    color: #333333;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* 오른쪽 */
+
+.mypage-main {
+    flex: 1;
+}
+
+.mypage-main-title {
+    padding: 17px 22px;
+    border-bottom: 1px solid #cccccc;
+    background: #dddddd;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* 프로필 */
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    padding: 25px;
+    border-bottom: 1px solid #cccccc;
+}
+
+.profile-image {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 18px;
+    border: 1px solid #bbbbbb;
+    border-radius: 50%;
+    background: #eeeeee;
+}
+
+.profile-image span {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+
+.profile-info p {
+    margin: 3px 0;
+    color: #666666;
+    font-size: 13px;
+}
+
+.profile-edit-button {
+    padding: 7px 12px;
+    border: 1px solid #999999;
+    background: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* 주문 내역 */
+
+.order-history-section {
+    padding: 25px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.section-title h2 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.section-title span {
+    color: #777777;
+    font-size: 13px;
+}
+
+.order-history-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.order-history-card {
+    padding: 18px;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+}
+
+.order-history-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.order-number {
+    color: #888888;
+    font-size: 11px;
+}
+
+.order-history-top h3 {
+    margin: 5px 0 15px;
+    font-size: 16px;
+}
+
+.order-status {
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.order-status.pending {
+    background: #fff0c7;
+    color: #8b6500;
+}
+
+.order-status.accepted {
+    background: #e4efff;
+    color: #2561a9;
+}
+
+.order-status.completed {
+    background: #eeeeee;
+    color: #666666;
+}
+
+.order-history-info {
+    border-top: 1px solid #eeeeee;
+    padding-top: 10px;
+}
+
+.order-history-info p {
+    display: flex;
+    justify-content: space-between;
+    margin: 7px 0;
+    font-size: 12px;
+}
+
+.order-history-info span {
+    color: #777777;
+}

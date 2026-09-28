@@ -1,0 +1,142 @@
+.store-register-page {
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 40px 20px 70px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.store-register-layout {
+    display: flex;
+    min-height: 580px;
+    border: 1px solid #cccccc;
+    background: white;
+}
+
+/* 왼쪽 메뉴 */
+
+.store-register-sidebar {
+    width: 180px;
+    padding: 28px 22px;
+    box-sizing: border-box;
+    border-right: 1px solid #cccccc;
+    background: #f4f4f4;
+}
+
+.store-register-sidebar strong {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+.store-register-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.store-register-sidebar button {
+    padding: 7px 0;
+    border: none;
+    background: transparent;
+    color: #333333;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.store-register-sidebar .active {
+    font-weight: 700;
+}
+
+/* 오른쪽 */
+
+.store-register-main {
+    flex: 1;
+}
+
+.store-register-title {
+    padding: 17px 22px;
+    border-bottom: 1px solid #cccccc;
+    background: #dddddd;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.store-register-content {
+    padding: 28px;
+}
+
+/* 입력 영역 */
+
+.register-section {
+    margin-bottom: 28px;
+    padding: 22px;
+    border: 1px solid #dddddd;
+}
+
+.register-section h2 {
+    margin: 0 0 22px;
+    font-size: 17px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cccccc;
+    background: white;
+    font-size: 14px;
+}
+
+.time-row {
+    display: flex;
+    gap: 20px;
+}
+
+.time-row .form-group {
+    flex: 1;
+}
+
+/* 하단 버튼 */
+
+.register-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.register-buttons button {
+    min-width: 110px;
+    padding: 11px 18px;
+    border: 1px solid #aaaaaa;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background: white;
+    color: #444444;
+}
+
+.register-button {
+    background: #555555;
+    color: white;
+}

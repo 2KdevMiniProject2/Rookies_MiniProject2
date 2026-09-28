@@ -1,0 +1,186 @@
+.menu-register-page {
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 40px 20px 70px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.menu-register-layout {
+    display: flex;
+    min-height: 580px;
+    border: 1px solid #cccccc;
+    background: white;
+}
+
+/* 왼쪽 메뉴 */
+
+.menu-register-sidebar {
+    width: 180px;
+    padding: 28px 22px;
+    box-sizing: border-box;
+    border-right: 1px solid #cccccc;
+    background: #f4f4f4;
+}
+
+.menu-register-sidebar strong {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+.menu-register-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.menu-register-sidebar button {
+    padding: 7px 0;
+    border: none;
+    background: transparent;
+    color: #333333;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.menu-register-sidebar .active {
+    font-weight: 700;
+}
+
+/* 오른쪽 */
+
+.menu-register-main {
+    flex: 1;
+}
+
+.menu-register-title {
+    padding: 17px 22px;
+    border-bottom: 1px solid #cccccc;
+    background: #dddddd;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.menu-register-content {
+    padding: 28px;
+}
+
+/* 메뉴 영역 */
+
+.menu-section {
+    margin-bottom: 25px;
+    padding: 22px;
+    border: 1px solid #dddddd;
+}
+
+.menu-section h2 {
+    margin: 0 0 22px;
+    font-size: 17px;
+}
+
+.menu-form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.menu-form-group label {
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.menu-form-group input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cccccc;
+    background: white;
+    font-size: 14px;
+}
+
+/* 버튼 */
+
+.menu-register-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.menu-register-buttons button {
+    min-width: 110px;
+    padding: 11px 18px;
+    border: 1px solid #aaaaaa;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.back-button {
+    background: white;
+    color: #333333;
+}
+
+.menu-save-button {
+    background: #555555;
+    color: white;
+}
+
+/* 등록된 메뉴 */
+
+.menu-list-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.menu-list-title h2 {
+    margin-bottom: 18px;
+}
+
+.menu-list-title span {
+    margin-bottom: 18px;
+    color: #777777;
+    font-size: 13px;
+}
+
+.empty-menu {
+    padding: 30px;
+    border: 1px dashed #cccccc;
+    color: #888888;
+    text-align: center;
+    font-size: 13px;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 17px 0;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-item strong {
+    font-size: 15px;
+}
+
+.menu-item p {
+    margin: 5px 0 0;
+    color: #666666;
+    font-size: 13px;
+}
+
+.menu-status {
+    padding: 5px 9px;
+    border-radius: 12px;
+    background: #eeeeee;
+    color: #555555;
+    font-size: 11px;
+    font-weight: 700;
+}
