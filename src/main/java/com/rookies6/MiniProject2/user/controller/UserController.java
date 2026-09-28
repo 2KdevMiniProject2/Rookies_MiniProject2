@@ -34,4 +34,20 @@ public class UserController {
         UserDTO.UserResponse response = userService.getUserById(id);
         return ResponseEntity.ok(response);
     }
+
+    // 4. 회원 정보 수정 API
+    @PatchMapping("/api/users/{id}")
+    public ResponseEntity<UserDTO.UserResponse> updateUser(
+            @PathVariable Long id,
+            @RequestBody UserDTO.UpdateRequest request) {
+        UserDTO.UserResponse response = userService.updateUser(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    // 5. 회원 탈퇴 API
+    @DeleteMapping("/api/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
 }
