@@ -35,6 +35,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(org.springframework.dao.DataIntegrityViolationException e) {
+        log.warn("Data integrity violation: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.CONFLICT.value(), "연관된 데이터(매장 또는 주문 내역 등)가 존재하여 삭제 또는 수정할 수 없습니다.");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(org.springframework.web.HttpRequestMethodNotSupportedException e) {
+        log.warn("Method not supported: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.METHOD_NOT_ALLOWED.value(),
+                "지원하지 않는 HTTP 요청 방식(Method)입니다. URL 끝에 대상 ID(예: /api/users/1)를 붙였는지 확인해 주세요.");
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error("Unhandled exception", e);
