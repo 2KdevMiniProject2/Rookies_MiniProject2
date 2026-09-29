@@ -5,14 +5,14 @@ import com.rookies6.MiniProject2.common.exception.ErrorCode;
 import com.rookies6.MiniProject2.menu.dto.MenuItemCreateRequest;
 import com.rookies6.MiniProject2.menu.dto.MenuItemResponse;
 import com.rookies6.MiniProject2.menu.entity.MenuItem;
-import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.menu.repository.MenuItemRepository;
+import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.user.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +22,12 @@ public class MenuService {
     private final MenuItemRepository menuItemRepository;
     private final StoreRepository storeRepository;
 
-    public List<MenuItemResponse> getMenus(Long storeId) {
-        return menuItemRepository.findByStoreIdAndDeletedAtIsNull(storeId).stream()
-                .map(MenuItemResponse::from)
-                .toList();
+    public Page<MenuItemResponse> getMenus(Long storeId, Pageable pageable) {
+        storeRepository.findByIdAndDeletedAtIsNull(storeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
+
+        return menuItemRepository.findByStoreIdAndDeletedAtIsNull(storeId, pageable)
+                .map(MenuItemResponse::from);
     }
 
     @Transactional

@@ -4,11 +4,12 @@ import com.rookies6.MiniProject2.user.dto.UserDTO;
 import com.rookies6.MiniProject2.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,8 +19,9 @@ public class UserController {
 
     // 0. 회원 전체 목록 조회 API
     @GetMapping("/api/users")
-    public ResponseEntity<List<UserDTO.UserResponse>> getAllUsers() {
-        List<UserDTO.UserResponse> users = userService.getAllUsers();
+    public ResponseEntity<Page<UserDTO.UserResponse>> getAllUsers(
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<UserDTO.UserResponse> users = userService.getAllUsers(pageable);
         return ResponseEntity.ok(users);
     }
 

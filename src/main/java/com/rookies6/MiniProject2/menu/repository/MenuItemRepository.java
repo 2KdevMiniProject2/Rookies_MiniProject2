@@ -1,6 +1,8 @@
 package com.rookies6.MiniProject2.menu.repository;
 
 import com.rookies6.MiniProject2.menu.entity.MenuItem;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +14,7 @@ import java.util.Set;
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     boolean existsByStoreIdAndNameAndDeletedAtIsNull(Long storeId, String name);
 
-    List<MenuItem> findByStoreIdAndDeletedAtIsNull(Long storeId);
+    Page<MenuItem> findByStoreIdAndDeletedAtIsNull(Long storeId, Pageable pageable);
 
     Optional<MenuItem> findByIdAndDeletedAtIsNull(Long menuId);
 

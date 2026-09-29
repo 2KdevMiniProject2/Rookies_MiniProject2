@@ -2,14 +2,16 @@ package com.rookies6.MiniProject2.user.service;
 
 import com.rookies6.MiniProject2.common.exception.BusinessException;
 import com.rookies6.MiniProject2.common.exception.ErrorCode;
-import com.rookies6.MiniProject2.user.repository.StoreDetailRepository;
-import com.rookies6.MiniProject2.user.repository.StoreRepository;
-import com.rookies6.MiniProject2.user.repository.UserRepository;
 import com.rookies6.MiniProject2.user.dto.StoreDTO;
 import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.user.entity.StoreDetail;
 import com.rookies6.MiniProject2.user.entity.User;
+import com.rookies6.MiniProject2.user.repository.StoreDetailRepository;
+import com.rookies6.MiniProject2.user.repository.StoreRepository;
+import com.rookies6.MiniProject2.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,18 +27,15 @@ public class StoreService {
     private final StoreDetailRepository storeDetailRepository;
     private final UserRepository userRepository;
 
-    // 1. 매장 전체 목록 조회 (카테고리 필터링 지원)
-    public List<StoreDTO.StoreResponse> getAllStores(String category) {
-        List<Store> stores;
+    // 1. 매장 전체 목록 조회 (카테고리 필터링 + 페이징 지원)
+    public Page<StoreDTO.StoreResponse> getAllStores(String category, Pageable pageable) {
+        Page<Store> stores;
         if (category != null && !category.isBlank() && !category.equalsIgnoreCase("전체")) {
-            stores = storeRepository.findByCategoryAndDeletedAtIsNull(category);
+            stores = storeRepository.findByCategoryAndDeletedAtIsNull(category, pageable);
         } else {
-            stores = storeRepository.findByDeletedAtIsNull();
+            stores = storeRepository.findByDeletedAtIsNull(pageable);
         }
-
-        return stores.stream()
-                .map(StoreDTO.StoreResponse::from)
-                .collect(Collectors.toList());
+        return stores.map(StoreDTO.StoreResponse::from);
     }
 
     // 2. 매장 단건 상세 조회
