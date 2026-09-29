@@ -33,6 +33,10 @@ public class MenuService {
         Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
 
+        if (menuItemRepository.existsByStoreIdAndNameAndDeletedAtIsNull(storeId, request.getName())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_MENU_NAME, request.getName());
+        }
+
         MenuItem menuItem = MenuItem.builder()
                 .store(store)
                 .name(request.getName())
