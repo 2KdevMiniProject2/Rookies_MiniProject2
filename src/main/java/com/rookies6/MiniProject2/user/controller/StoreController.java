@@ -52,4 +52,13 @@ public class StoreController {
         List<StoreDTO.StoreResponse> stores = storeService.getStoresByOwnerId(ownerId);
         return ResponseEntity.ok(stores);
     }
+
+    // 매장 삭제 API
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<Void> deleteStore(
+            @PathVariable Long storeId,
+            @RequestParam(defaultValue = "1") Long ownerId) {
+        storeService.deleteStore(storeId, ownerId);
+        return ResponseEntity.noContent().build();
+    }
 }

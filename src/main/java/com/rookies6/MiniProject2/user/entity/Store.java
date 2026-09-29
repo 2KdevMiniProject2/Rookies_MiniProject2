@@ -39,4 +39,8 @@ public class Store extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

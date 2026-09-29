@@ -83,4 +83,17 @@ public class StoreService {
                 .map(StoreDTO.StoreResponse::from)
                 .collect(Collectors.toList());
     }
+
+    // 소유권자만 가능
+    @Transactional
+    public void deleteStore(Long storeId, Long ownerId) {
+        Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
+
+        if (!store.getOwner().getId().equals(ownerId)) {
+            throw new BusinessException(ErrorCode.STORE_ACCESS_DENIED, storeId);
+        }
+
+        store.softDelete();
+    }
 }
