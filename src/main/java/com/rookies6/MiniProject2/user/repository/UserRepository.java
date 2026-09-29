@@ -1,4 +1,4 @@
-package com.rookies6.MiniProject2.menu.repository;
+package com.rookies6.MiniProject2.user.repository;
 
 import com.rookies6.MiniProject2.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

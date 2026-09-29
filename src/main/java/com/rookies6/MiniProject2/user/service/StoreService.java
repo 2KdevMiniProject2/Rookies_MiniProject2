@@ -2,9 +2,9 @@ package com.rookies6.MiniProject2.user.service;
 
 import com.rookies6.MiniProject2.common.exception.BusinessException;
 import com.rookies6.MiniProject2.common.exception.ErrorCode;
-import com.rookies6.MiniProject2.menu.repository.StoreDetailRepository;
-import com.rookies6.MiniProject2.menu.repository.StoreRepository;
-import com.rookies6.MiniProject2.menu.repository.UserRepository;
+import com.rookies6.MiniProject2.user.repository.StoreDetailRepository;
+import com.rookies6.MiniProject2.user.repository.StoreRepository;
+import com.rookies6.MiniProject2.user.repository.UserRepository;
 import com.rookies6.MiniProject2.user.dto.StoreDTO;
 import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.user.entity.StoreDetail;
@@ -41,8 +41,7 @@ public class StoreService {
 
     // 2. 매장 단건 상세 조회
     public StoreDTO.StoreResponse getStoreById(Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .filter(s -> s.getDeletedAt() == null)
+        Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
 
         return StoreDTO.StoreResponse.from(store);

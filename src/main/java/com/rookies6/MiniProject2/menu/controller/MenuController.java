@@ -34,4 +34,10 @@ public class MenuController {
     public ResponseEntity<MenuItemResponse> toggleSoldOut(@PathVariable Long menuId) {
         return ResponseEntity.ok(menuService.toggleSoldOut(menuId));
     }
+
+    @DeleteMapping("/api/menus/{menuId}")
+    public ResponseEntity<Void> deleteMenu(@PathVariable Long menuId) {
+        menuService.deleteMenu(menuId);
+        return ResponseEntity.noContent().build();
+    }
 }

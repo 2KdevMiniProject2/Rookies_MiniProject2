@@ -5,6 +5,8 @@ import com.rookies6.MiniProject2.user.entity.Store;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "menu_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,8 +29,11 @@ public class MenuItem extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Builder
-    private MenuItem(Store store, String name, Integer price, String imageUrl){
+    private MenuItem(Store store, String name, Integer price, String imageUrl) {
         this.store = store;
         this.name = name;
         this.price = price;
@@ -39,4 +44,6 @@ public class MenuItem extends BaseEntity {
     public void toggleSoldOut() {
         this.soldOut = !this.soldOut;
     }
+
+    public void softDelete() { this.deletedAt = LocalDateTime.now(); }
 }
