@@ -3,6 +3,8 @@ package com.rookies6.MiniProject2.menu.entity;
 import com.rookies6.MiniProject2.common.entity.BaseEntity;
 import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.user.entity.User;
+import com.rookies6.MiniProject2.common.exception.BusinessException;
+import com.rookies6.MiniProject2.common.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -87,11 +89,11 @@ public class Order extends BaseEntity {
         changeStatus(OrderStatus.READY, OrderStatus.COMPLETED);
     }
 
-    // 현재 상태가 expected일 때만 next로 변경, 아니면 예외
+    // 현재 상태가 expected일 때만 next로 변경, 아니면 409 에러
     private void changeStatus(OrderStatus expected, OrderStatus next) {
         if (this.status != expected) {
-            throw new IllegalStateException(
-                    "주문 상태를 " + this.status + "에서 " + next + "(으)로 변경할 수 없습니다.");
+            throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS,
+                    this.status + "에서 " + next + "(으)로 변경할 수 없습니다");
         }
         this.status = next;
     }
