@@ -17,8 +17,20 @@ const apiClient = axios.create({
   },
 });
 
-// 인증 담당자가 JWT를 도입하면, 여기에 요청 인터셉터를 추가해서
-// 저장된 토큰을 Authorization 헤더에 자동으로 실어보내는 로직을 넣으면 됩니다.
-// apiClient.interceptors.request.use((config) => { ... });
+// 요청 인터셉터: 저장된 토큰이 있으면 Authorization 헤더에 자동 첨부
+apiClient.interceptors.request.use((config) => {
+  try {
+    const authData = localStorage.getItem('rookie_order_auth');
+    if (authData) {
+      const { token } = JSON.parse(authData);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to attach auth token', e);
+  }
+  return config;
+});
 
 export default apiClient;

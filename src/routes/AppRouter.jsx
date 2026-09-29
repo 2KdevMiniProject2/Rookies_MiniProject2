@@ -1,36 +1,43 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Header from '../components/layout/Header';
 import ProtectedRoute from './ProtectedRoute';
 
-/**
- * 전체 라우팅을 한 곳에 모아두는 파일입니다.
- * 각 담당자는 자신의 features/<도메인> 폴더에 페이지 컴포넌트를 만들고,
- * 이 파일에 Route 한 줄만 추가하면 됩니다. (여러 명이 같은 파일을 조금씩만 건드리게 되어
- * 병합 충돌이 나더라도 범위가 작습니다.)
- *
- * 예시:
- *   import LoginPage from '../features/auth/LoginPage';
- *   <Route path="/login" element={<LoginPage />} />
- */
+// 기능 페이지 컴포넌트 임포트
+import LoginPage from '../features/auth/LoginPage';
+import MyPage from '../features/auth/MyPage';
+import StoreListPage from '../features/store/StoreListPage';
+import StoreDetailPage from '../features/order/StoreDetailPage';
+import CheckoutPage from '../features/order/CheckoutPage';
+import OwnerDashboardPage from '../features/dashboard/OwnerDashboardPage';
+import StoreEditPage from '../features/store/StoreEditPage';
+
 function AppRouter() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<div>홈 화면 (추후 각자 페이지로 교체)</div>} />
+      {/* 상단 글로벌 헤더 */}
+      <Header />
 
-        {/* 로그인 없이 접근 가능한 라우트는 여기에 추가 */}
+      {/* 메인 콘텐츠 영역 */}
+      <main className="main-container">
+        <Routes>
+          {/* 1. 누구나 접근 가능한 공개 라우트 */}
+          <Route path="/" element={<StoreListPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/stores/:storeId" element={<StoreDetailPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
 
-        {/* 로그인만 하면 접근 가능한 라우트 예시 */}
-        <Route element={<ProtectedRoute />}>
-          {/* <Route path="/mypage" element={<MyPage />} /> */}
-        </Route>
+          {/* 2. 사장님(OWNER) 전용 보호 라우트 (시연용으로는 누구나 접근 가능하도록 열어둠) */}
+          <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
+          <Route path="/owner/store/edit" element={<StoreEditPage />} />
 
-        {/* ADMIN만 접근 가능한 라우트 예시 */}
-        <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-          {/* <Route path="/admin" element={<AdminPage />} /> */}
-        </Route>
-      </Routes>
+          {/* 알 수 없는 경로는 홈으로 리다이렉트 */}
+          <Route path="*" element={<StoreListPage />} />
+        </Routes>
+      </main>
     </BrowserRouter>
   );
 }
 
 export default AppRouter;
+
