@@ -36,7 +36,7 @@ public class StoreController {
     // TODO: JWT 인증 적용 후 SecurityContext의 인증된 사장님 ID로 자동 연동
     @PostMapping
     public ResponseEntity<StoreDTO.StoreResponse> createStore(
-            @RequestParamg(defaultValue = "1") Long ownerId,
+            @RequestParam(defaultValue = "1") Long ownerId,
             @Valid @RequestBody StoreDTO.StoreCreateRequest request) {
         StoreDTO.StoreResponse response = storeService.createStore(ownerId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
