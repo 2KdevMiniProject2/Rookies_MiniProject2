@@ -1,0 +1,268 @@
+/* 흑백 단색 기본 UI */
+.dashboard {
+  --black: #111;
+  --gray-line: #d0d0d0;
+  --gray-fill: #f0f0f0;
+  --gray-text: #666;
+
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  color: var(--black);
+  background: #fff;
+  text-align: left;
+}
+
+.dashboard__head {
+  border-bottom: 1px solid var(--black);
+  padding-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.dashboard__tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.dashboard__tab {
+  padding: 5px 14px;
+  border: 1px solid var(--gray-line);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--gray-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+/* NavLink는 현재 주소와 같으면 active 클래스를 자동으로 붙여줌 */
+.dashboard__tab.active {
+  background: var(--black);
+  border-color: var(--black);
+  color: #fff;
+}
+.dashboard__title {
+  margin: 0;
+  font-size: 22px;
+}
+.dashboard__section-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+.dashboard__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.dashboard__hint {
+  font-size: 12px;
+  color: var(--gray-text);
+}
+.dashboard__refresh {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dashboard__refresh-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--black);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--black);
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.dashboard__refresh-btn:hover {
+  background: var(--gray-fill);
+}
+.dashboard__refresh-btn:disabled {
+  color: var(--gray-text);
+  border-color: var(--gray-line);
+  cursor: default;
+}
+.dashboard__empty {
+  margin: 0;
+  padding: 16px 0;
+  font-size: 14px;
+  color: var(--gray-text);
+  text-align: center;
+}
+.dashboard__error {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--black);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* 영업 요약 */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.summary__item {
+  background: var(--gray-fill);
+  border-radius: 8px;
+  padding: 16px;
+}
+.summary__label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--gray-text);
+}
+.summary__value {
+  margin: 4px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+/* 주문 보드: 접수 대기 | 조리 중 | 픽업 대기 */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.board__col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.board__col-title {
+  margin: 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.board__count {
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--gray-fill);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* 주문 카드 */
+.order {
+  border: 1px solid var(--black);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.order__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.order__no {
+  font-weight: 700;
+}
+.order__info {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.order__price {
+  font-weight: 700;
+}
+.order__actions {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+}
+.order__actions:has(> :only-child) {
+  grid-template-columns: 1fr;
+}
+.order__btn {
+  white-space: nowrap;
+  padding: 10px;
+  border: 1px solid var(--black);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--black);
+  font-size: 14px;
+  cursor: pointer;
+}
+.order__btn:hover {
+  background: var(--gray-fill);
+}
+.order__btn--primary {
+  background: var(--black);
+  color: #fff;
+}
+.order__btn--primary:hover {
+  background: #333;
+}
+.order__btn--reject {
+  border-style: dashed;
+  color: var(--gray-text);
+}
+
+/* 상태 뱃지 */
+.badge {
+  white-space: nowrap;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--black);
+  font-size: 12px;
+}
+.badge--pending {
+  background: var(--black);
+  color: #fff;
+}
+.badge--accepted {
+  background: #fff;
+}
+.badge--ready {
+  background: #fff;
+  border-width: 2px;
+  font-weight: 700;
+}
+.badge--completed {
+  background: var(--gray-fill);
+  border-color: var(--gray-line);
+  color: var(--gray-text);
+}
+.badge--rejected {
+  background: #fff;
+  border-style: dashed;
+  color: var(--gray-text);
+  text-decoration: line-through;
+}
+
+/* 픽업 완료·거절된 주문 */
+.done {
+  border-top: 1px solid var(--gray-line);
+  padding-top: 12px;
+}
+.done__toggle {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 14px;
+  color: var(--gray-text);
+  cursor: pointer;
+}
+.done__list {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 800px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+}
