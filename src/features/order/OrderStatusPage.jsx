@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { fetchOrder } from "../../api/orderApi";
 
 import "./OrderStatusPage.css";
 
@@ -38,43 +39,6 @@ const STATUS_INFO = {
     },
 };
 
-// ── 목데이터 (백엔드 주문 1건 조회 API 가 생기면 교체) ──────────
-// 새로고침이 잘 되는지 보이도록 10초마다 상태가 한 단계씩 넘어간다
-const MOCK_STATUSES = ["PENDING", "ACCEPTED", "READY", "COMPLETED"];
-let mockStartedAt = null;
-
-async function fetchMockOrder(orderId) {
-    await new Promise((resolve) => setTimeout(resolve, 300)); // 서버처럼 잠깐 기다림
-
-    if (mockStartedAt === null) {
-        mockStartedAt = Date.now();
-    }
-    const statusIndex = Math.min(
-        Math.floor((Date.now() - mockStartedAt) / 10000),
-        MOCK_STATUSES.length - 1
-    );
-
-    const now = new Date();
-    const today = [
-        now.getFullYear(),
-        String(now.getMonth() + 1).padStart(2, "0"),
-        String(now.getDate()).padStart(2, "0"),
-    ].join("-");
-
-    return {
-        id: Number(orderId),
-        status: MOCK_STATUSES[statusIndex],
-        storeName: "루키즈 베이커리",
-        pickupTime: `${today}T15:30:00`,
-        totalPrice: 13000,
-        items: [
-            { menuItemId: 101, menuName: "바닐라라떼", quantity: 1 },
-            { menuItemId: 102, menuName: "아메리카노", quantity: 1 },
-            { menuItemId: 103, menuName: "소금빵", quantity: 1 },
-        ],
-    };
-}
-
 // "2026-09-29T15:30:00" → "15:30"
 function formatTime(dateTime) {
     return dateTime.split("T")[1].slice(0, 5);
@@ -88,7 +52,7 @@ function OrderStatusPage() {
     // 처음 한 번 + 5초마다 다시 불러오기
     useEffect(() => {
         const loadOrder = async () => {
-            const result = await fetchMockOrder(orderId);
+            const result = await fetchOrder(orderId);
             setOrder(result);
         };
 
@@ -102,7 +66,7 @@ function OrderStatusPage() {
     // 새로고침 버튼
     async function handleRefresh() {
         setRefreshing(true);
-        const result = await fetchMockOrder(orderId);
+        const result = await fetchOrder(orderId);
         setOrder(result);
         setRefreshing(false);
     }
