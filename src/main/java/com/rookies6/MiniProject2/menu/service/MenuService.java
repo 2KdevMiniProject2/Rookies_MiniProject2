@@ -23,7 +23,7 @@ public class MenuService {
     private final StoreRepository storeRepository;
 
     public List<MenuItemResponse> getMenus(Long storeId) {
-        return menuItemRepository.findByStoreId(storeId).stream()
+        return menuItemRepository.findByStoreIdAndDeletedAtIsNull(storeId).stream()
                 .map(MenuItemResponse::from)
                 .toList();
     }
@@ -45,10 +45,18 @@ public class MenuService {
 
     @Transactional
     public MenuItemResponse toggleSoldOut(Long menuId) {
-        MenuItem menuItem = menuItemRepository.findById(menuId)
+        MenuItem menuItem = menuItemRepository.findByIdAndDeletedAtIsNull(menuId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND, menuId));
 
         menuItem.toggleSoldOut();
         return MenuItemResponse.from(menuItem);
+    }
+
+    @Transactional
+    public void deleteMenu(Long menuId) {
+        MenuItem menuItem = menuItemRepository.findByIdAndDeletedAtIsNull(menuId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND, menuId));
+
+        menuItem.softDelete();
     }
 }
