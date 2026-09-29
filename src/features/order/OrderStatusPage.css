@@ -1,0 +1,436 @@
+/* =========================================================
+   손님 주문 상태 페이지 — 흑백 기본 스타일 (웹 기준 → 태블릿 → 폰)
+
+   ▶ 공통 컨셉 CSS 가 정해지면
+     index.css 의 :root 에 --color-* 같은 공통 변수를 넣기
+     아래 var(공통변수, 기본값) 에서 공통 변수가 있으면 그 값을,
+     없으면 지금의 흑백 기본값을 씁니다. 이 파일은 고치지 않아도 됩니다.
+
+   ▶ 클래스 이름 모두 order-status__ 로 시작 (다른 페이지와 겹치지 않게)
+   ========================================================= */
+
+.order-status {
+    /* ── 색 ─────────────────────────────────────────── */
+    --os-text: var(--color-text, #111111);        /* 본문 글자 */
+    --os-sub: var(--color-sub, #666666);          /* 보조 글자 */
+    --os-line: var(--color-line, #d0d0d0);        /* 연한 선 */
+    --os-border: var(--color-border, #111111);    /* 카드 테두리 */
+    --os-fill: var(--color-fill, #f0f0f0);        /* 회색 채우기 */
+    --os-surface: var(--color-surface, #ffffff);  /* 카드 배경 */
+    --os-primary: var(--color-primary, #111111);  /* 강조(버튼·진행) */
+    --os-on-primary: var(--color-on-primary, #ffffff);
+    --os-danger: var(--color-danger, #111111);    /* 거절 (흑백이라 지금은 검정) */
+
+    /* ── 모양 ───────────────────────────────────────── */
+    --os-radius: var(--radius-card, 12px);
+    --os-radius-sm: var(--radius-sm, 8px);
+    --os-font: var(--font-base, inherit);
+
+    /* ── 크기 (웹 기준) ─────────────────────────────── */
+    --os-card-w: 1040px;     /* 카드 전체 너비 */
+    --os-inner-w: 880px;     /* 카드 안 내용 너비 */
+    --os-step-w: 120px;      /* 진행 단계 한 칸 너비 (선 위치 계산에 쓴다) */
+
+    padding-block: 40px 60px;
+    padding-inline: 16px;
+    color: var(--os-text);
+    font-family: var(--os-font);
+    text-align: left;        /* 팀 index.css 의 #root { text-align: center } 무시 */
+    word-break: keep-all;    /* 한글이 단어 중간에서 줄바꿈되지 않게 */
+}
+
+/* 너비에 padding·테두리까지 포함 — 박스들의 바깥 너비가 똑같이 맞는다 */
+.order-status,
+.order-status *,
+.order-status *::before,
+.order-status *::after {
+    box-sizing: border-box;
+}
+
+/* 팀 index.css 가 h1·h2 색을 따로 지정해서 다크 모드에서 흰 글자가 되는 것 방지 */
+.order-status h2 {
+    color: var(--os-text);
+    letter-spacing: normal;
+}
+
+/* ── 카드 ──────────────────────────────────────────── */
+.order-status__card {
+    max-width: var(--os-card-w);
+    margin: 0 auto;
+    border: 1px solid var(--os-border);
+    border-radius: var(--os-radius);
+    background: var(--os-surface);
+    padding-bottom: 40px;
+    overflow: hidden;
+}
+.order-status__card--center {
+    padding: 48px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+.order-status__notice {
+    margin: 0;
+    color: var(--os-sub);
+}
+
+/* ── 윗부분: 제목 ──────────────────────────────────── */
+.order-status__top {
+    position: relative;
+    background: var(--os-fill);
+    border-bottom: 1px solid var(--os-line);
+    padding: 56px 40px 88px;
+}
+.order-status__store {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    padding: 4px 14px;
+    border: 1px solid var(--os-line);
+    border-radius: 999px;
+    background: var(--os-surface);
+    font-size: 14px;
+}
+.order-status__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.order-status__icon {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--os-text);
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: 700;
+}
+.order-status__icon--rejected {
+    border-color: var(--os-danger);
+    color: var(--os-danger);
+}
+.order-status__title {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.35;
+    text-align: center;
+}
+.order-status__order-no {
+    padding: 5px 18px;
+    border: 1px solid var(--os-line);
+    border-radius: 999px;
+    background: var(--os-surface);
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── 픽업 시간 박스 (윗부분 경계에 반쯤 걸침) ───────── */
+.order-status__pickup {
+    position: relative;
+    width: fit-content;
+    max-width: calc(100% - 32px);
+    margin: -52px auto 0;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 40px;
+    border: 1px solid var(--os-border);
+    border-radius: var(--os-radius-sm);
+    background: var(--os-surface);
+}
+.order-status__pickup-icon {
+    width: 56px;
+    height: 56px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--os-fill);
+}
+.order-status__pickup-label {
+    margin: 0;
+    font-size: 13px;
+    color: var(--os-sub);
+}
+.order-status__pickup-time {
+    margin: 2px 0 0;
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.order-status__pickup-sub {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--os-sub);
+}
+
+/* ── 진행 단계 ─────────────────────────────────────── */
+.order-status__progress {
+    position: relative;
+    max-width: var(--os-inner-w);
+    margin: 48px auto 0;
+    padding-inline: 16px;
+}
+/* 선은 첫 점 가운데 ~ 마지막 점 가운데 (양쪽 여백 16px + 칸 절반) */
+.order-status__progress-line {
+    position: absolute;
+    top: 7px;
+    left: calc(16px + var(--os-step-w) / 2);
+    right: calc(16px + var(--os-step-w) / 2);
+    height: 4px;
+    border-radius: 2px;
+    background: var(--os-line);
+}
+.order-status__progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--os-primary);
+    transition: width 0.4s ease;
+}
+.order-status__steps {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.order-status__step {
+    width: var(--os-step-w);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.order-status__step-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--os-line);
+}
+.order-status__step.is-done .order-status__step-dot {
+    background: var(--os-primary);
+}
+.order-status__step.is-current .order-status__step-dot {
+    background: var(--os-primary);
+    box-shadow: 0 0 0 5px var(--os-surface), 0 0 0 7px var(--os-primary);
+    animation: order-status-pulse 1.6s ease-in-out infinite;
+}
+.order-status__step-label {
+    font-size: 15px;
+    color: var(--os-sub);
+    white-space: nowrap;
+}
+.order-status__step.is-current .order-status__step-label {
+    color: var(--os-text);
+    font-weight: 700;
+}
+
+/* 지금 단계 점이 살짝 숨 쉬듯 — "실시간" 느낌 */
+@keyframes order-status-pulse {
+    50% { transform: scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .order-status__step.is-current .order-status__step-dot { animation: none; }
+    .order-status__progress-fill { transition: none; }
+}
+
+/* ── 상태 안내 문구 ────────────────────────────────── */
+.order-status__message {
+    max-width: var(--os-inner-w);
+    margin: 36px auto 0;
+    padding: 18px 24px;
+    border: 1px solid var(--os-line);
+    border-radius: var(--os-radius-sm);
+    background: var(--os-fill);
+    text-align: center;
+    font-size: 17px;
+}
+.order-status__message--rejected {
+    border-color: var(--os-danger);
+    border-style: dashed;
+    background: var(--os-surface);
+}
+.order-status__error {
+    max-width: var(--os-inner-w);
+    margin: 10px auto 0;
+    font-size: 13px;
+    color: var(--os-danger);
+    text-align: center;
+}
+
+/* ── 주문 내역 ─────────────────────────────────────── */
+.order-status__detail {
+    max-width: var(--os-inner-w);
+    margin: 24px auto 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 40px;
+    padding: 28px 36px;
+    border: 1px solid var(--os-border);
+    border-radius: var(--os-radius-sm);
+}
+.order-status__items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.order-status__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 19px;
+    font-weight: 700;
+}
+.order-status__item-qty {
+    white-space: nowrap;
+}
+.order-status__total {
+    min-width: 220px;
+    padding-left: 40px;
+    border-left: 1px solid var(--os-line);
+    text-align: right;
+}
+.order-status__total-price {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.order-status__total-meta {
+    margin: 0;
+    font-size: 13px;
+    color: var(--os-sub);
+}
+
+/* ── 새로고침 ──────────────────────────────────────── */
+.order-status__actions {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.order-status__button {
+    display: inline-block;
+    padding: 14px 32px;
+    border: none;
+    border-radius: var(--os-radius-sm);
+    background: var(--os-primary);
+    color: var(--os-on-primary);
+    font: inherit;
+    font-size: 16px;
+    text-decoration: none;
+    cursor: pointer;
+}
+.order-status__button:hover {
+    opacity: 0.85;
+}
+.order-status__button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+.order-status__button:focus-visible {
+    outline: 2px solid var(--os-primary);
+    outline-offset: 3px;
+}
+.order-status__hint {
+    font-size: 12px;
+    color: var(--os-sub);
+}
+
+/* ── 반응형: 태블릿 (1023px 이하) — 크기만 한 단계 줄인다 ── */
+@media (max-width: 1023px) {
+    .order-status {
+        --os-step-w: 96px;
+        padding-inline: 24px;
+    }
+    .order-status__top {
+        padding: 48px 32px 80px;
+    }
+    .order-status__title {
+        font-size: 26px;
+    }
+    .order-status__progress,
+    .order-status__message,
+    .order-status__error,
+    .order-status__detail {
+        margin-left: 32px;
+        margin-right: 32px;
+    }
+}
+
+/* ── 반응형: 폰 (600px 이하) ───────────────────────── */
+@media (max-width: 600px) {
+    .order-status {
+        --os-step-w: 64px;
+        padding-block: 20px 40px;
+        padding-inline: 12px;
+    }
+    .order-status__top {
+        padding: 52px 16px 64px;
+    }
+    .order-status__title {
+        font-size: 20px;
+    }
+    .order-status__pickup {
+        margin-top: -44px;
+        padding: 12px 18px;
+        gap: 12px;
+    }
+    .order-status__pickup-icon {
+        width: 46px;
+        height: 46px;
+    }
+    .order-status__pickup-time {
+        font-size: 20px;
+    }
+    .order-status__progress {
+        margin: 36px 8px 0;
+        padding-inline: 8px;
+    }
+    .order-status__progress-line {
+        left: calc(8px + var(--os-step-w) / 2);
+        right: calc(8px + var(--os-step-w) / 2);
+    }
+    .order-status__step-label {
+        font-size: 12px;
+    }
+    .order-status__message,
+    .order-status__error,
+    .order-status__detail {
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+    .order-status__detail {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 20px;
+    }
+    .order-status__item {
+        font-size: 17px;
+    }
+    .order-status__total-price {
+        font-size: 22px;
+    }
+    .order-status__total {
+        min-width: 0;
+        padding: 12px 0 0;
+        border-left: none;
+        border-top: 1px solid var(--os-line);
+        text-align: left;
+    }
+    .order-status__button {
+        width: calc(100% - 32px);   
+        padding: 14px 24px;
+    }
+}

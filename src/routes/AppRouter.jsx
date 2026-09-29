@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import DashboardPage from '../features/order/DashboardPage';
+import OrderStatusPage from '../features/order/OrderStatusPage';
 
 /**
  * 전체 라우팅을 한 곳에 모아두는 파일입니다.
@@ -20,7 +21,10 @@ function AppRouter() {
 
         {/* 로그인 없이 접근 가능한 라우트는 여기에 추가 */}
         {/* [파트 C · 본영] 로그인 기능이 붙기 전까지는 공개 영역에 둠 */}
-          <Route path="/owner/dashboard" element={<DashboardPage />} /> 
+          {/* 사장님 대시보드 페이지*/}
+          <Route path="/owner/dashboard" element={<DashboardPage />} />
+          {/* 손님용 주문 현황 페이지 */}
+          <Route path="/orders/:orderId" element={<OrderStatusPage />} />
         {/* 로그인만 하면 접근 가능한 라우트 예시 */}
         <Route element={<ProtectedRoute />}>
           {/* <Route path="/mypage" element={<MyPage />} /> */}
