@@ -36,7 +36,7 @@ public class OrderService {
     @Transactional
     public OrderResponse createOrder(Long customerId, OrderCreateRequest request) {
         User customer = userRepository.findById(customerId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, customerId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, customerId));
 
         Store store = storeRepository.findByIdAndDeletedAtIsNull(request.getStoreId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, request.getStoreId()));

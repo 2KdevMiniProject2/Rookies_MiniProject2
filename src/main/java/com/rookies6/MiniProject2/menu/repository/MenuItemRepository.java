@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
+    boolean existsByStoreIdAndNameAndDeletedAtIsNull(Long storeId, String name);
+
     List<MenuItem> findByStoreIdAndDeletedAtIsNull(Long storeId);
 
     Optional<MenuItem> findByIdAndDeletedAtIsNull(Long menuId);

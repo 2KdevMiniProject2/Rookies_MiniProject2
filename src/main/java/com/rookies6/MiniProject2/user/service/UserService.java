@@ -72,7 +72,7 @@ public class UserService {
     // 3. 회원 단건 조회
     public UserDTO.UserResponse getUserById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
         return UserDTO.UserResponse.from(user);
     }
 
@@ -80,7 +80,7 @@ public class UserService {
     @Transactional
     public UserDTO.UserResponse updateUser(Long userId, UserDTO.UpdateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
 
         if (request.getName() != null && !request.getName().isBlank()) {
             user.setName(request.getName());
@@ -99,7 +99,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
         userRepository.delete(user);
     }
 }
