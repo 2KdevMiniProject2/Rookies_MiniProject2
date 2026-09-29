@@ -2,9 +2,9 @@ package com.rookies6.MiniProject2.user.service;
 
 import com.rookies6.MiniProject2.common.exception.BusinessException;
 import com.rookies6.MiniProject2.common.exception.ErrorCode;
-import com.rookies6.MiniProject2.menu.repository.StoreDetailRepository;
-import com.rookies6.MiniProject2.menu.repository.StoreRepository;
-import com.rookies6.MiniProject2.menu.repository.UserRepository;
+import com.rookies6.MiniProject2.user.repository.StoreDetailRepository;
+import com.rookies6.MiniProject2.user.repository.StoreRepository;
+import com.rookies6.MiniProject2.user.repository.UserRepository;
 import com.rookies6.MiniProject2.user.dto.StoreDTO;
 import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.user.entity.StoreDetail;

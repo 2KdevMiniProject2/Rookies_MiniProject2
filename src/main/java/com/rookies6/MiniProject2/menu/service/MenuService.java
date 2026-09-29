@@ -7,7 +7,7 @@ import com.rookies6.MiniProject2.menu.dto.MenuItemResponse;
 import com.rookies6.MiniProject2.menu.entity.MenuItem;
 import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.menu.repository.MenuItemRepository;
-import com.rookies6.MiniProject2.menu.repository.StoreRepository;
+import com.rookies6.MiniProject2.user.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
