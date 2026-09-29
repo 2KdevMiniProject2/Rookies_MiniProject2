@@ -15,7 +15,7 @@ public enum ErrorCode {
 
     // 유저 정보 관련 에러 코드
     STORE_NOT_FOUND("존재하지 않는 매장입니다. storeId=%s", HttpStatus.NOT_FOUND),
-    CUSTOMER_NOT_FOUND("존재하지 않는 회원입니다. customerId=%s", HttpStatus.NOT_FOUND),
+    USER_NOT_FOUND("존재하지 않는 회원입니다. customerId=%s", HttpStatus.NOT_FOUND),
 
     // 메뉴 관련 에러 코드
     MENU_ITEM_NOT_FOUND("존재하지 않는 메뉴입니다. menuId=%s", HttpStatus.NOT_FOUND),

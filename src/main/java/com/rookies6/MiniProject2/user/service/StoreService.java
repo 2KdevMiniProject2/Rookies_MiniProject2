@@ -51,7 +51,7 @@ public class StoreService {
     @Transactional
     public StoreDTO.StoreResponse createStore(Long ownerId, StoreDTO.StoreCreateRequest request) {
         User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, ownerId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, ownerId));
 
         // 가게 기본 정보 생성
         Store store = Store.builder()
