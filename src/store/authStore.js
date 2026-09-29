@@ -8,10 +8,10 @@ import { create } from 'zustand';
  * (예: 로그인 성공 시 JWT를 저장하고, apiClient의 요청 인터셉터에서 그 토큰을 실어 보내는 방식)
  */
 export const useAuthStore = create((set) => ({
-  user: null, // { id, email, role } 형태 예정
+  user: null, // { id, email, role } 형태 예정d
   isAuthenticated: false,
 
   login: (user) => set({ user, isAuthenticated: true }),
 
   logout: () => set({ user: null, isAuthenticated: false }),
-}));
+})); 
