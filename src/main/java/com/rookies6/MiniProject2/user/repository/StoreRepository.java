@@ -38,4 +38,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "JOIN FETCH s.owner " +
             "WHERE s.owner.id = :ownerId AND s.deletedAt IS NULL")
     List<Store> findByOwnerIdAndDeletedAtIsNull(Long ownerId);
+
+    // ===== 파트 C =====
+    // [권한 확인] 이 가게가 이 사장님 소유의 영업 중인 가게인지 확인
+    boolean existsByIdAndOwnerIdAndDeletedAtIsNull(Long storeId, Long ownerId);
 }
