@@ -30,7 +30,7 @@ public class MenuService {
 
     @Transactional
     public MenuItemResponse createMenu(Long storeId, MenuItemCreateRequest request) {
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
 
         MenuItem menuItem = MenuItem.builder()

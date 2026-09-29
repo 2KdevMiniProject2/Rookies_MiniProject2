@@ -38,7 +38,7 @@ public class OrderService {
         User customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.CUSTOMER_NOT_FOUND, customerId));
 
-        Store store = storeRepository.findById(request.getStoreId())
+        Store store = storeRepository.findByIdAndDeletedAtIsNull(request.getStoreId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, request.getStoreId()));
 
         Set<Long> uniqueMenuItemIds = request.getItems().stream()
@@ -121,7 +121,7 @@ public class OrderService {
     }
 
     public List<OrderResponse> getOrdersByStore(Long storeId, Order.OrderStatus status) {
-        storeRepository.findById(storeId)
+        storeRepository.findByIdAndDeletedAtIsNull(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
 
         List<Order> orders = (status != null)
