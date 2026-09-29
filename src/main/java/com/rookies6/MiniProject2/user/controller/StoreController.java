@@ -4,6 +4,9 @@ import com.rookies6.MiniProject2.user.dto.StoreDTO;
 import com.rookies6.MiniProject2.user.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +22,10 @@ public class StoreController {
 
     // 1. 매장 전체 목록 조회 API (카테고리 필터링 지원: ?category=베이커리)
     @GetMapping
-    public ResponseEntity<List<StoreDTO.StoreResponse>> getAllStores(
-            @RequestParam(required = false) String category) {
-        List<StoreDTO.StoreResponse> stores = storeService.getAllStores(category);
+    public ResponseEntity<Page<StoreDTO.StoreResponse>> getAllStores(
+            @RequestParam(required = false) String category,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<StoreDTO.StoreResponse> stores = storeService.getAllStores(category, pageable);
         return ResponseEntity.ok(stores);
     }
 
