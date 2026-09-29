@@ -23,6 +23,14 @@
   --auth-mock-bg: #ececec;
   --auth-mock-bg-hover: #e0e0e0;
   --auth-mock-border: #bdbdbd;
+  /*
+   * 브랜드 포인트 컬러 (제출 버튼 · 선택된 회원 유형 카드 테두리) — StoreListPage의 --home-accent와 같은 값
+   * 색조 16° · 채도 85% · 명도 53% (흰 글자 대비 3.49:1) — 비교 후보 중 C안
+   */
+  --auth-accent: #ed5821;
+  --auth-on-accent: #ffffff;
+  /* 포인트 컬러를 12%만 섞은 아주 연한 틴트 — 선택된 회원 유형 카드 배경용 (--auth-accent를 바꾸면 같이 바뀜) */
+  --auth-accent-soft: color-mix(in srgb, var(--auth-accent) 12%, transparent);
 
   flex: 1;
   display: flex;
@@ -69,6 +77,9 @@
  *     --auth-mock-bg: #262626;
  *     --auth-mock-bg-hover: #303030;
  *     --auth-mock-border: #4a4a4a;
+ *     --auth-accent: #ed5821;
+ *     --auth-on-accent: #ffffff;
+ *     --auth-accent-soft: color-mix(in srgb, var(--auth-accent) 12%, transparent);
  *   }
  * }
  */
@@ -201,16 +212,17 @@
   font: inherit;
   font-size: 16px;
   font-weight: 600;
-  color: var(--auth-on-primary);
-  background: var(--auth-primary);
+  color: var(--auth-on-accent);
+  background: var(--auth-accent);
   border: none;
   border-radius: 10px;
   cursor: pointer;
   transition: filter 0.15s, transform 0.05s;
 }
 
+/* 호버 시 밝게 하면 흰 글자 대비가 기준 아래로 떨어지므로 살짝 어둡게 */
 .submit:hover:not(:disabled) {
-  filter: brightness(1.08);
+  filter: brightness(0.92);
 }
 
 .submit:active:not(:disabled) {
@@ -308,9 +320,14 @@
   pointer-events: none;
 }
 
+/*
+ * 선택된 회원 유형: 포인트 컬러 2px 테두리 + 아주 연한 주황 배경(--auth-accent-soft)
+ * 테두리가 1px 늘어난 만큼 padding을 1px 줄여 카드 크기가 흔들리지 않게 함
+ */
 .roleOption:has(input:checked) {
-  border-color: var(--auth-primary);
-  background: var(--auth-soft);
+  padding: 13px;
+  border: 2px solid var(--auth-accent);
+  background: var(--auth-accent-soft);
 }
 
 .roleOption:has(input:focus-visible) {

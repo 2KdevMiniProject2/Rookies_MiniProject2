@@ -86,11 +86,13 @@ function SignupForm() {
       await apiClient.post('/api/auth/signup', { email, password, name, phone, role });
       navigate('/login', { replace: true });
     } catch (err) {
-      const apiError = err.response?.data?.error;
-      if (apiError?.field) {
-        setErrors({ [apiError.field]: apiError.message });
+      // 백엔드 에러 응답: { status, message, timestamp, errors } — errors는 검증 실패(400) 시 필드별 메시지 맵
+      const data = err.response?.data;
+      const fieldErrors = data?.errors ?? {};
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
       } else {
-        setServerError(apiError?.message || '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        setServerError(data?.message || '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.');
       }
     } finally {
       setLoading(false);

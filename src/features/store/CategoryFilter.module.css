@@ -1,0 +1,42 @@
+/* 색상: StoreListPage.module.css의 .page에 정의된 무채색 로컬 변수(--home-*) 사용 */
+
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  height: 38px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--home-text);
+  background: var(--home-surface);
+  border: 1px solid var(--home-button-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--home-border-strong);
+}
+
+/* 포커스 테두리는 StoreListPage.module.css의 `.page button:focus-visible`(무채색 outline)로 통일 */
+
+/* 선택된 카테고리: 포인트 컬러(--home-accent) 바탕 + 흰 글자 */
+.active,
+.active:hover {
+  color: var(--home-on-accent);
+  background: var(--home-accent);
+  border-color: var(--home-accent);
+}
