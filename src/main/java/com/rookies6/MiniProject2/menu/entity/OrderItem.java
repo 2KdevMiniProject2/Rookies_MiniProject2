@@ -1,6 +1,6 @@
 package com.rookies6.MiniProject2.menu.entity;
 
-import com.rookies6.MiniProject2.common.entity.BaseEntity;
+import com.rookies6.MiniProject2.common.entity.BaseCreatedEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "order_items")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderItem extends BaseEntity {
+public class OrderItem extends BaseCreatedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)

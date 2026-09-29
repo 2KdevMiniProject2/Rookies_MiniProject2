@@ -33,7 +33,7 @@ public class UserService {
     public UserDTO.UserResponse signup(UserDTO.SignupRequest request) {
         // 이메일 중복 확인
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다: " + request.getEmail());
+            throw new BusinessException(ErrorCode.DUPLICATE_EMAIL, request.getEmail());
         }
 
         // 비밀번호 암호화 및 유저 생성
@@ -53,11 +53,11 @@ public class UserService {
     public UserDTO.LoginResponse login(UserDTO.LoginRequest request) {
         // 이메일로 회원 조회
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CREDENTIALS));
 
         // 비밀번호 일치 여부 확인
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
+            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
         }
 
         // JWT 토큰 연동 전 임시 토큰 발급 (추후 JwtTokenProvider 연결)

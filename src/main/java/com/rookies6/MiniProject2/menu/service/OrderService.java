@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -76,5 +77,59 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
         return OrderResponse.from(savedOrder);
+    }
+
+    @Transactional
+    public OrderResponse acceptOrder(Long orderId) {
+        Order order = findOrder(orderId);
+        changeOrderStatus(order::accept);
+        return OrderResponse.from(order);
+    }
+
+    @Transactional
+    public OrderResponse rejectOrder(Long orderId) {
+        Order order = findOrder(orderId);
+        changeOrderStatus(order::reject);
+        return OrderResponse.from(order);
+    }
+
+    @Transactional
+    public OrderResponse readyOrder(Long orderId) {
+        Order order = findOrder(orderId);
+        changeOrderStatus(order::ready);
+        return OrderResponse.from(order);
+    }
+
+    @Transactional
+    public OrderResponse completeOrder(Long orderId) {
+        Order order = findOrder(orderId);
+        changeOrderStatus(order::complete);
+        return OrderResponse.from(order);
+    }
+
+    private Order findOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND, orderId));
+    }
+
+    private void changeOrderStatus(Runnable statusChange) {
+        try {
+            statusChange.run();
+        } catch (IllegalStateException e) {
+            throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS, e.getMessage());
+        }
+    }
+
+    public List<OrderResponse> getOrdersByStore(Long storeId, Order.OrderStatus status) {
+        storeRepository.findById(storeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
+
+        List<Order> orders = (status != null)
+                ? orderRepository.findByStoreIdAndStatus(storeId, status)
+                : orderRepository.findByStoreId(storeId);
+
+        return orders.stream()
+                .map(OrderResponse::from)
+                .toList();
     }
 }
