@@ -20,7 +20,7 @@ public class OrderController {
 
     @PostMapping("/api/orders")
     public ResponseEntity<OrderResponse> createOrder(
-            @RequestParam Long customerId,
+            @RequestParam(defaultValue = "1") Long customerId,
             @Valid @RequestBody OrderCreateRequest request) {
         OrderResponse response = orderService.createOrder(customerId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

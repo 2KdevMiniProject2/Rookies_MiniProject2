@@ -41,4 +41,11 @@ public class StoreController {
         StoreDTO.StoreResponse response = storeService.createStore(ownerId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    // 4. 사장님 소유 매장 목록 조회 API (1:N 다중 매장 지원)
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<StoreDTO.StoreResponse>> getStoresByOwner(@PathVariable Long ownerId) {
+        List<StoreDTO.StoreResponse> stores = storeService.getStoresByOwnerId(ownerId);
+        return ResponseEntity.ok(stores);
+    }
 }

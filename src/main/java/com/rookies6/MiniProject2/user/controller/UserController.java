@@ -48,7 +48,7 @@ public class UserController {
     @RequestMapping(value = "/api/users/{id}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<UserDTO.UserResponse> updateUser(
             @PathVariable Long id,
-            @RequestBody UserDTO.UpdateRequest request) {
+            @Valid @RequestBody UserDTO.UpdateRequest request) {
         UserDTO.UserResponse response = userService.updateUser(id, request);
         return ResponseEntity.ok(response);
     }

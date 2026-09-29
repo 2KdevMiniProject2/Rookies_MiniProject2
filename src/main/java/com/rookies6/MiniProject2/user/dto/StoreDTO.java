@@ -3,6 +3,7 @@ package com.rookies6.MiniProject2.user.dto;
 import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.user.entity.StoreDetail;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalTime;
@@ -17,12 +18,15 @@ public class StoreDTO {
     @Builder
     public static class StoreCreateRequest {
         @NotBlank(message = "가게 이름은 필수 입력 항목입니다.")
+        @Size(max = 100, message = "가게 이름은 100자 이하여야 합니다.")
         private String name;
 
         @NotBlank(message = "가게 주소는 필수 입력 항목입니다.")
+        @Size(max = 200, message = "가게 주소는 200자 이하여야 합니다.")
         private String address;
 
         @NotBlank(message = "카테고리는 필수 입력 항목입니다.")
+        @Size(max = 50, message = "카테고리는 50자 이하여야 합니다.")
         private String category;
 
         private LocalTime openTime;

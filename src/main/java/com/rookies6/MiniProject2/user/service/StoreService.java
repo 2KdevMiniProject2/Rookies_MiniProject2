@@ -76,4 +76,12 @@ public class StoreService {
 
         return StoreDTO.StoreResponse.from(savedStore);
     }
+
+    // 4. 사장님(ownerId)의 매장 목록 전체 조회 (다중 매장 소유 지원)
+    public List<StoreDTO.StoreResponse> getStoresByOwnerId(Long ownerId) {
+        List<Store> stores = storeRepository.findByOwnerIdAndDeletedAtIsNull(ownerId);
+        return stores.stream()
+                .map(StoreDTO.StoreResponse::from)
+                .collect(Collectors.toList());
+    }
 }
