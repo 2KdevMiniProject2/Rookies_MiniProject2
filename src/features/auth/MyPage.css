@@ -1,87 +1,121 @@
 .mypage {
     width: 100%;
-    max-width: 1050px;
-    margin: 0 auto;
-    padding: 40px 20px 70px;
+    padding: 48px 24px 70px;
     box-sizing: border-box;
+    color: #111111;
+    background: #ffffff;
     text-align: left;
 }
 
 .mypage-layout {
     display: flex;
-    min-height: 580px;
-    border: 1px solid #cccccc;
-    background: white;
+    width: 100%;
+    min-height: 600px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    box-shadow:
+        rgba(0, 0, 0, 0.08) 0 10px 15px -3px,
+        rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+    overflow: hidden;
 }
 
-/* 왼쪽 메뉴 */
-
+/* 왼쪽 사이드바 */
 .mypage-sidebar {
-    width: 180px;
-    padding: 28px 22px;
+    width: 210px;
+    padding: 32px 24px;
     box-sizing: border-box;
-    border-right: 1px solid #cccccc;
-    background: #f4f4f4;
+    background: #f7f7f7;
+    border-right: 1px solid #e0e0e0;
 }
 
 .mypage-sidebar strong {
     display: block;
-    margin-bottom: 20px;
-    font-size: 15px;
+    margin-bottom: 26px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .mypage-sidebar nav {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    gap: 8px;
 }
 
 .mypage-sidebar button {
-    padding: 7px 0;
+    width: 100%;
+    padding: 11px 12px;
     border: none;
+    border-radius: 10px;
     background: transparent;
-    color: #333333;
+    color: #555555;
     font-size: 14px;
+    text-align: left;
     cursor: pointer;
+    transition:
+        background 0.15s,
+        color 0.15s;
 }
 
-/* 오른쪽 */
+.mypage-sidebar .active {
+    background: #1a1a1a;
+    color: #ffffff;
+    font-weight: 600;
+}
 
+.mypage-sidebar .active:hover {
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+.mypage-sidebar button:hover {
+    background: #ececec;
+    color: #111111;
+}
+
+/* 오른쪽 영역 */
 .mypage-main {
     flex: 1;
+    min-width: 0;
 }
 
 .mypage-main-title {
-    padding: 17px 22px;
-    border-bottom: 1px solid #cccccc;
-    background: #dddddd;
-    font-size: 15px;
+    padding: 25px 30px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #111111;
+    background: #ffffff;
+    font-size: 20px;
     font-weight: 700;
 }
 
-/* 프로필 */
 
+/* 회원 정보 */
 .profile-section {
     display: flex;
     align-items: center;
-    padding: 25px;
-    border-bottom: 1px solid #cccccc;
+    margin: 30px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
 }
 
 .profile-image {
-    width: 72px;
-    height: 72px;
+    width: 74px;
+    height: 74px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 18px;
-    border: 1px solid #bbbbbb;
+    flex-shrink: 0;
+    margin-right: 20px;
     border-radius: 50%;
-    background: #eeeeee;
+    background: #1a1a1a;
+    color: #ffffff;
 }
 
 .profile-image span {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 700;
 }
 
@@ -90,41 +124,68 @@
 }
 
 .profile-info strong {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 18px;
+    display: inline-block;
+    margin-bottom: 9px;
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: #ececec;
+    color: #333333;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .profile-info p {
-    margin: 3px 0;
+    margin: 4px 0;
     color: #666666;
-    font-size: 13px;
+    font-size: 14px;
+}
+
+.profile-info p:first-of-type {
+    color: #111111;
+    font-size: 17px;
+    font-weight: 600;
 }
 
 .profile-edit-button {
-    padding: 7px 12px;
-    border: 1px solid #999999;
-    background: white;
-    font-size: 12px;
+    padding: 10px 15px;
+    border: 1px solid #bdbdbd;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.profile-edit-button:hover {
+    background: #f3f3f3;
+    border-color: #8c8c8c;
 }
 
 /* 주문 내역 */
-
 .order-history-section {
-    padding: 25px;
+    margin: 0 30px 30px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
 }
 
 .section-title {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
 .section-title h2 {
     margin: 0;
-    font-size: 19px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .section-title span {
@@ -135,13 +196,23 @@
 .order-history-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 14px;
 }
 
 .order-history-card {
-    padding: 18px;
-    border: 1px solid #dddddd;
-    border-radius: 6px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #ffffff;
+    transition:
+        box-shadow 0.15s,
+        transform 0.15s;
+}
+
+.order-history-card:hover {
+    box-shadow:
+        rgba(0, 0, 0, 0.06) 0 6px 12px -2px;
+    transform: translateY(-1px);
 }
 
 .order-history-top {
@@ -152,68 +223,76 @@
 
 .order-number {
     color: #888888;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .order-history-top h3 {
-    margin: 5px 0 15px;
+    margin: 5px 0 17px;
+    color: #111111;
     font-size: 16px;
 }
 
 .order-status {
-    padding: 4px 8px;
-    border-radius: 10px;
+    padding: 5px 9px;
+    border-radius: 8px;
     font-size: 11px;
     font-weight: 700;
 }
 
 .order-status.pending {
-    background: #fff0c7;
-    color: #8b6500;
+    background: #eeeeee;
+    color: #555555;
 }
 
 .order-status.accepted {
-    background: #e4efff;
-    color: #2561a9;
+    background: #dddddd;
+    color: #333333;
 }
 
 .order-status.completed {
-    background: #eeeeee;
-    color: #666666;
+    background: #1a1a1a;
+    color: #ffffff;
 }
 
 .order-history-info {
+    padding-top: 12px;
     border-top: 1px solid #eeeeee;
-    padding-top: 10px;
 }
 
 .order-history-info p {
     display: flex;
     justify-content: space-between;
-    margin: 7px 0;
-    font-size: 12px;
+    margin: 8px 0;
+    font-size: 13px;
 }
 
 .order-history-info span {
     color: #777777;
 }
 
+.order-history-info strong {
+    color: #333333;
+}
 
-/* 사장님 화면 */
-
+/* 사장님 안내 */
 .owner-guide-section {
-  margin: 25px;
-  padding: 22px;
-  border: 1px solid #dddddd;
+    margin: 0 30px 30px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
 }
 
 .owner-guide-section h2 {
-  margin: 0 0 10px;
-  font-size: 18px;
+    margin: 0 0 10px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .owner-guide-section p {
-  margin: 0;
-  color: #666666;
-  font-size: 14px;
+    margin: 0;
+    color: #666666;
+    font-size: 14px;
+    line-height: 1.6;
 }

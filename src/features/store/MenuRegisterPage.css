@@ -1,108 +1,204 @@
 .menu-register-page {
     width: 100%;
-    max-width: 1050px;
-    margin: 0 auto;
-    padding: 40px 20px 70px;
+    padding: 48px 24px 70px;
     box-sizing: border-box;
+    color: #111111;
+    background: #ffffff;
     text-align: left;
 }
 
 .menu-register-layout {
     display: flex;
-    min-height: 580px;
-    border: 1px solid #cccccc;
-    background: white;
+    width: 100%;
+    min-height: 650px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    box-shadow:
+        rgba(0, 0, 0, 0.08) 0 10px 15px -3px,
+        rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+    overflow: hidden;
 }
 
-/* 왼쪽 메뉴 */
-
+/* 왼쪽 사이드바 */
 .menu-register-sidebar {
-    width: 180px;
-    padding: 28px 22px;
+    width: 210px;
+    padding: 32px 24px;
     box-sizing: border-box;
-    border-right: 1px solid #cccccc;
-    background: #f4f4f4;
+    background: #f7f7f7;
+    border-right: 1px solid #e0e0e0;
 }
 
 .menu-register-sidebar strong {
     display: block;
-    margin-bottom: 20px;
-    font-size: 15px;
+    margin-bottom: 26px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .menu-register-sidebar nav {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    gap: 8px;
 }
 
 .menu-register-sidebar button {
-    padding: 7px 0;
+    width: 100%;
+    padding: 11px 12px;
     border: none;
+    border-radius: 10px;
     background: transparent;
-    color: #333333;
+    color: #555555;
     font-size: 14px;
+    text-align: left;
     cursor: pointer;
+    transition:
+        background 0.15s,
+        color 0.15s;
+}
+
+.menu-register-sidebar button:hover {
+    background: #ececec;
+    color: #111111;
 }
 
 .menu-register-sidebar .active {
-    font-weight: 700;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-weight: 600;
 }
 
-/* 오른쪽 */
+.menu-register-sidebar .active:hover {
+    background: #1a1a1a;
+    color: #ffffff;
+}
 
+/* 오른쪽 영역 */
 .menu-register-main {
     flex: 1;
+    min-width: 0;
+    background: #ffffff;
 }
 
 .menu-register-title {
-    padding: 17px 22px;
-    border-bottom: 1px solid #cccccc;
-    background: #dddddd;
-    font-size: 15px;
+    padding: 25px 30px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #111111;
+    background: #ffffff;
+    font-size: 20px;
     font-weight: 700;
 }
 
 .menu-register-content {
-    padding: 28px;
+    padding: 30px;
+}
+
+/* 현재 가게 */
+.current-store-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding: 24px 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #f8f8f8;
+}
+
+.current-store-label {
+    display: inline-block;
+    margin-bottom: 6px;
+    color: #777777;
+    font-size: 12px;
+}
+
+.current-store-section h2 {
+    margin: 0 0 5px;
+    color: #111111;
+    font-size: 18px;
+}
+
+.current-store-section p {
+    margin: 0;
+    color: #777777;
+    font-size: 13px;
+}
+
+.store-change-button {
+    padding: 10px 15px;
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.store-change-button:hover {
+    background: #f0f0f0;
 }
 
 /* 메뉴 영역 */
-
 .menu-section {
-    margin-bottom: 25px;
-    padding: 22px;
-    border: 1px solid #dddddd;
+    margin-bottom: 22px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
 }
 
 .menu-section h2 {
-    margin: 0 0 22px;
-    font-size: 17px;
-}
-
-.menu-form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 18px;
-}
-
-.menu-form-group label {
-    margin-bottom: 7px;
-    font-size: 13px;
+    margin: 0 0 6px;
+    color: #111111;
+    font-size: 18px;
     font-weight: 700;
 }
 
+.menu-section-description {
+    margin: 0 0 24px;
+    color: #777777;
+    font-size: 13px;
+}
+
+/* 메뉴 입력 */
+.menu-form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.menu-form-group label {
+    margin-bottom: 8px;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 600;
+}
+
 .menu-form-group input {
-    box-sizing: border-box;
     width: 100%;
-    padding: 11px 12px;
-    border: 1px solid #cccccc;
-    background: white;
+    height: 44px;
+    padding: 0 13px;
+    box-sizing: border-box;
+    border: 1px solid #d5d5d5;
+    border-radius: 10px;
+    outline: none;
+    background: #ffffff;
+    color: #222222;
     font-size: 14px;
 }
 
-/* 버튼 */
+.menu-form-group input::placeholder {
+    color: #aaaaaa;
+}
 
+.menu-form-group input:focus {
+    border-color: #555555;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+/* 버튼 */
 .menu-register-buttons {
     display: flex;
     justify-content: flex-end;
@@ -113,60 +209,82 @@
 .menu-register-buttons button {
     min-width: 110px;
     padding: 11px 18px;
-    border: 1px solid #aaaaaa;
-    font-weight: 700;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
 }
 
 .back-button {
-    background: white;
-    color: #333333;
+    border: 1px solid #cfcfcf;
+    background: #ffffff;
+    color: #444444;
+}
+
+.back-button:hover {
+    background: #f3f3f3;
 }
 
 .menu-save-button {
-    background: #555555;
-    color: white;
+    border: 1px solid #1a1a1a;
+    background: #1a1a1a;
+    color: #ffffff;
 }
 
-/* 등록된 메뉴 */
+.menu-save-button:hover {
+    background: #333333;
+}
 
+/* 메뉴 목록 */
 .menu-list-title {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 18px;
 }
 
 .menu-list-title h2 {
-    margin-bottom: 18px;
+    margin-bottom: 5px;
 }
 
-.menu-list-title span {
-    margin-bottom: 18px;
+.menu-list-title p {
+    margin: 0;
     color: #777777;
     font-size: 13px;
 }
 
+.menu-list-title > span {
+    padding: 5px 9px;
+    border-radius: 8px;
+    background: #eeeeee;
+    color: #555555;
+    font-size: 12px;
+    font-weight: 600;
+}
+
 .empty-menu {
-    padding: 30px;
+    padding: 36px;
     border: 1px dashed #cccccc;
+    border-radius: 12px;
     color: #888888;
     text-align: center;
     font-size: 13px;
 }
 
+.menu-list {
+    border-top: 1px solid #eeeeee;
+}
+
 .menu-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 17px 0;
+    justify-content: space-between;
+    padding: 18px 4px;
     border-bottom: 1px solid #eeeeee;
 }
 
-.menu-item:last-child {
-    border-bottom: none;
-}
-
 .menu-item strong {
+    color: #111111;
     font-size: 15px;
 }
 
@@ -177,10 +295,10 @@
 }
 
 .menu-status {
-    padding: 5px 9px;
-    border-radius: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
     background: #eeeeee;
-    color: #555555;
+    color: #444444;
     font-size: 11px;
     font-weight: 700;
 }

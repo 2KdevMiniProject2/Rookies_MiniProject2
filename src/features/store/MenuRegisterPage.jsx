@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './MenuRegisterPage.css';
 
 function MenuRegisterPage() {
     const navigate = useNavigate();
+    const { storeId } = useParams();
 
     const [menuName, setMenuName] = useState('');
     const [menuPrice, setMenuPrice] = useState('');
@@ -29,8 +30,10 @@ function MenuRegisterPage() {
     return (
         <main className="menu-register-page">
             <div className="menu-register-layout">
+
+                {/* 왼쪽 메뉴 */}
                 <aside className="menu-register-sidebar">
-                    <strong>마이페이지</strong>
+                    <strong>사장님 마이페이지</strong>
 
                     <nav>
                         <button
@@ -50,12 +53,13 @@ function MenuRegisterPage() {
                         <button
                             type="button"
                             className="active"
+                            onClick={() => navigate('/owner/stores')}
                         >
-                            메뉴 관리
+                            가게별 메뉴 관리
                         </button>
 
                         <button type="button">
-                            실시간 주문 확인
+                            회원정보
                         </button>
 
                         <button type="button">
@@ -64,14 +68,46 @@ function MenuRegisterPage() {
                     </nav>
                 </aside>
 
+                {/* 오른쪽 내용 */}
                 <section className="menu-register-main">
                     <div className="menu-register-title">
-                        메뉴 관리
+                        가게별 메뉴 관리
                     </div>
 
                     <div className="menu-register-content">
+
+                        {/* 현재 가게 */}
+                        <section className="current-store-section">
+                            <div>
+                                <span className="current-store-label">
+                                    선택한 가게
+                                </span>
+
+                                <h2>
+                                    가게 메뉴 관리
+                                </h2>
+
+                                <p>
+                                    선택한 가게의 메뉴를 등록하고 관리할 수 있습니다.
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                className="store-change-button"
+                                onClick={() => navigate('/owner/stores')}
+                            >
+                                가게 변경
+                            </button>
+                        </section>
+
+                        {/* 메뉴 추가 */}
                         <section className="menu-section">
                             <h2>새 메뉴 추가</h2>
+
+                            <p className="menu-section-description">
+                                가게에서 판매할 메뉴의 이름과 가격을 입력해주세요.
+                            </p>
 
                             <div className="menu-form-group">
                                 <label htmlFor="menuName">
@@ -105,7 +141,7 @@ function MenuRegisterPage() {
                                 <button
                                     type="button"
                                     className="back-button"
-                                    onClick={() => navigate('/stores/register')}
+                                    onClick={() => navigate('/owner/stores')}
                                 >
                                     이전
                                 </button>
@@ -120,9 +156,14 @@ function MenuRegisterPage() {
                             </div>
                         </section>
 
+                        {/* 등록된 메뉴 */}
                         <section className="menu-section">
                             <div className="menu-list-title">
-                                <h2>등록된 메뉴</h2>
+                                <div>
+                                    <h2>등록된 메뉴</h2>
+                                    <p>현재 가게에 등록된 메뉴 목록입니다.</p>
+                                </div>
+
                                 <span>{menus.length}개</span>
                             </div>
 
@@ -139,7 +180,9 @@ function MenuRegisterPage() {
                                         >
                                             <div>
                                                 <strong>{menu.name}</strong>
-                                                <p>{menu.price.toLocaleString()}원</p>
+                                                <p>
+                                                    {menu.price.toLocaleString()}원
+                                                </p>
                                             </div>
 
                                             <span className="menu-status">
@@ -150,8 +193,10 @@ function MenuRegisterPage() {
                                 </div>
                             )}
                         </section>
+
                     </div>
                 </section>
+
             </div>
         </main>
     );

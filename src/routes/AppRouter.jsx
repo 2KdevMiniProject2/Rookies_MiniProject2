@@ -4,6 +4,7 @@ import ProtectedRoute from './ProtectedRoute';
 import MyPage from '../features/auth/MyPage';
 import StoreRegisterPage from '../features/store/StoreRegisterPage';
 import MenuRegisterPage from '../features/store/MenuRegisterPage';
+import StoreListPage from '../features/store/StoreListPage';
 
 
 /**
@@ -25,6 +26,7 @@ function AppRouter() {
         {/* 로그인 없이 접근 가능한 라우트는 여기에 추가 */}
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/stores/register"  element={<StoreRegisterPage />} />
+        <Route path="/owner/stores" element={<StoreListPage />} />
         <Route path="/owner/stores/:storeId/menus" element={<MenuRegisterPage />} />
 
 

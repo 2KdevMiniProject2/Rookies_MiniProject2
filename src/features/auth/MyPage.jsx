@@ -1,18 +1,28 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../../api/client';
 import './MyPage.css';
 
 function MyPage() {
     const navigate = useNavigate();
 
-    // 임시 사용자 데이터
-    // 나중에 로그인 사용자 정보로 교체
-    const user = {
-        id: 1,
-        name: '김민수',
-        email: 'user@example.com',
-        phone: '010-0000-0000',
-        role: 'OWNER',
-    };
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await apiClient.get('/api/users/7');
+                setUser(response.data);
+            } catch (error) {
+                console.error('사용자 조회 실패:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUser();
+    }, []);
 
     const orders = [
         {
@@ -47,6 +57,19 @@ function MyPage() {
         return status;
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    if (!user) {
+        return (
+            <main className="mypage">
+                <p>로그인 사용자 정보가 없습니다.</p>
+            </main>
+        );
+    }
+
     return (
         <main className="mypage">
             <div className="mypage-layout">
@@ -60,35 +83,46 @@ function MyPage() {
                             <>
                                 <button
                                     type="button"
+                                    className="active"
+                                    onClick={() => navigate('/mypage')}
+                                >
+                                    마이페이지
+                                </button>
+
+                                <button
+                                    type="button"
                                     onClick={() => navigate('/stores/register')}
                                 >
-                                    가게 등록/관리
+                                    가게 등록
                                 </button>
 
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/owner/stores/1/menus')}
+                                    onClick={() => navigate('/owner/stores')}
                                 >
-                                    메뉴 관리
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/owner/stores/1/orders')}
-                                >
-                                    실시간 주문 확인
+                                    가게별 메뉴 관리
                                 </button>
 
                                 <button type="button">
                                     회원정보
                                 </button>
 
-                                <button type="button">
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                >
                                     로그아웃
                                 </button>
                             </>
                         ) : (
                             <>
+                                <button
+                                    type="button"
+                                    className="active"
+                                >
+                                    마이페이지
+                                </button>
+
                                 <button type="button">
                                     이용내역
                                 </button>
@@ -97,7 +131,10 @@ function MyPage() {
                                     회원정보
                                 </button>
 
-                                <button type="button">
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                >
                                     로그아웃
                                 </button>
                             </>
@@ -184,8 +221,7 @@ function MyPage() {
                         <section className="owner-guide-section">
                             <h2>가게 관리</h2>
                             <p>
-                                왼쪽 메뉴에서 가게 등록, 메뉴 관리,
-                                실시간 주문 확인 기능을 이용할 수 있습니다.
+                                왼쪽 메뉴에서 가게 등록과 메뉴 관리 기능을 이용할 수 있습니다.
                             </p>
                         </section>
                     )}
