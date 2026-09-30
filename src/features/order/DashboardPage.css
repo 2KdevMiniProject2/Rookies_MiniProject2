@@ -1,268 +1,458 @@
-/* 흑백 단색 기본 UI */
-.dashboard {
-  --black: #111;
-  --gray-line: #d0d0d0;
-  --gray-fill: #f0f0f0;
-  --gray-text: #666;
+/* =========================================================
+   사장님 주문 대시보드 — 팀 공통 스타일 적용
+   색 · 모양 · 폭 · 반응형 기준은 orderTheme.css (팀 --home-* 와 같은 값)
+   ========================================================= */
 
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 32px 16px;
+@import "./orderTheme.css";
+
+.dashboard {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 28px;
-  color: var(--black);
-  background: #fff;
-  text-align: left;
+  /* 배경은 화면 끝까지, 내용은 --content-max 안에 (팀 헤더와 같은 방식) */
+  padding: 32px max(var(--gutter), calc((100% - var(--content-max)) / 2)) 48px;
 }
 
+/* ---------- 머리말: 히어로 배너 (팀 .hero 와 같은 그라데이션) ---------- */
+
 .dashboard__head {
-  border-bottom: 1px solid var(--black);
-  padding-bottom: 12px;
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 28px;
+  color: var(--order-on-accent);
+  background: linear-gradient(135deg, var(--order-hero-from), var(--order-hero-to));
+  border-radius: var(--order-radius-hero);
 }
-.dashboard__tabs {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.dashboard__tab {
-  padding: 5px 14px;
-  border: 1px solid var(--gray-line);
-  border-radius: 999px;
-  font-size: 13px;
-  color: var(--gray-text);
-  text-decoration: none;
-  white-space: nowrap;
-}
-/* NavLink는 현재 주소와 같으면 active 클래스를 자동으로 붙여줌 */
-.dashboard__tab.active {
-  background: var(--black);
-  border-color: var(--black);
-  color: #fff;
-}
+
+/* 팀 .title 과 같은 크기 */
 .dashboard__title {
   margin: 0;
-  font-size: 22px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
 }
+
+/* 사장님 메뉴 탭 — 팀 카테고리 칩과 같은 모양 (배너 위라 흰색 반투명) */
+.dashboard__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dashboard__tab {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--order-on-accent);
+  text-decoration: none;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  transition: background-color 0.15s;
+}
+
+.dashboard__tab:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* NavLink 는 현재 주소와 같으면 active 클래스를 자동으로 붙여줌 */
+.dashboard__tab.active {
+  font-weight: 600;
+  color: var(--order-accent);
+  background: var(--order-surface);
+  border-color: var(--order-surface);
+}
+
+.dashboard__head :is(a, button):focus-visible {
+  outline-color: var(--order-on-accent);
+}
+
+/* ---------- 섹션 공통 ---------- */
+
 .dashboard__section-title {
-  margin: 0 0 10px;
-  font-size: 16px;
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
 }
+
 .dashboard__row {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  align-items: baseline;
+  gap: 8px 12px;
+  margin-bottom: 12px;
 }
-.dashboard__hint {
-  font-size: 12px;
-  color: var(--gray-text);
+
+.dashboard__row .dashboard__section-title {
+  margin: 0;
 }
+
 .dashboard__refresh {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-.dashboard__refresh-btn {
-  padding: 5px 12px;
-  border: 1px solid var(--black);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--black);
+
+.dashboard__hint {
   font-size: 13px;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.dashboard__refresh-btn:hover {
-  background: var(--gray-fill);
-}
-.dashboard__refresh-btn:disabled {
-  color: var(--gray-text);
-  border-color: var(--gray-line);
-  cursor: default;
-}
-.dashboard__empty {
-  margin: 0;
-  padding: 16px 0;
-  font-size: 14px;
-  color: var(--gray-text);
-  text-align: center;
-}
-.dashboard__error {
-  margin: 0 0 12px;
-  padding: 10px 14px;
-  border: 1px solid var(--black);
-  border-radius: 8px;
-  font-size: 14px;
+  color: var(--order-text-muted);
 }
 
-/* 영업 요약 */
+/* 팀 .pageButton 과 같은 모양 */
+.dashboard__refresh-btn {
+  height: 40px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--order-text);
+  white-space: nowrap;
+  background: var(--order-surface);
+  border: 1px solid var(--order-button-border);
+  border-radius: var(--order-radius-button);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.dashboard__refresh-btn:hover:not(:disabled) {
+  background: var(--order-button-bg);
+  border-color: var(--order-border-strong);
+}
+
+.dashboard__refresh-btn:disabled {
+  color: var(--order-text-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dashboard__empty {
+  margin: 0;
+  padding: 24px 12px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--order-text-muted);
+  border: 1px dashed var(--order-border);
+  border-radius: var(--order-radius-button);
+}
+
+.dashboard__error {
+  margin: 0 0 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--order-text);
+  background: var(--order-accent-soft);
+  border: 1px solid var(--order-accent);
+  border-radius: var(--order-radius-button);
+}
+
+/* ---------- 오늘의 영업 요약 ---------- */
+
 .summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-.summary__item {
-  background: var(--gray-fill);
-  border-radius: 8px;
-  padding: 16px;
-}
-.summary__label {
-  margin: 0;
-  font-size: 13px;
-  color: var(--gray-text);
-}
-.summary__value {
-  margin: 4px 0 0;
-  font-size: 26px;
-  font-weight: 700;
+  gap: 16px;
 }
 
-/* 주문 보드: 접수 대기 | 조리 중 | 픽업 대기 */
+.summary__item {
+  padding: 20px 24px;
+  background: var(--order-surface);
+  border: 1px solid var(--order-border);
+  border-radius: var(--order-radius-card);
+}
+
+.summary__label {
+  margin: 0;
+  font-size: 14px;
+  color: var(--order-text-muted);
+}
+
+.summary__value {
+  margin: 6px 0 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 주문 보드: 접수 대기 | 조리 중 | 픽업 대기 ---------- */
+
 .board {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
+  align-items: start;
 }
+
 .board__col {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-.board__col-title {
-  margin: 0;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.board__count {
-  min-width: 22px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: var(--gray-fill);
-  font-size: 12px;
-  text-align: center;
+  padding: 14px;
+  background: var(--order-fill);
+  border-radius: var(--order-radius-card);
 }
 
-/* 주문 카드 */
+.board__col-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 2px 4px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.board__count {
+  min-width: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  color: var(--order-text);
+  background: var(--order-fill-strong);
+  border-radius: 999px;
+}
+
+/* 보드 안의 "주문이 없어요" 는 회색 바탕 위라 테두리만 흰색 계열로 */
+.board__col .dashboard__empty {
+  background: var(--order-surface);
+  border-color: var(--order-border);
+}
+
+/* ---------- 주문 카드 — 팀 StoreCard 와 같은 모양 ---------- */
+
 .order {
-  border: 1px solid var(--black);
-  border-radius: 10px;
-  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  padding: 16px;
+  background: var(--order-surface);
+  border: 1px solid var(--order-border);
+  border-radius: var(--order-radius-card);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
+
+.order:hover {
+  border-color: var(--order-border-strong);
+  box-shadow: var(--order-shadow);
+}
+
 .order__head {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
+
 .order__no {
+  font-size: 17px;
   font-weight: 700;
+  letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
 }
+
 .order__info {
-  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   margin: 0;
   padding: 0;
+  list-style: none;
   font-size: 14px;
-  line-height: 1.7;
+  line-height: 1.6;
+  color: var(--order-text-muted);
 }
+
 .order__price {
+  margin-top: 4px;
+  font-size: 17px;
   font-weight: 700;
+  color: var(--order-text);
+  font-variant-numeric: tabular-nums;
 }
+
 .order__actions {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 8px;
 }
+
 .order__actions:has(> :only-child) {
   grid-template-columns: 1fr;
 }
+
+/* 기본 버튼 — 팀 .pageButton 과 같은 모양 */
 .order__btn {
-  white-space: nowrap;
-  padding: 10px;
-  border: 1px solid var(--black);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--black);
+  height: 40px;
+  padding: 0 10px;
+  font: inherit;
   font-size: 14px;
+  font-weight: 600;
+  color: var(--order-text);
+  white-space: nowrap;
+  background: var(--order-surface);
+  border: 1px solid var(--order-button-border);
+  border-radius: var(--order-radius-button);
   cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, filter 0.15s;
 }
+
 .order__btn:hover {
-  background: var(--gray-fill);
+  background: var(--order-button-bg);
+  border-color: var(--order-border-strong);
 }
-.order__btn--primary {
-  background: var(--black);
-  color: #fff;
-}
+
+/* 주문 수락 — 팀 .detailButton 과 같은 포인트 컬러 버튼 */
+.order__btn--primary,
 .order__btn--primary:hover {
-  background: #333;
+  color: var(--order-on-accent);
+  background: var(--order-accent);
+  border-color: var(--order-accent);
 }
+
+.order__btn--primary:hover {
+  filter: brightness(0.92);
+}
+
 .order__btn--reject {
-  border-style: dashed;
-  color: var(--gray-text);
+  color: var(--order-text-muted);
 }
 
-/* 상태 뱃지 */
+/* ---------- 상태 뱃지 — 팀 StoreCard .status 와 같은 알약 모양 ---------- */
+
 .badge {
-  white-space: nowrap;
-  padding: 2px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--black);
+  padding: 4px 10px;
   font-size: 12px;
-}
-.badge--pending {
-  background: var(--black);
-  color: #fff;
-}
-.badge--accepted {
-  background: #fff;
-}
-.badge--ready {
-  background: #fff;
-  border-width: 2px;
-  font-weight: 700;
-}
-.badge--completed {
-  background: var(--gray-fill);
-  border-color: var(--gray-line);
-  color: var(--gray-text);
-}
-.badge--rejected {
-  background: #fff;
-  border-style: dashed;
-  color: var(--gray-text);
-  text-decoration: line-through;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  border-radius: 999px;
 }
 
-/* 픽업 완료·거절된 주문 */
-.done {
-  border-top: 1px solid var(--gray-line);
-  padding-top: 12px;
+/* 접수 대기: 사장님이 처리해야 할 주문 → 포인트 컬러 */
+.badge--pending {
+  color: var(--order-on-accent);
+  background: var(--order-accent);
 }
+
+/* 조리 중 */
+.badge--accepted {
+  color: var(--order-on-primary);
+  background: var(--order-primary);
+}
+
+/* 픽업 대기: 준비 끝 → 팀 "주문 가능" 초록 */
+.badge--ready {
+  color: #ffffff;
+  background: var(--order-ok);
+}
+
+.badge--completed {
+  color: var(--order-text-muted);
+  background: var(--order-fill-strong);
+}
+
+.badge--rejected {
+  color: var(--order-text-muted);
+  text-decoration: line-through;
+  background: var(--order-fill);
+  border: 1px dashed var(--order-border-strong);
+}
+
+/* ---------- 픽업 완료 · 거절된 주문 ---------- */
+
+.done {
+  padding-top: 16px;
+  border-top: 1px solid var(--order-border);
+}
+
 .done__toggle {
-  border: none;
-  background: none;
   padding: 0;
+  font: inherit;
   font-size: 14px;
-  color: var(--gray-text);
+  font-weight: 600;
+  color: var(--order-text-muted);
+  background: none;
+  border: none;
   cursor: pointer;
 }
-.done__list {
-  margin-top: 12px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+
+.done__toggle:hover {
+  color: var(--order-text);
 }
 
-@media (max-width: 800px) {
+.done__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* ---------- 태블릿 (1024px 이하) ---------- */
+
+/* 세 칸이 좁아지므로 한 줄에 한 칸씩, 칸 안의 카드는 여러 개씩 나란히 */
+@media (max-width: 1024px) {
   .board {
     grid-template-columns: 1fr;
+  }
+
+  .board__col {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+
+  .board__col-title,
+  .board__col .dashboard__empty {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---------- 모바일 (640px 이하 — 팀과 같은 기준) ---------- */
+
+@media (max-width: 640px) {
+  .dashboard {
+    gap: 22px;
+    padding-block: 20px 36px;
+  }
+
+  .dashboard__head {
+    padding: 22px 20px;
+  }
+
+  /* 팀 .title 모바일 크기와 같음 */
+  .dashboard__title {
+    font-size: 22px;
+  }
+
+  .summary {
+    gap: 12px;
+  }
+
+  .summary__item {
+    padding: 16px;
+  }
+
+  .summary__value {
+    font-size: 22px;
+  }
+
+  .board__col {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .order__btn {
+    height: 44px;
   }
 }

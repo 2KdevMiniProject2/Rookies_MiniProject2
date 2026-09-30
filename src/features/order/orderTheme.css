@@ -1,0 +1,100 @@
+/* =========================================================
+   파트 C(주문) 공통 테마 — 사장님 대시보드 · 손님 주문 상태 페이지가 함께 씀
+   각 페이지 CSS 맨 위에서 @import "./orderTheme.css"; 로 불러옵니다.
+
+   ▶ 팀 공통 스타일(승호님 StoreListPage · AuthForm) 과 같은 방식·같은 값
+     - 색은 :root 공통 변수(--accent 등) 대신 페이지 로컬 변수(--order-*) 사용
+       (--home-* / --auth-* 와 값이 같음 → 한쪽을 바꾸면 여기도 같이 바꿀 것)
+     - 무채색 + 브랜드 포인트 컬러 #ed5821
+     - 라이트 고정 (다크 모드는 팀과 같이 비활성)
+     - #root(1126px) 밖으로 배경을 화면 전체 폭으로 넓힘 (breakout)
+   ========================================================= */
+
+.order-status,
+.dashboard {
+  /* ── 무채색 (--home-* 와 같은 값) ── */
+  --order-bg: #ffffff;
+  --order-surface: #ffffff;
+  --order-text: #111111;
+  --order-text-muted: #666666;
+  --order-border: #e0e0e0;
+  --order-border-strong: #8c8c8c;
+  --order-primary: #1a1a1a;
+  --order-on-primary: #ffffff;
+  --order-soft: rgba(0, 0, 0, 0.06);
+  --order-fill: #f2f2f2;
+  --order-fill-strong: #e6e6e6;
+  --order-button-bg: #ececec;
+  --order-button-border: #bdbdbd;
+  --order-shadow:
+    rgba(0, 0, 0, 0.08) 0 10px 15px -3px, rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+
+  /* ── 브랜드 포인트 컬러 (--home-accent 와 같은 값) ── */
+  --order-accent: #ed5821;
+  --order-on-accent: #ffffff;
+  --order-accent-soft: color-mix(in srgb, var(--order-accent) 12%, transparent);
+  --order-hero-from: var(--order-accent);
+  --order-hero-to: #ff8f66;
+
+  /* ── 의미 전달용 색 (팀 StoreCard "주문 가능" 초록과 같은 값) ── */
+  --order-ok: rgb(34, 160, 90);
+
+  /* ── 모양 (팀 카드 16px · 버튼 10px · 칩 999px · 히어로 20px) ── */
+  --order-radius-hero: 20px;
+  --order-radius-card: 16px;
+  --order-radius-button: 10px;
+
+  /* ── 폭 (팀 StoreListPage 와 같은 값) ── */
+  --content-max: 1400px;
+  --gutter: 32px;
+
+  /* 루트(:root)의 보라빛 회색 글자색 · 가운데 정렬이 상속되지 않도록 고정 */
+  color: var(--order-text);
+  text-align: left;
+  word-break: keep-all;
+
+  /* breakout: #root(최대 1126px)를 벗어나 화면 전체 폭 사용 + #root 좌우 테두리 선 가리기 */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  box-sizing: border-box;
+  background: var(--order-bg);
+}
+
+/* 이 페이지들이 화면에 있는 동안: 100vw 가로 넘침 자르기 + 브라우저 기본 요소 라이트 고정 */
+html:has(.order-status),
+html:has(.dashboard) {
+  overflow-x: clip;
+  color-scheme: light;
+}
+
+.order-status *,
+.order-status *::before,
+.order-status *::after,
+.dashboard *,
+.dashboard *::before,
+.dashboard *::after {
+  box-sizing: border-box;
+}
+
+/* 루트의 h1·h2 규칙(색 · 글자 간격 · 여백)이 들어오지 않도록 */
+.order-status :is(h1, h2, h3),
+.dashboard :is(h1, h2, h3) {
+  color: inherit;
+  font-family: inherit;
+  letter-spacing: normal;
+}
+
+/* 버튼·링크 포커스 테두리 — 팀과 같은 무채색 outline */
+.order-status :is(button, a):focus-visible,
+.dashboard :is(button, a):focus-visible {
+  outline: 2px solid var(--order-text);
+  outline-offset: 2px;
+}
+
+/* 모바일 — 팀과 같은 기준(640px) · 같은 여백 */
+@media (max-width: 640px) {
+  .order-status,
+  .dashboard {
+    --gutter: 16px;
+  }
+}
