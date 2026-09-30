@@ -31,9 +31,17 @@ export default function DashboardPage() {
   const [store, setStore] = useState(null);
 
   useEffect(() => {
-    getStore(storeId)
-      .then((storeInfo) => setStore(storeInfo))
-      .catch(() => setStore(null));
+    // useEffect 에는 async 를 바로 못 붙여서, 안에 async 함수를 만들어 부른다
+    const loadStore = async () => {
+      try {
+        const storeInfo = await getStore(storeId);
+        setStore(storeInfo);
+      } catch (error) {
+        console.error("가게 정보 불러오기 실패:", error);
+        setStore(null);
+      }
+    };
+    loadStore();
   }, [storeId]);
 
   const orders = useDashboardStore((state) => state.orders);
