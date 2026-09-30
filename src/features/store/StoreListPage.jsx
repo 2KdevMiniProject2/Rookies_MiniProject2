@@ -1,23 +1,64 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../../api/client';
 import './StoreListPage.css';
 
 function StoreListPage() {
     const navigate = useNavigate();
 
-    const stores = [
-        {
-            id: 1,
-            name: '루키즈 베이커리',
-            category: '베이커리',
-            address: '서울시 강남구 테헤란로 123 1층',
-        },
-        {
-            id: 2,
-            name: '루키즈 로스터리 카페',
-            category: '카페',
-            address: '서울시 서초구 서초대로 45 2층',
-        },
-    ];
+    const ownerId = 7; // 임시 테스트용, 나중에 로그인 사용자 id로 변경
+
+    const [stores, setStores] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchStores = async () => {
+            try {
+                const response = await apiClient.get(`/api/stores/owner/${ownerId}`);
+                setStores(response.data);
+            } catch (error) {
+                console.error('가게 목록 조회 실패:', error);
+                setError('가게 목록을 불러오지 못했습니다.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStores();
+    }, []);
+
+    const handleDeleteStore = async (storeId, storeName) => {
+        const confirmed = window.confirm(
+            `${storeName} 가게를 삭제하시겠습니까?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await apiClient.delete(`/api/stores/${storeId}`, {
+                params: {
+                    ownerId: ownerId,
+                },
+            });
+
+            setStores((prev) =>
+                prev.filter((store) => store.id !== storeId)
+            );
+
+            alert('가게가 삭제되었습니다.');
+        } catch (error) {
+            console.error('가게 삭제 실패:', error);
+
+            if (error.response?.data?.message) {
+                alert(error.response.data.message);
+            } else {
+                alert('가게 삭제에 실패했습니다.');
+            }
+        }
+    };
 
     return (
         <main className="store-list-page">
@@ -26,49 +67,133 @@ function StoreListPage() {
                     <strong>사장님 마이페이지</strong>
 
                     <nav>
-                        <button type="button" onClick={() => navigate('/mypage')}>마이페이지</button>
-                        <button type="button" onClick={() => navigate('/stores/register')}>가게 등록</button>
-                        <button type="button" className="active">가게별 메뉴 관리</button>
-                        <button type="button">회원정보</button>
-                        <button type="button">로그아웃</button>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/mypage')}
+                        >
+                            마이페이지
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => navigate('/stores/register')}
+                        >
+                            가게 등록
+                        </button>
+
+                        <button
+                            type="button"
+                            className="active"
+                        >
+                            가게별 메뉴 관리
+                        </button>
+
+                        <button type="button">
+                            회원정보
+                        </button>
+
+                        <button type="button">
+                            로그아웃
+                        </button>
                     </nav>
                 </aside>
 
                 <section className="store-list-main">
-                    <div className="store-list-title">가게별 메뉴 관리</div>
+                    <div className="store-list-title">
+                        가게별 메뉴 관리
+                    </div>
 
                     <div className="store-list-content">
                         <section className="store-list-section">
                             <div className="store-list-heading">
                                 <div>
                                     <h2>내 가게</h2>
-                                    <p>메뉴를 관리할 가게를 선택해주세요.</p>
+                                    <p>관리할 가게를 선택해주세요.</p>
                                 </div>
 
-                                <button type="button" className="store-add-button" onClick={() => navigate('/stores/register')}>
+                                <button
+                                    type="button"
+                                    className="store-add-button"
+                                    onClick={() => navigate('/stores/register')}
+                                >
                                     가게 등록
                                 </button>
                             </div>
 
-                            <div className="store-card-list">
-                                {stores.map((store) => (
-                                    <article className="store-card" key={store.id}>
-                                        <div className="store-card-info">
-                                            <span className="store-category">{store.category}</span>
-                                            <h3>{store.name}</h3>
-                                            <p>{store.address}</p>
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            className="store-menu-button"
-                                            onClick={() => navigate(`/owner/stores/${store.id}/menus`)}
+                            {loading ? (
+                                <div className="empty-store">
+                                    가게 목록을 불러오는 중입니다.
+                                </div>
+                            ) : error ? (
+                                <div className="empty-store">
+                                    {error}
+                                </div>
+                            ) : stores.length === 0 ? (
+                                <div className="empty-store">
+                                    등록된 가게가 없습니다.
+                                </div>
+                            ) : (
+                                <div className="store-card-list">
+                                    {stores.map((store) => (
+                                        <article
+                                            className="store-card"
+                                            key={store.id}
                                         >
-                                            메뉴 관리
-                                        </button>
-                                    </article>
-                                ))}
-                            </div>
+                                            {store.imageUrl && (
+                                                <div className="store-card-image-wrap">
+                                                    <img
+                                                        src={store.imageUrl}
+                                                        alt={`${store.name} 가게 이미지`}
+                                                        className="store-card-image"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div className="store-card-info">
+                                                <span className="store-category">
+                                                    {store.category}
+                                                </span>
+
+                                                <h3>{store.name}</h3>
+
+                                                <p>{store.address}</p>
+
+                                                {(store.openTime || store.closeTime) && (
+                                                    <p className="store-time">
+                                                        영업시간 {store.openTime || '-'} ~ {store.closeTime || '-'}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="store-card-actions">
+                                                <button
+                                                    type="button"
+                                                    className="store-menu-button"
+                                                    onClick={() => navigate(`/owner/stores/${store.id}/menus`)}
+                                                >
+                                                    메뉴 관리
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="store-menu-button"
+                                                    onClick={() => navigate(`/owner/stores/${store.id}/edit`)}
+                                                >
+                                                    가게 수정
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="store-delete-button"
+                                                    onClick={() => handleDeleteStore(store.id, store.name)}
+                                                >
+                                                    가게 삭제
+                                                </button>
+                                            </div>
+                                        </article>
+                                    ))}
+                                </div>
+                            )}
                         </section>
                     </div>
                 </section>
