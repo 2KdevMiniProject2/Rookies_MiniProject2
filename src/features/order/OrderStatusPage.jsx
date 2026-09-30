@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { fetchOrder } from "../../api/orderApi";
+
+import { useOrderStatusStore } from "../../store/orderStatusStore";
 
 import "./OrderStatusPage.css";
 
@@ -46,36 +48,50 @@ function formatTime(dateTime) {
 
 function OrderStatusPage() {
     const { orderId } = useParams();
-    const [order, setOrder] = useState(null);
+
+    // 화면 전용 값 — 이 버튼에서만 쓰므로 useState 에 둔다
     const [refreshing, setRefreshing] = useState(false);
+
+    // store 에서 필요한 것만 하나씩 꺼내기
+    const storedOrder = useOrderStatusStore((state) => state.order);
+    const loading = useOrderStatusStore((state) => state.loading);
+    const error = useOrderStatusStore((state) => state.error);
+    const loadOrder = useOrderStatusStore((state) => state.loadOrder);
+
+    // store 에 다른 주문이 남아 있을 수 있으므로, 주소의 주문 번호와 같을 때만 쓴다
+    const order = storedOrder?.id === Number(orderId) ? storedOrder : null;
 
     // 처음 한 번 + 5초마다 다시 불러오기
     useEffect(() => {
-        const loadOrder = async () => {
-            const result = await fetchOrder(orderId);
-            setOrder(result);
-        };
-
-        loadOrder();
-        const timer = setInterval(loadOrder, REFRESH_MS);
+        loadOrder(orderId);
+        const timer = setInterval(() => loadOrder(orderId), REFRESH_MS);
 
         // 화면을 떠나면 타이머 멈춤
         return () => clearInterval(timer);
-    }, [orderId]);
+    }, [orderId, loadOrder]);
 
     // 새로고침 버튼
     async function handleRefresh() {
         setRefreshing(true);
-        const result = await fetchOrder(orderId);
-        setOrder(result);
+        await loadOrder(orderId);
         setRefreshing(false);
     }
 
+    // 불러오는 중 / 못 불러옴
     if (!order) {
         return (
             <div className="order-status">
                 <div className="order-status__card order-status__card--center">
-                    <p className="order-status__notice">주문 정보를 불러오는 중…</p>
+                    {loading || !error ? (
+                        <p className="order-status__notice">주문 정보를 불러오는 중…</p>
+                    ) : (
+                        <>
+                            <p className="order-status__notice">{error}</p>
+                            <Link to="/" className="order-status__button">
+                                홈으로 가기
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
         );
@@ -140,6 +156,8 @@ function OrderStatusPage() {
 
                 {/* 상태 안내 문구 */}
                 <p className="order-status__message">{info.message}</p>
+                {/* 새로고침 중 에러가 나면 지난 정보는 그대로 두고 한 줄로 알린다 */}
+                {error && <p className="order-status__error">{error}</p>}                
 
                 {/* 주문 내역 */}
                 <div className="order-status__detail">

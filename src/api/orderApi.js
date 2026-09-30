@@ -8,7 +8,7 @@
 
 import apiClient from "./client";
 
-const USE_MOCK = true;
+const USE_MOCK = true; // 에러 화면 테스트 false로 바꾸기.
 
 // 주문 API 의 경로. axios 가 baseURL(http://localhost:8080) 뒤에 이어 붙인다.
 const ORDERS_PATH = "/api/orders";
