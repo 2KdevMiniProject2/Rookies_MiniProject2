@@ -26,6 +26,9 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private String category;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
