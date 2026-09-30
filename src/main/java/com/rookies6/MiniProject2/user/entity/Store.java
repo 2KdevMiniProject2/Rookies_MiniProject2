@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-@Setter
 public class Store extends BaseEntity {
 
     @Column(nullable = false)
@@ -45,5 +44,26 @@ public class Store extends BaseEntity {
 
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    // 매장 기본정보 부분 수정 (null/blank는 무시, 값 있는 필드만 반영)
+    public void update(String name, String address, String category, String imageUrl) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (address != null && !address.isBlank()) {
+            this.address = address;
+        }
+        if (category != null && !category.isBlank()) {
+            this.category = category;
+        }
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            this.imageUrl = imageUrl;
+        }
+    }
+
+    // StoreDetail(영업시간)을 이 매장에 연결
+    public void assignStoreDetail(StoreDetail storeDetail) {
+        this.storeDetail = storeDetail;
     }
 }

@@ -15,17 +15,21 @@ public class OrderResponse {
     private final LocalDateTime pickupTime;
     private final List<OrderItemResponse> items;
 
-    private OrderResponse(Order order) {
+    private OrderResponse(Order order, List<OrderItemResponse> items) {
         this.orderId = order.getId();
         this.status = order.getStatus();
         this.totalAmount = order.getTotalAmount();
         this.pickupTime = order.getPickupTime();
-        this.items = order.getOrderItems().stream()
-                .map(OrderItemResponse::from)
-                .toList();
+        this.items = items;
     }
 
     public static OrderResponse from(Order order) {
-        return new OrderResponse(order);
+        return new OrderResponse(order, order.getOrderItems().stream()
+                .map(OrderItemResponse::from)
+                .toList());
+    }
+
+    public static OrderResponse from(Order order, List<OrderItemResponse> items) {
+        return new OrderResponse(order, items);
     }
 }

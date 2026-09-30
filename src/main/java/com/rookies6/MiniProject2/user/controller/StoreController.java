@@ -53,6 +53,16 @@ public class StoreController {
         return ResponseEntity.ok(stores);
     }
 
+    // 매장 정보 수정 API
+    @PutMapping("/{storeId}")
+    public ResponseEntity<StoreDTO.StoreResponse> updateStore(
+            @PathVariable Long storeId,
+            @RequestParam(defaultValue = "1") Long ownerId,
+            @Valid @RequestBody StoreDTO.StoreUpdateRequest request) {
+        StoreDTO.StoreResponse response = storeService.updateStore(storeId, ownerId, request);
+        return ResponseEntity.ok(response);
+    }
+
     // 매장 삭제 API
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteStore(
