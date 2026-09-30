@@ -45,5 +45,17 @@ public class MenuItem extends BaseEntity {
         this.soldOut = !this.soldOut;
     }
 
+    public void update(String name, Integer price, String imageUrl) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (price != null) {
+            this.price = price;
+        }
+        if (imageUrl != null) {
+            this.imageUrl = imageUrl;
+        }
+    }
+
     public void softDelete() { this.deletedAt = LocalDateTime.now(); }
 }

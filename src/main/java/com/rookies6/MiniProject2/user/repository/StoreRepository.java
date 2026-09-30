@@ -1,6 +1,8 @@
 package com.rookies6.MiniProject2.user.repository;
 
 import com.rookies6.MiniProject2.user.entity.Store;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,22 +11,24 @@ import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
-    // 1. 폐업하지 않은 정상 영업 중인 매장 전체 목록 조회
-    @Query("SELECT DISTINCT s FROM Store s " +
-            "JOIN FETCH s.storeDetail " +
+    // 1. 폐업하지 않은 정상 영업 중인 매장 전체 목록 조회 (페이징)
+    @Query(value = "SELECT DISTINCT s FROM Store s " +
+            "LEFT JOIN FETCH s.storeDetail " +
             "JOIN FETCH s.owner " +
-            "WHERE s.deletedAt IS NULL")
-    List<Store> findByDeletedAtIsNull();
+            "WHERE s.deletedAt IS NULL",
+            countQuery = "SELECT COUNT(s) FROM Store s WHERE s.deletedAt IS NULL")
+    Page<Store> findByDeletedAtIsNull(Pageable pageable);
 
-    // 2. 카테고리별 정상 영업 매장 목록 조회 (메인 홈 필터용)
-    @Query("SELECT DISTINCT s FROM Store s " +
-            "JOIN FETCH s.storeDetail " +
+    // 2. 카테고리별 정상 영업 매장 목록 조회 (페이징)
+    @Query(value = "SELECT DISTINCT s FROM Store s " +
+            "LEFT JOIN FETCH s.storeDetail " +
             "JOIN FETCH s.owner " +
-            "WHERE s.category = :category AND s.deletedAt IS NULL")
-    List<Store> findByCategoryAndDeletedAtIsNull(String category);
+            "WHERE s.category = :category AND s.deletedAt IS NULL",
+            countQuery = "SELECT COUNT(s) FROM Store s WHERE s.category = :category AND s.deletedAt IS NULL")
+    Page<Store> findByCategoryAndDeletedAtIsNull(String category, Pageable pageable);
 
     @Query("SELECT s FROM Store s " +
-            "JOIN FETCH s.storeDetail " +
+            "LEFT JOIN FETCH s.storeDetail " +
             "JOIN FETCH s.owner " +
             "WHERE s.id = :id AND s.deletedAt IS NULL")
     Optional<Store> findByIdAndDeletedAtIsNull(Long id);
@@ -40,6 +44,5 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     List<Store> findByOwnerIdAndDeletedAtIsNull(Long ownerId);
 
     // ===== 파트 C =====
-    // [권한 확인] 이 가게가 이 사장님 소유의 영업 중인 가게인지 확인
     boolean existsByIdAndOwnerIdAndDeletedAtIsNull(Long storeId, Long ownerId);
 }

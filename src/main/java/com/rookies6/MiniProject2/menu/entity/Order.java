@@ -26,7 +26,8 @@ public class Order extends BaseEntity {
         ACCEPTED,   // 수락, 음식 준비 중
         READY,      // 준비 완료, 손님 호출됨
         COMPLETED,  // 픽업 완료
-        REJECTED    // 거절
+        REJECTED,   // 거절
+        CANCELLED   // 취소
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -76,8 +77,13 @@ public class Order extends BaseEntity {
 
     // 거절: PENDING → REJECTED
     public void reject() {
-        changeStatus(OrderStatus.PENDING, OrderStatus.REJECTED);
+        if (this.status != OrderStatus.PENDING && this.status != OrderStatus.ACCEPTED) {
+            throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS,
+                    this.status + "에서 REJECTED(으)로 변경할 수 없습니다");
+        }
+        this.status = OrderStatus.REJECTED;
     }
+
 
     // 호출(준비 완료): ACCEPTED → READY
     public void ready() {
@@ -87,6 +93,11 @@ public class Order extends BaseEntity {
     // 픽업 완료: READY → COMPLETED
     public void complete() {
         changeStatus(OrderStatus.READY, OrderStatus.COMPLETED);
+    }
+
+    // 손님 전용 취소 메서드
+    public void customerCancel() {
+        changeStatus(OrderStatus.PENDING, OrderStatus.CANCELLED);
     }
 
     // 현재 상태가 expected일 때만 next로 변경, 아니면 409 에러

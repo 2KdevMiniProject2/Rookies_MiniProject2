@@ -10,15 +10,16 @@ import com.rookies6.MiniProject2.menu.entity.Order;
 import com.rookies6.MiniProject2.menu.entity.OrderItem;
 import com.rookies6.MiniProject2.menu.repository.MenuItemRepository;
 import com.rookies6.MiniProject2.menu.repository.OrderRepository;
-import com.rookies6.MiniProject2.user.repository.StoreRepository;
-import com.rookies6.MiniProject2.user.repository.UserRepository;
 import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.user.entity.User;
+import com.rookies6.MiniProject2.user.repository.StoreRepository;
+import com.rookies6.MiniProject2.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -79,57 +80,14 @@ public class OrderService {
         return OrderResponse.from(savedOrder);
     }
 
-    @Transactional
-    public OrderResponse acceptOrder(Long orderId) {
-        Order order = findOrder(orderId);
-        changeOrderStatus(order::accept);
-        return OrderResponse.from(order);
-    }
-
-    @Transactional
-    public OrderResponse rejectOrder(Long orderId) {
-        Order order = findOrder(orderId);
-        changeOrderStatus(order::reject);
-        return OrderResponse.from(order);
-    }
-
-    @Transactional
-    public OrderResponse readyOrder(Long orderId) {
-        Order order = findOrder(orderId);
-        changeOrderStatus(order::ready);
-        return OrderResponse.from(order);
-    }
-
-    @Transactional
-    public OrderResponse completeOrder(Long orderId) {
-        Order order = findOrder(orderId);
-        changeOrderStatus(order::complete);
-        return OrderResponse.from(order);
-    }
-
-    private Order findOrder(Long orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND, orderId));
-    }
-
-    private void changeOrderStatus(Runnable statusChange) {
-        try {
-            statusChange.run();
-        } catch (IllegalStateException e) {
-            throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS, e.getMessage());
-        }
-    }
-
-    public List<OrderResponse> getOrdersByStore(Long storeId, Order.OrderStatus status) {
+    public Page<OrderResponse> getOrdersByStore(Long storeId, Order.OrderStatus status, Pageable pageable) {
         storeRepository.findByIdAndDeletedAtIsNull(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
 
-        List<Order> orders = (status != null)
-                ? orderRepository.findByStoreIdAndStatus(storeId, status)
-                : orderRepository.findByStoreId(storeId);
+        Page<Order> orders = (status != null)
+                ? orderRepository.findByStoreIdAndStatus(storeId, status, pageable)
+                : orderRepository.findByStoreId(storeId, pageable);
 
-        return orders.stream()
-                .map(OrderResponse::from)
-                .toList();
+        return orders.map(OrderResponse::from);
     }
 }

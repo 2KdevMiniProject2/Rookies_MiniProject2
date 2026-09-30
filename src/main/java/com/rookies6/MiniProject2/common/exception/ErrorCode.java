@@ -28,7 +28,14 @@ public enum ErrorCode {
     INVALID_ORDER_STATUS("올바르지 않은 주문 변경입니다. = %s", HttpStatus.CONFLICT),
 
     //동기화 관련 에러 코드
-    INVALID_STORE_MENU_OR_NOT_FOUND("주문할 수 없는 메뉴가 포함되어 있습니다.( ex) 품절, 이벤트 시간 마감 등 )", HttpStatus.BAD_REQUEST);
+    INVALID_STORE_MENU_OR_NOT_FOUND("주문할 수 없는 메뉴가 포함되어 있습니다.( ex) 품절, 이벤트 시간 마감 등 )", HttpStatus.BAD_REQUEST),
+
+    // 매장 권한 관련 에러 코드
+    STORE_ACCESS_DENIED("본인 소유의 매장만 삭제할 수 있습니다. storeId=%s", HttpStatus.FORBIDDEN),
+
+    // 이미지 업로드 관련 에러 코드
+    INVALID_IMAGE_FILE("이미지 파일만 업로드할 수 있습니다.", HttpStatus.BAD_REQUEST),
+    IMAGE_UPLOAD_FAILED("이미지 업로드에 실패했습니다: %s", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String messageTemplate;
     private final HttpStatus httpStatus;
