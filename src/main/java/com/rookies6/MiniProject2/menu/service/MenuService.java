@@ -32,9 +32,11 @@ public class MenuService {
     }
 
     @Transactional
-    public MenuItemResponse createMenu(Long storeId, MenuItemCreateRequest request) {
+    public MenuItemResponse createMenu(Long storeId, Long ownerId, MenuItemCreateRequest request) {
         Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
+
+        validateOwner(store, ownerId);
 
         if (menuItemRepository.existsByStoreIdAndNameAndDeletedAtIsNull(storeId, request.getName())) {
             throw new BusinessException(ErrorCode.DUPLICATE_MENU_NAME, request.getName());
@@ -51,18 +53,22 @@ public class MenuService {
     }
 
     @Transactional
-    public MenuItemResponse toggleSoldOut(Long menuId) {
+    public MenuItemResponse toggleSoldOut(Long menuId, Long ownerId) {
         MenuItem menuItem = menuItemRepository.findByIdAndDeletedAtIsNull(menuId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND, menuId));
+
+        validateOwner(menuItem.getStore(), ownerId);
 
         menuItem.toggleSoldOut();
         return MenuItemResponse.from(menuItem);
     }
 
     @Transactional
-    public MenuItemResponse updateMenu(Long menuId, MenuItemUpdateRequest request) {
+    public MenuItemResponse updateMenu(Long menuId, Long ownerId, MenuItemUpdateRequest request) {
         MenuItem menuItem = menuItemRepository.findByIdAndDeletedAtIsNull(menuId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND, menuId));
+
+        validateOwner(menuItem.getStore(), ownerId);
 
         boolean isRenaming = request.getName() != null
                 && !request.getName().isBlank()
@@ -78,10 +84,18 @@ public class MenuService {
     }
 
     @Transactional
-    public void deleteMenu(Long menuId) {
+    public void deleteMenu(Long menuId, Long ownerId) {
         MenuItem menuItem = menuItemRepository.findByIdAndDeletedAtIsNull(menuId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND, menuId));
 
+        validateOwner(menuItem.getStore(), ownerId);
+
         menuItem.softDelete();
+    }
+
+    private void validateOwner(Store store, Long ownerId) {
+        if (!store.getOwner().getId().equals(ownerId)) {
+            throw new BusinessException(ErrorCode.STORE_ACCESS_DENIED, store.getId());
+        }
     }
 }

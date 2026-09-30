@@ -38,27 +38,33 @@ public class MenuController {
     @PostMapping("/api/stores/{storeId}/menus")
     public ResponseEntity<MenuItemResponse> createMenu(
             @PathVariable Long storeId,
+            @RequestParam(defaultValue = "1") Long ownerId,
             @Valid @RequestBody MenuItemCreateRequest request) {
-        MenuItemResponse response = menuService.createMenu(storeId, request);
+        MenuItemResponse response = menuService.createMenu(storeId, ownerId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/api/menus/{menuId}/sold-out")
-    public ResponseEntity<MenuItemResponse> toggleSoldOut(@PathVariable Long menuId) {
-        return ResponseEntity.ok(menuService.toggleSoldOut(menuId));
+    public ResponseEntity<MenuItemResponse> toggleSoldOut(
+            @PathVariable Long menuId,
+            @RequestParam(defaultValue = "1") Long ownerId) {
+        return ResponseEntity.ok(menuService.toggleSoldOut(menuId, ownerId));
     }
 
     @PatchMapping("/api/menus/{menuId}")
     public ResponseEntity<MenuItemResponse> updateMenu(
             @PathVariable Long menuId,
+            @RequestParam(defaultValue = "1") Long ownerId,
             @Valid @RequestBody MenuItemUpdateRequest request) {
-        MenuItemResponse response = menuService.updateMenu(menuId, request);
+        MenuItemResponse response = menuService.updateMenu(menuId, ownerId, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/api/menus/{menuId}")
-    public ResponseEntity<Void> deleteMenu(@PathVariable Long menuId) {
-        menuService.deleteMenu(menuId);
+    public ResponseEntity<Void> deleteMenu(
+            @PathVariable Long menuId,
+            @RequestParam(defaultValue = "1") Long ownerId) {
+        menuService.deleteMenu(menuId, ownerId);
         return ResponseEntity.noContent().build();
     }
 }
