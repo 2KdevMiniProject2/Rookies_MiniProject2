@@ -8,6 +8,9 @@ import com.rookies6.MiniProject2.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.rookies6.MiniProject2.security.jwt.JwtService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     // 0. 회원 전체 목록 조회
     public Page<UserDTO.UserResponse> getAllUsers(Pageable pageable) {
@@ -47,22 +52,22 @@ public class UserService {
         return UserDTO.UserResponse.from(savedUser);
     }
 
-    // 2. 로그인
+    // 2. 사용자 로그인 처리
     public UserDTO.LoginResponse login(UserDTO.LoginRequest request) {
-        // 이메일로 회원 조회
+        // Spring Security 인증 수행 (비밀번호 검증 및 UserDetails 로드)
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
+
+        // 인증 통과 후 회원 정보 조회
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CREDENTIALS));
 
-        // 비밀번호 일치 여부 확인
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
-        }
-
-        // JWT 토큰 연동 전 임시 토큰 발급 (추후 JwtTokenProvider 연결)
-        String mockToken = "mock-jwt-token-for-" + user.getEmail();
+        // 실제 JWT Access 토큰 발급
+        String token = jwtService.generateToken(user.getEmail());
 
         return UserDTO.LoginResponse.builder()
-                .accessToken(mockToken)
+                .accessToken(token)
                 .user(UserDTO.UserResponse.from(user))
                 .build();
     }
