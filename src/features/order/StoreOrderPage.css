@@ -1,0 +1,474 @@
+/* =========================================================
+   주문 페이지 (손님) — 팀 공통 스타일 적용
+   색 · 모양 · 폭 · 반응형 기준은 orderTheme.css (팀 --home-* 와 같은 값)
+   클래스 이름은 모두 store-order__ 로 시작 (다른 페이지와 겹치지 않게)
+   ========================================================= */
+
+@import "./orderTheme.css";
+
+.store-order {
+  --inner-max: 960px;
+  --cart-bar-h: 76px;  /* 하단 고정 바 높이 — 본문이 바에 가려지지 않게 아래 여백으로 씀 */
+  --photo: 132px;      /* 메뉴 사진 크기 */
+
+  flex: 1;
+  padding: 24px var(--gutter) calc(var(--cart-bar-h) + 40px);
+}
+
+.store-order__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: var(--inner-max);
+  margin: 0 auto;
+}
+
+/* ---------- 불러오는 중 / 에러 — 팀 .empty 와 같은 모양 ---------- */
+
+.store-order__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: var(--inner-max);
+  margin: 40px auto 0;
+  padding: 64px 16px;
+  text-align: center;
+  border: 1px dashed var(--order-border);
+  border-radius: var(--order-radius-card);
+}
+
+.store-order__state-text {
+  margin: 0;
+  font-size: 15px;
+  color: var(--order-text-muted);
+}
+
+.store-order__state-button {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--order-on-primary);
+  text-decoration: none;
+  background: var(--order-primary);
+  border-radius: var(--order-radius-button);
+}
+
+/* ---------- 메인으로 돌아가기 ---------- */
+
+.store-order__back {
+  align-self: flex-start;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--order-text-muted);
+  text-decoration: none;
+}
+
+.store-order__back:hover {
+  color: var(--order-text);
+}
+
+/* ---------- 가게 정보 — 팀 히어로 배너 ---------- */
+
+.store-order__store {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 28px;
+  color: var(--order-on-accent);
+  background: linear-gradient(135deg, var(--order-hero-from), var(--order-hero-to));
+  border-radius: var(--order-radius-hero);
+}
+
+.store-order__store-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 팀 .title 과 같은 크기 */
+.store-order__store-name {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+}
+
+.store-order__category {
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--order-on-accent);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+}
+
+.store-order__store-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+}
+
+.store-order__info-label {
+  margin-right: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.store-order__store-desc {
+  margin: 0;
+  padding-top: 12px;
+  font-size: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- 메뉴 목록 ---------- */
+
+.store-order__section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.store-order__menu-count {
+  min-width: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  background: var(--order-fill-strong);
+  border-radius: 999px;
+}
+
+.store-order__empty {
+  margin: 0;
+  padding: 40px 16px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--order-text-muted);
+  border: 1px dashed var(--order-border);
+  border-radius: var(--order-radius-card);
+}
+
+.store-order__menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 메뉴 카드 — 팀 StoreCard 와 같은 모양 (글 왼쪽 · 사진 오른쪽) */
+.store-order__menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 16px 16px 20px;
+  background: var(--order-surface);
+  border: 1px solid var(--order-border);
+  border-radius: var(--order-radius-card);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.store-order__menu:hover {
+  border-color: var(--order-border-strong);
+  box-shadow: var(--order-shadow);
+}
+
+.store-order__menu-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.store-order__menu-name-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.store-order__menu-name {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.store-order__menu-in-cart {
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--order-accent);
+  background: var(--order-accent-soft);
+  border-radius: 999px;
+}
+
+.store-order__menu-desc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--order-text-muted);
+}
+
+.store-order__menu-price {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 사진 + 담기 버튼 (그림처럼 사진 오른쪽 아래에 버튼) */
+.store-order__menu-photo {
+  position: relative;
+  flex: none;
+  width: var(--photo);
+  height: var(--photo);
+  overflow: hidden;
+  background: var(--order-fill);
+  border-radius: 12px;
+}
+
+.store-order__menu-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.store-order__menu-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.store-order__menu-placeholder svg {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: var(--order-text-muted);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.5;
+}
+
+.store-order__add {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  height: 32px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--order-text);
+  background: var(--order-surface);
+  border: 1px solid var(--order-button-border);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+}
+
+.store-order__add:hover:not(:disabled) {
+  color: var(--order-on-accent);
+  background: var(--order-accent);
+  border-color: var(--order-accent);
+}
+
+.store-order__add:disabled {
+  color: var(--order-text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 품절 — 팀 "준비 중" 회색 뱃지와 같은 색 */
+.store-order__sold-out {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(60, 60, 70, 0.75);
+  border-radius: 999px;
+}
+
+.store-order__menu.is-sold-out .store-order__menu-text {
+  opacity: 0.5;
+}
+
+.store-order__menu.is-sold-out .store-order__menu-photo img,
+.store-order__menu.is-sold-out .store-order__menu-placeholder {
+  opacity: 0.5;
+}
+
+/* ---------- 하단 고정 장바구니 바 ---------- */
+
+.store-order__cart-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--order-bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--order-border);
+}
+
+.store-order__cart-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: var(--inner-max);
+  min-height: 52px;
+  margin: 0 auto;
+}
+
+.store-order__cart-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0;
+  font-size: 15px;
+  color: var(--order-text-muted);
+}
+
+.store-order__cart-summary strong {
+  color: var(--order-text);
+}
+
+.store-order__cart-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--order-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 팀 .detailButton 과 같은 포인트 컬러 버튼 */
+.store-order__cart-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 22px 0 10px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--order-on-accent);
+  background: var(--order-accent);
+  border: 1px solid var(--order-accent);
+  border-radius: var(--order-radius-button);
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.store-order__cart-button:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.store-order__cart-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* 그림의 (갯수) 칸 */
+.store-order__cart-badge {
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--order-accent);
+  background: var(--order-surface);
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 모바일 (640px 이하 — 팀과 같은 기준) ---------- */
+
+@media (max-width: 640px) {
+  .store-order {
+    --photo: 96px;
+    padding-top: 16px;
+  }
+
+  .store-order__store {
+    padding: 22px 20px;
+  }
+
+  /* 팀 .title 모바일 크기와 같음 */
+  .store-order__store-name {
+    font-size: 22px;
+  }
+
+  .store-order__store-info {
+    flex-direction: column;
+    font-size: 14px;
+  }
+
+  .store-order__menu {
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .store-order__menu-name {
+    font-size: 16px;
+  }
+
+  .store-order__menu-desc {
+    font-size: 13px;
+  }
+
+  .store-order__add {
+    right: 6px;
+    bottom: 6px;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  /* 폰: "현재 담은 메뉴 3개" 한 줄, 총 금액은 아래 줄 */
+  .store-order__cart-summary {
+    display: block;
+    font-size: 13px;
+  }
+
+  .store-order__cart-total {
+    display: block;
+    font-size: 16px;
+  }
+
+  .store-order__cart-button {
+    height: 46px;
+    padding-right: 16px;
+    font-size: 14px;
+  }
+}

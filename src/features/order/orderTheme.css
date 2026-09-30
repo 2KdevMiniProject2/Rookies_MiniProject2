@@ -11,7 +11,8 @@
    ========================================================= */
 
 .order-status,
-.dashboard {
+.dashboard,
+.store-order {
   /* ── 무채색 (--home-* 와 같은 값) ── */
   --order-bg: #ffffff;
   --order-surface: #ffffff;
@@ -62,7 +63,8 @@
 
 /* 이 페이지들이 화면에 있는 동안: 100vw 가로 넘침 자르기 + 브라우저 기본 요소 라이트 고정 */
 html:has(.order-status),
-html:has(.dashboard) {
+html:has(.dashboard),
+html:has(.store-order) {
   overflow-x: clip;
   color-scheme: light;
 }
@@ -72,13 +74,17 @@ html:has(.dashboard) {
 .order-status *::after,
 .dashboard *,
 .dashboard *::before,
-.dashboard *::after {
+.dashboard *::after,
+.store-order *,
+.store-order *::before,
+.store-order *::after {
   box-sizing: border-box;
 }
 
 /* 루트의 h1·h2 규칙(색 · 글자 간격 · 여백)이 들어오지 않도록 */
 .order-status :is(h1, h2, h3),
-.dashboard :is(h1, h2, h3) {
+.dashboard :is(h1, h2, h3),
+.store-order :is(h1, h2, h3) {
   color: inherit;
   font-family: inherit;
   letter-spacing: normal;
@@ -86,7 +92,8 @@ html:has(.dashboard) {
 
 /* 버튼·링크 포커스 테두리 — 팀과 같은 무채색 outline */
 .order-status :is(button, a):focus-visible,
-.dashboard :is(button, a):focus-visible {
+.dashboard :is(button, a):focus-visible,
+.store-order :is(button, a):focus-visible {
   outline: 2px solid var(--order-text);
   outline-offset: 2px;
 }
@@ -94,7 +101,8 @@ html:has(.dashboard) {
 /* 모바일 — 팀과 같은 기준(640px) · 같은 여백 */
 @media (max-width: 640px) {
   .order-status,
-  .dashboard {
+  .dashboard,
+  .store-order {
     --gutter: 16px;
   }
 }
