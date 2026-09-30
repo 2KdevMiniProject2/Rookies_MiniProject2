@@ -59,6 +59,7 @@ public class StoreService {
                 .name(request.getName())
                 .address(request.getAddress())
                 .category(request.getCategory())
+                .imageUrl(request.getImageUrl())
                 .build();
 
         Store savedStore = storeRepository.save(store);

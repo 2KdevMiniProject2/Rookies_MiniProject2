@@ -29,6 +29,8 @@ public class StoreDTO {
         @Size(max = 50, message = "카테고리는 50자 이하여야 합니다.")
         private String category;
 
+        private String imageUrl;
+
         private LocalTime openTime;
         private LocalTime closeTime;
     }
@@ -44,6 +46,7 @@ public class StoreDTO {
         private String name;
         private String address;
         private String category;
+        private String imageUrl;
         private LocalTime openTime;
         private LocalTime closeTime;
         private Long ownerId;
@@ -56,6 +59,7 @@ public class StoreDTO {
                     .name(store.getName())
                     .address(store.getAddress())
                     .category(store.getCategory())
+                    .imageUrl(store.getImageUrl())
                     .openTime(detail != null ? detail.getOpenTime() : null)
                     .closeTime(detail != null ? detail.getCloseTime() : null)
                     .ownerId(store.getOwner() != null ? store.getOwner().getId() : null)
