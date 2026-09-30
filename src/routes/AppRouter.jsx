@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import DashboardPage from '../features/order/DashboardPage';
 import OrderStatusPage from '../features/order/OrderStatusPage';
@@ -24,8 +24,10 @@ function AppRouter() {
         {/* [파트 C · 본영] 로그인 기능이 붙기 전까지는 공개 영역에 둠 */}
           {/* 주문 페이지*/}
           <Route path="/stores/:storeId" element={<StoreOrderPage />} />
-          {/* 사장님 대시보드 페이지*/}
-          <Route path="/owner/dashboard" element={<DashboardPage />} />
+          {/* 사장님 주문 대시보드 — 가게 번호를 주소로 받는다 */}
+          <Route path="/owner/stores/:storeId/orders" element={<DashboardPage />} />
+          {/* 사장님 대시보드 페이지 1번 사장님만 보임. (로그인 붙기 전 임시)*/}
+          <Route path="/owner/dashboard" element={<Navigate to="/owner/stores/1/orders" replace/>} />
           {/* 손님용 주문 현황 페이지 */}
           <Route path="/orders/:orderId" element={<OrderStatusPage />} />
         {/* 로그인만 하면 접근 가능한 라우트 예시 */}

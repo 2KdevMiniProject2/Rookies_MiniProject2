@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { useDashboardStore } from "../../store/dashboardStore";
+import { getStore } from "../../api/dashboardApi"; 
+
 import "./DashboardPage.css";
 
-const STORE_ID = 1; // 루키즈 베이커리 (더미). 나중에 로그인한 사장님의 storeId로 교체
+//const STORE_ID = 1; // 루키즈 베이커리 (더미). 나중에 로그인한 사장님의 storeId로 교체
 const REFRESH_MS = 5000;
 
 // 상태별 표시 문구와 다음 단계 (백엔드 OrderStatus 기준)
@@ -21,6 +23,19 @@ const won = (amount) => `${amount.toLocaleString()}원`;
 const hhmm = (dateTime) => dateTime.slice(11, 16); // "2026-09-28T15:30:00" → "15:30"
 
 export default function DashboardPage() {
+  // 주소 /owner/stores/3/orders → storeId 3 (주소 값은 글자라서 숫자로 바꿈)
+  const params = useParams();
+  const storeId = Number(params.storeId);
+
+  // 머리말에 보여줄 가게 이름 — 이 화면에서만 쓰는 값이라 useState
+  const [storeName, setStoreName] = useState("");
+
+  useEffect(() => {
+    getStore(storeId)
+      .then((store) => setStoreName(store.name))
+      .catch(() => setStoreName(""));
+  }, [storeId]);
+
   const orders = useDashboardStore((state) => state.orders);
   const sales = useDashboardStore((state) => state.sales);
   const loading = useDashboardStore((state) => state.loading);
@@ -30,22 +45,22 @@ export default function DashboardPage() {
 
   const [showDone, setShowDone] = useState(false);
 
-  // 처음 불러오고, 5초마다 다시 불러오기
+  // 처음 불러오고, 5초마다 다시 불러오기 (가게 바뀌면 다시 시작.)
   useEffect(() => {
-    fetchDashboard(STORE_ID);
-    const timer = setInterval(() => fetchDashboard(STORE_ID), REFRESH_MS);
+    fetchDashboard(storeId);
+    const timer = setInterval(() => fetchDashboard(storeId), REFRESH_MS);
     return () => clearInterval(timer);
-  }, [fetchDashboard]);
+  }, [fetchDashboard, storeId]);
 
   const handleChange = (orderId, nextStatus) => {
-    changeStatus(STORE_ID, orderId, nextStatus);
+    changeStatus(storeId, orderId, nextStatus);
   };
 
   // 수동 새로고침: 5초를 기다리지 않고 바로 다시 불러오기
   const [refreshing, setRefreshing] = useState(false);
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchDashboard(STORE_ID);
+    await fetchDashboard(storeId);
     setRefreshing(false);
   };
 
@@ -57,10 +72,10 @@ export default function DashboardPage() {
   return (
     <div className="dashboard">
       <header className="dashboard__head">
-        <h1 className="dashboard__title">루키즈 베이커리 사장님 페이지</h1>
+        <h1 className="dashboard__title">{storeName || `${storeId}번 가게`} 사장님 페이지</h1>
         {/* 사장님 메뉴 탭: 매장 정보 수정(파트 A), 메뉴 관리(파트 B) 주소는 각 파트와 맞출 것 */}
         <nav className="dashboard__tabs">
-          <NavLink to="/owner/dashboard" className="dashboard__tab">주문 대시보드</NavLink>
+          <NavLink to={`/owner/stores/${storeId}/orders`} className="dashboard__tab">주문 대시보드</NavLink>
           <NavLink to="/owner/store" className="dashboard__tab">매장 정보 수정</NavLink>
           <NavLink to="/owner/menus" className="dashboard__tab">메뉴 관리</NavLink>
         </nav>
