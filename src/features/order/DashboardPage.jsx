@@ -27,13 +27,13 @@ export default function DashboardPage() {
   const params = useParams();
   const storeId = Number(params.storeId);
 
-  // 머리말에 보여줄 가게 이름 — 이 화면에서만 쓰는 값이라 useState
-  const [storeName, setStoreName] = useState("");
+  // 가게 정보 (이름 · ownerId) — 이 화면에서만 쓰는 값이라 useState
+  const [store, setStore] = useState(null);
 
   useEffect(() => {
     getStore(storeId)
-      .then((store) => setStoreName(store.name))
-      .catch(() => setStoreName(""));
+      .then((storeInfo) => setStore(storeInfo))
+      .catch(() => setStore(null));
   }, [storeId]);
 
   const orders = useDashboardStore((state) => state.orders);
@@ -53,7 +53,8 @@ export default function DashboardPage() {
   }, [fetchDashboard, storeId]);
 
   const handleChange = (orderId, nextStatus) => {
-    changeStatus(storeId, orderId, nextStatus);
+    if (!store) return;
+    changeStatus(storeId, orderId, nextStatus, store.ownerId);
   };
 
   // 수동 새로고침: 5초를 기다리지 않고 바로 다시 불러오기
@@ -72,7 +73,7 @@ export default function DashboardPage() {
   return (
     <div className="dashboard">
       <header className="dashboard__head">
-        <h1 className="dashboard__title">{storeName || `${storeId}번 가게`} 사장님 페이지</h1>
+        <h1 className="dashboard__title">{store?.name ?? `${storeId}번 가게`} 사장님 페이지</h1>
         {/* 사장님 메뉴 탭: 매장 정보 수정(파트 A), 메뉴 관리(파트 B) 주소는 각 파트와 맞출 것 */}
         <nav className="dashboard__tabs">
           <NavLink to={`/owner/stores/${storeId}/orders`} className="dashboard__tab">주문 대시보드</NavLink>

@@ -1,8 +1,7 @@
 /* ---------------------------------------------------------
    파트 C API — 사장님 주문 대시보드
+   상태 변경 — 파트 C 사장님 전용 API (20260929 지우님 구현 · Postman 테스트 완료)
    백엔드 최신(backend_main 9/30) 실제 API 연결
-
-   USE_MOCK = true 로 바꾸면 백엔드 없이 목데이터(mock/orders.js)로 동작합니다.
    --------------------------------------------------------- */
 
 import apiClient from "./client"; // 팀 공통 axios (baseURL = http://localhost:8080)
@@ -11,15 +10,6 @@ const USE_MOCK = false;
 
 // 주문 목록은 10개씩 페이지
 const ORDER_PAGE_SIZE = 100;
-
-// 상태 → 백엔드 PATCH 주소 끝부분
-// PATCH /api/orders/{orderId}/accept | reject | ready | complete  (body 없음)
-const STATUS_TO_PATH = {
-  ACCEPTED: "accept",
-  REJECTED: "reject",
-  READY: "ready",
-  COMPLETED: "complete",
-};
 
 /* 백엔드 OrderResponse: { orderId, status, totalAmount, pickupTime, items: [{ menuItemId, menuName, quantity, orderPrice }] }
    손님 이름 · 전화번호는 아직 백엔드 응답에 없음 → null (화면에서 숨김) */
@@ -49,14 +39,18 @@ export const getOwnerOrders = async (storeId) => {
   return response.data.content.map(toOrder);
 };
 
-// PATCH /api/orders/{orderId}/status   body: { status }  → 응답 없음(Void)
-// status: "ACCEPTED" | "READY" | "COMPLETED" | "REJECTED"
-export const updateOrderStatus = async (orderId, status) => {
-  const path = STATUS_TO_PATH[status];
-  if (!path) {
-    throw new Error(`바꿀 수 없는 상태입니다: ${status}`);
-  }
-  await apiClient.patch(`/api/orders/${orderId}/${path}`);
+/* 상태 변경 — 파트 C 사장님 전용 API (지우님 구현 · Postman 테스트 완료)
+   PATCH /api/owner/orders/{orderId}/status?ownerId=1   body { "status": "ACCEPTED" }
+   - 이 사장님 가게의 주문만 바뀜 (남의 가게 주문이면 404)
+   - 순서가 틀리면 409 (예: 접수 대기 → 바로 픽업 완료)
+   ownerId: 지금은 가게 정보의 ownerId를 넣음.
+            로그인(JWT)이 붙으면 백엔드가 토큰에서 꺼내도록 바뀔 예정 */
+export const updateOrderStatus = async (orderId, status, ownerId) => {
+  await apiClient.patch(
+    `/api/owner/orders/${orderId}/status`,   // 주소
+    { status },                              // 보낼 데이터 (body)
+    { params: { ownerId } }                  // 주소 뒤 ?ownerId=1
+  );
 };
 
 // GET /api/owner/sales/today  (storeId)  → { totalSales, orderCount }

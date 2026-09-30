@@ -23,13 +23,16 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
-  // 상태 변경 후 목록 다시 불러오기 (PATCH 응답이 Void라서)
-  changeStatus: async (storeId, orderId, status) => {
+  // 상태 변경 후 목록 다시 불러오기
+  changeStatus: async (storeId, orderId, status, ownerId) => {
     try {
-      await updateOrderStatus(orderId, status);
+      await updateOrderStatus(orderId, status, ownerId);
       await get().fetchDashboard(storeId);
-    } catch {
-      set({ error: "주문 상태를 바꾸지 못했어요. 다시 시도해주세요." });
+    } catch (error) {
+      console.error("상태 변경 실패:", error);
+      // 목록을 최신으로 맞춘 뒤 에러 문구를 띄운다 (먼저 띄우면 fetchDashboard 가 지워버림)
+      await get().fetchDashboard(storeId);
+      set({ error: error.response?.data?.message ?? "주문 상태를 바꾸지 못했어요. 다시 시도해주세요." });
     }
   },
 }));
