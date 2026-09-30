@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import { getStores } from './storeApi';
 import CategoryFilter from './CategoryFilter';
 import StoreCard from './StoreCard';
+import Logo from '../../components/common/Logo';
 import styles from './StoreListPage.module.css';
 
 /**
@@ -16,7 +17,8 @@ import styles from './StoreListPage.module.css';
  */
 
 const ALL = '전체';
-const CATEGORIES = [ALL, '카페/디저트', '한식', '양식', '베이커리', '기타'];
+// 백엔드 매장 카테고리 값과 글자가 정확히 같아야 필터가 동작함
+const CATEGORIES = [ALL, '베이커리', '카페', '분식', '일식', '치킨'];
 const SKELETON_COUNT = 6;
 const PAGE_SIZE = 8;
 
@@ -180,7 +182,9 @@ function StoreListPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link to="/" className={styles.logo}>오더메이트</Link>
+        <Link to="/" className={styles.logo} aria-label="메인 홈으로">
+          <Logo className={styles.logoImage} />
+        </Link>
 
         <div className={styles.search}>
           <svg className={styles.searchIcon} viewBox="0 0 24 24" aria-hidden="true">
@@ -217,8 +221,15 @@ function StoreListPage() {
 
       <main className={styles.main}>
         <section className={styles.hero}>
-          <h1 className={styles.title}>지금 주문 가능한 가게</h1>
-          <p className={styles.subtitle}>가까운 가게에서 미리 주문하고 바로 픽업하세요.</p>
+          <p className={styles.eyebrow}>스마트 픽업 주문 서비스</p>
+          <h1 className={styles.title}>
+            동네 단골 매장의 갓 만든 메뉴를 
+            <br />
+            기다림 없이 바로 픽업하세요!
+          </h1>
+          <p className={styles.subtitle}>
+            주문 후 픽업 시간에 맞춰 방문하시면, 갓 준비된 메뉴를 바로 받아가실 수 있어요.
+          </p>
         </section>
 
         <CategoryFilter categories={CATEGORIES} selectedCategory={category} onSelectCategory={handleCategoryChange} />

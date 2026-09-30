@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
+import Logo from '../../components/common/Logo';
 import styles from './AuthForm.module.css';
 
 /**
@@ -12,16 +13,18 @@ import styles from './AuthForm.module.css';
  *   password: string,
  *   passwordConfirm: string,  — 화면 검증용, 서버로 보내지 않음
  *   name: string,
- *   phone: string,
+ *   phone: string,            — 하이픈 포함 필수 (예: 010-1234-5678)
  * }
  * 가입 성공 시 로그인 화면(/login)으로 이동
  *
  * API: POST /api/auth/signup
  *   요청: { email, password, name, phone, role }
+ *   응답(201): { id, email, name, phone, role } — 감싸지 않음, 화면에서는 사용하지 않음
  */
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^01[016789]-?\d{3,4}-?\d{4}$/;
+// 서버(SignupRequest.phone) 검증 규칙과 동일: 2~3자리-3~4자리-4자리, 하이픈 필수
+const PHONE_REGEX = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
 const MIN_PASSWORD_LENGTH = 8;
 
 const ROLE_OPTIONS = [
@@ -54,7 +57,7 @@ function validate(form) {
   if (!form.name.trim()) errors.name = '이름을 입력해주세요.';
 
   if (!form.phone.trim()) errors.phone = '전화번호를 입력해주세요.';
-  else if (!PHONE_REGEX.test(form.phone)) errors.phone = '올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)';
+  else if (!PHONE_REGEX.test(form.phone)) errors.phone = '하이픈(-)을 포함해 입력해주세요. (예: 010-1234-5678)';
 
   return errors;
 }
@@ -124,8 +127,8 @@ function SignupForm() {
     <div className={styles.page}>
       <div className={styles.card}>
         <header className={styles.header}>
-          <div className={styles.logo}>오더메이트</div>
-          <p className={styles.subtitle}>골목 소상공인을 위한 스마트 오더</p>
+          <Logo className={styles.logo} />
+          <p className={styles.subtitle}>동네 소상공인을 위한 스마트 픽업 오더</p>
         </header>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
@@ -159,7 +162,14 @@ function SignupForm() {
           })}
           {renderField({ name: 'passwordConfirm', label: '비밀번호 확인', type: 'password', placeholder: '비밀번호를 한 번 더 입력하세요', autoComplete: 'new-password' })}
           {renderField({ name: 'name', label: '이름', placeholder: '홍길동', autoComplete: 'name' })}
-          {renderField({ name: 'phone', label: '전화번호', type: 'tel', placeholder: '010-1234-5678', autoComplete: 'tel' })}
+          {renderField({
+            name: 'phone',
+            label: '전화번호',
+            type: 'tel',
+            placeholder: '010-1234-5678',
+            autoComplete: 'tel',
+            hint: '하이픈(-)을 포함해 입력해주세요.',
+          })}
 
           {serverError && <div className={styles.alert} role="alert">{serverError}</div>}
 

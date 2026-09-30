@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import Logo from '../../components/common/Logo';
 import styles from './AuthForm.module.css';
 
 /**
@@ -12,7 +13,7 @@ import styles from './AuthForm.module.css';
  *
  * API: POST /api/auth/login
  *   요청: { email, password }
- *   응답: { success, data: { accessToken, user: { id, email, name, role } }, message }
+ *   응답(200): { accessToken, user: { id, email, name, phone, role } } — 감싸지 않고 최상위에 바로 옴
  */
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -56,7 +57,7 @@ function LoginPage() {
     setLoading(true);
     try {
       const res = await apiClient.post('/api/auth/login', form);
-      const { accessToken, user } = res.data.data;
+      const { accessToken, user } = res.data;
       login(user, accessToken);
       navigate('/', { replace: true });
     } catch (err) {
@@ -82,8 +83,8 @@ function LoginPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <header className={styles.header}>
-          <div className={styles.logo}>오더메이트</div>
-          <p className={styles.subtitle}>골목 소상공인을 위한 스마트 오더</p>
+          <Logo className={styles.logo} />
+          <p className={styles.subtitle}>동네 소상공인을 위한 스마트 픽업 오더</p>
         </header>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>

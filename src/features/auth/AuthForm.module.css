@@ -125,11 +125,10 @@
   }
 }
 
-.logo {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  color: var(--auth-text);
+/* 로고 이미지 (components/common/Logo) — 카드 상단 가운데. 공용 Logo 기본값보다 우선하도록 .header 아래로 지정 */
+.header .logo {
+  height: 72px;
+  margin: 0 auto;
 }
 
 .subtitle {

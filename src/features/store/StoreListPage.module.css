@@ -9,7 +9,7 @@
   /*
    * 무채색 로컬 색상 변수
    * 다크 모드 블록은 아래에 주석으로 보관 중 → 현재는 OS 테마와 무관하게 항상 라이트로 고정
-   * 예외(의미 전달용 색): StoreCard의 "주문 가능"(초록)·"준비 중"(회색) 뱃지, 별점(노랑)은 그대로 유지
+   * 예외(의미 전달용 색): StoreCard의 "주문 가능"(초록)·"준비 중"(회색) 뱃지는 그대로 유지
    */
   --home-bg: #ffffff;
   --home-surface: #ffffff;
@@ -131,11 +131,19 @@
 
 .logo {
   justify-self: start;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  color: var(--home-text);
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
+}
+
+/*
+ * 헤더 로고 이미지 (components/common/Logo) — 공용 Logo 기본값보다 우선하도록 .logo 아래로 지정
+ * logo.svg 안쪽에 빈 여백(위 14% · 아래 11% · 왼쪽 7%)이 있어서, 그만큼 음수 margin으로 상쇄
+ * → 로고는 크게 보이면서 헤더 높이는 늘지 않고, 왼쪽 끝이 본문 콘텐츠 줄과 맞음
+ */
+.logo .logoImage {
+  height: 60px;
+  margin: -9px 0 -7px -13px;
 }
 
 .search {
@@ -262,25 +270,45 @@
 }
 
 /* 히어로 배너: 진한 주황 → 포인트 컬러 대각선 그라데이션 + 흰 글자 (참고 이미지 스타일) */
+/*
+ * 히어로 배너 — 소개글(작게) → 제목(크고 굵게, 2줄) → 설명글 3단 구조
+ * 글자 크기 비율은 design-reference_1.png 기준 (소개글 : 제목 : 설명글 ≈ 1 : 2.4 : 1.15)
+ */
 .hero {
-  padding: 28px 28px 26px;
+  /* 상하만 줄여 콤팩트하게 (좌우 40px 유지) */
+  padding: 30px 40px;
   border-radius: 20px;
   background: linear-gradient(135deg, var(--home-hero-from), var(--home-hero-to));
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  /* 줄 높이를 글자에 가깝게 → 배너 위쪽 여백이 덜 벌어짐 */
+  line-height: 1.3;
+  letter-spacing: 0.5px;
+  color: var(--home-on-accent);
+  opacity: 0.9;
 }
 
 /* h1은 루트의 h1 규칙(color: var(--text-h))을 받으므로 직접 지정 — 없으면 루트 색이 들어감 */
 .title {
   margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.6px;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.32;
+  letter-spacing: -0.8px;
   color: var(--home-on-accent);
 }
 
 .subtitle {
-  margin-top: 6px;
-  font-size: 15px;
+  margin: 12px 0 0;
+  font-size: 17px;
+  /* 한 줄일 때 아래쪽 여백이 덜 벌어지도록 줄 높이 축소 */
+  line-height: 1.4;
   color: var(--home-on-accent);
+  opacity: 0.95;
 }
 
 .count {
@@ -415,6 +443,11 @@
     grid-column: 1 / -1;
   }
 
+  .logo .logoImage {
+    height: 52px;
+    margin: -7px 0 -6px -11px;
+  }
+
   .userName {
     display: none;
   }
@@ -423,7 +456,21 @@
     padding-block: 20px;
   }
 
+  .hero {
+    padding: 20px 22px;
+  }
+
+  .eyebrow {
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
   .title {
-    font-size: 22px;
+    font-size: 24px;
+  }
+
+  .subtitle {
+    margin-top: 8px;
+    font-size: 14px;
   }
 }

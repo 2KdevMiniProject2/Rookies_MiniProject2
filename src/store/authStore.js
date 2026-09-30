@@ -13,7 +13,7 @@ import { persist } from 'zustand/middleware';
 export const useAuthStore = create(
   persist(
     (set) => ({
-      user: null, // { id, email, name, role } 형태
+      user: null, // { id, email, name, phone, role } 형태 (로그인 응답의 user 그대로)
       token: null, // JWT accessToken
       isAuthenticated: false,
 

@@ -1,0 +1,7 @@
+/* 로고 기본값 — 높이만 정하면 가로는 원본 비율대로. 화면별 크기는 사용하는 쪽 className으로 덮어씀 */
+.logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  max-width: 100%;
+}
