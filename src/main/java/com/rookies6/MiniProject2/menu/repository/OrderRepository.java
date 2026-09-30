@@ -16,6 +16,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // ===== 파트 B =====
     Page<Order> findByStoreId(Long storeId, Pageable pageable);
 
+    Page<Order> findByCustomerId(Long customerId, Pageable pageable);
+
     Page<Order> findByStoreIdAndStatus(Long storeId, Order.OrderStatus status, Pageable pageable);
 
     // ===== 파트 C =====

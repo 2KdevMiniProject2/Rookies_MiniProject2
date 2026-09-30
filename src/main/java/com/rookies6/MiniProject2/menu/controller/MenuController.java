@@ -2,6 +2,7 @@ package com.rookies6.MiniProject2.menu.controller;
 
 import com.rookies6.MiniProject2.menu.dto.MenuItemCreateRequest;
 import com.rookies6.MiniProject2.menu.dto.MenuItemResponse;
+import com.rookies6.MiniProject2.menu.dto.MenuItemUpdateRequest;
 import com.rookies6.MiniProject2.menu.service.ImageUploadService;
 import com.rookies6.MiniProject2.menu.service.MenuService;
 import jakarta.validation.Valid;
@@ -45,6 +46,14 @@ public class MenuController {
     @PatchMapping("/api/menus/{menuId}/sold-out")
     public ResponseEntity<MenuItemResponse> toggleSoldOut(@PathVariable Long menuId) {
         return ResponseEntity.ok(menuService.toggleSoldOut(menuId));
+    }
+
+    @PatchMapping("/api/menus/{menuId}")
+    public ResponseEntity<MenuItemResponse> updateMenu(
+            @PathVariable Long menuId,
+            @Valid @RequestBody MenuItemUpdateRequest request) {
+        MenuItemResponse response = menuService.updateMenu(menuId, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/api/menus/{menuId}")

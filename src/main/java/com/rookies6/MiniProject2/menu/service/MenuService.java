@@ -4,6 +4,7 @@ import com.rookies6.MiniProject2.common.exception.BusinessException;
 import com.rookies6.MiniProject2.common.exception.ErrorCode;
 import com.rookies6.MiniProject2.menu.dto.MenuItemCreateRequest;
 import com.rookies6.MiniProject2.menu.dto.MenuItemResponse;
+import com.rookies6.MiniProject2.menu.dto.MenuItemUpdateRequest;
 import com.rookies6.MiniProject2.menu.entity.MenuItem;
 import com.rookies6.MiniProject2.menu.repository.MenuItemRepository;
 import com.rookies6.MiniProject2.user.entity.Store;
@@ -55,6 +56,24 @@ public class MenuService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND, menuId));
 
         menuItem.toggleSoldOut();
+        return MenuItemResponse.from(menuItem);
+    }
+
+    @Transactional
+    public MenuItemResponse updateMenu(Long menuId, MenuItemUpdateRequest request) {
+        MenuItem menuItem = menuItemRepository.findByIdAndDeletedAtIsNull(menuId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND, menuId));
+
+        boolean isRenaming = request.getName() != null
+                && !request.getName().isBlank()
+                && !request.getName().equals(menuItem.getName());
+
+        if (isRenaming && menuItemRepository.existsByStoreIdAndNameAndDeletedAtIsNull(
+                menuItem.getStore().getId(), request.getName())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_MENU_NAME, request.getName());
+        }
+
+        menuItem.update(request.getName(), request.getPrice(), request.getImageUrl());
         return MenuItemResponse.from(menuItem);
     }
 

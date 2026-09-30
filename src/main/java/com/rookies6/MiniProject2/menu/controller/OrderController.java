@@ -27,26 +27,6 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping("/api/orders/{orderId}/accept")
-    public ResponseEntity<OrderResponse> acceptOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.acceptOrder(orderId));
-    }
-
-    @PatchMapping("/api/orders/{orderId}/reject")
-    public ResponseEntity<OrderResponse> rejectOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.rejectOrder(orderId));
-    }
-
-    @PatchMapping("/api/orders/{orderId}/ready")
-    public ResponseEntity<OrderResponse> readyOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.readyOrder(orderId));
-    }
-
-    @PatchMapping("/api/orders/{orderId}/complete")
-    public ResponseEntity<OrderResponse> completeOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.completeOrder(orderId));
-    }
-
     @GetMapping("/api/stores/{storeId}/orders")
     public ResponseEntity<Page<OrderResponse>> getOrdersByStore(
             @PathVariable Long storeId,
