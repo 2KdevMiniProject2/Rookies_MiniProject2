@@ -67,4 +67,25 @@ public class StoreDTO {
                     .build();
         }
     }
+
+    // 매장 정보 수정 DTO
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class StoreUpdateRequest {
+        @Size(max = 100, message = "가게 이름은 100자 이하여야 합니다.")
+        private String name;
+
+        @Size(max = 200, message = "가게 주소는 200자 이하여야 합니다.")
+        private String address;
+
+        @Size(max = 50, message = "카테고리는 50자 이하여야 합니다.")
+        private String category;
+
+        private String imageUrl;
+
+        private LocalTime openTime;
+        private LocalTime closeTime;
+    }
 }

@@ -52,7 +52,6 @@ public class StoreService {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, ownerId));
 
-        // 가게 기본 정보 생성
         Store store = Store.builder()
                 .owner(owner)
                 .name(request.getName())
@@ -63,7 +62,6 @@ public class StoreService {
 
         Store savedStore = storeRepository.save(store);
 
-        // 가게 상세 정보 (영업시간) 생성 (1:1 연관관계 매핑)
         if (request.getOpenTime() != null || request.getCloseTime() != null) {
             StoreDetail storeDetail = StoreDetail.builder()
                     .store(savedStore)
@@ -71,7 +69,7 @@ public class StoreService {
                     .closeTime(request.getCloseTime())
                     .build();
             storeDetailRepository.save(storeDetail);
-            savedStore.setStoreDetail(storeDetail);
+            savedStore.assignStoreDetail(storeDetail);
         }
 
         return StoreDTO.StoreResponse.from(savedStore);
@@ -83,6 +81,41 @@ public class StoreService {
         return stores.stream()
                 .map(StoreDTO.StoreResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    // 5. 매장 정보 수정 (사장님 본인 소유 매장만 가능)
+    @Transactional
+    public StoreDTO.StoreResponse updateStore(Long storeId, Long ownerId, StoreDTO.StoreUpdateRequest request) {
+        Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
+
+        if (!store.getOwner().getId().equals(ownerId)) {
+            throw new BusinessException(ErrorCode.STORE_ACCESS_DENIED, storeId);
+        }
+
+        store.update(request.getName(), request.getAddress(), request.getCategory(), request.getImageUrl());
+
+        if (request.getOpenTime() != null || request.getCloseTime() != null) {
+            StoreDetail detail = store.getStoreDetail();
+            if (detail == null) {
+                detail = StoreDetail.builder()
+                        .store(store)
+                        .openTime(request.getOpenTime())
+                        .closeTime(request.getCloseTime())
+                        .build();
+                storeDetailRepository.save(detail);
+                store.assignStoreDetail(detail);
+            } else {
+                if (request.getOpenTime() != null) {
+                    detail.setOpenTime(request.getOpenTime());
+                }
+                if (request.getCloseTime() != null) {
+                    detail.setCloseTime(request.getCloseTime());
+                }
+            }
+        }
+
+        return StoreDTO.StoreResponse.from(store);
     }
 
     // 소유권자만 가능

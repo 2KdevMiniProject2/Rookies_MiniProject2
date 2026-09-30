@@ -72,7 +72,7 @@ public class DataInitRunner implements CommandLineRunner {
                 .closeTime(LocalTime.of(21, 0))
                 .build();
         storeDetailRepository.save(storeDetail);
-        bakeryStore.setStoreDetail(storeDetail);
+        bakeryStore.assignStoreDetail(storeDetail);
 
         log.info(">>>>> [초기 더미 데이터 생성 완료!] <<<<<");
         log.info("1) 사장님 계정: owner@rookie.com / 1234");
