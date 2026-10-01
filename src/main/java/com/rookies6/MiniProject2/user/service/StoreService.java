@@ -45,10 +45,6 @@ public class StoreService {
         return stores.map(StoreDTO.StoreResponse::from);
     }
 
-    public Page<StoreDTO.StoreResponse> getAllStores(String category, Pageable pageable) {
-        return getAllStores(category, null, pageable);
-    }
-
     // 2. 매장 단건 상세 조회
     public StoreDTO.StoreResponse getStoreById(Long storeId) {
         Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
@@ -86,8 +82,11 @@ public class StoreService {
         return StoreDTO.StoreResponse.from(savedStore);
     }
 
-    // 4. 사장님(ownerId)의 매장 목록 전체 조회 (다중 매장 소유 지원)
-    public List<StoreDTO.StoreResponse> getStoresByOwnerId(Long ownerId) {
+    // 4. 사장님(ownerId)의 매장 목록 전체 조회 (다중 매장 소유 지원, 본인 소유만 가능)
+    public List<StoreDTO.StoreResponse> getStoresByOwnerId(Long ownerId, Long callerId) {
+        if (!ownerId.equals(callerId)) {
+            throw new BusinessException(ErrorCode.STORE_ACCESS_DENIED, ownerId);
+        }
         List<Store> stores = storeRepository.findByOwnerIdAndDeletedAtIsNull(ownerId);
         return stores.stream()
                 .map(StoreDTO.StoreResponse::from)

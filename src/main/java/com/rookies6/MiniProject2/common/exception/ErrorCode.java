@@ -33,7 +33,7 @@ public enum ErrorCode {
     INVALID_STORE_MENU_OR_NOT_FOUND("주문할 수 없는 메뉴가 포함되어 있습니다.( ex) 품절, 이벤트 시간 마감 등 )", HttpStatus.BAD_REQUEST),
 
     // 매장 권한 관련 에러 코드
-    STORE_ACCESS_DENIED("본인 소유의 매장만 삭제할 수 있습니다. storeId=%s", HttpStatus.FORBIDDEN),
+    STORE_ACCESS_DENIED("본인 소유의 매장만 조회·수정·삭제할 수 있습니다. (id=%s)", HttpStatus.FORBIDDEN),
 
     // 이미지 업로드 관련 에러 코드
     INVALID_IMAGE_FILE("이미지 파일만 업로드할 수 있습니다.", HttpStatus.BAD_REQUEST),
