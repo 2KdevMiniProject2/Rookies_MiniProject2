@@ -1,5 +1,6 @@
 package com.rookies6.MiniProject2.user.controller;
 
+import com.rookies6.MiniProject2.security.models.UserInfoUserDetails;
 import com.rookies6.MiniProject2.user.dto.UserDTO;
 import com.rookies6.MiniProject2.user.service.UserService;
 import jakarta.validation.Valid;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,26 +42,31 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // 3. 회원 단건 조회 API
+    // 3. 회원 단건 조회 API (본인만)
     @GetMapping("/api/users/{id}")
-    public ResponseEntity<UserDTO.UserResponse> getUser(@PathVariable Long id) {
-        UserDTO.UserResponse response = userService.getUserById(id);
+    public ResponseEntity<UserDTO.UserResponse> getUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserInfoUserDetails principal) {
+        UserDTO.UserResponse response = userService.getUserById(id, principal.getUser().getId());
         return ResponseEntity.ok(response);
     }
 
-    // 4. 회원 정보 수정 API (PUT, PATCH 모두 지원)
+    // 4. 회원 정보 수정 API (PUT, PATCH 모두 지원, 본인만)
     @RequestMapping(value = "/api/users/{id}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<UserDTO.UserResponse> updateUser(
             @PathVariable Long id,
+            @AuthenticationPrincipal UserInfoUserDetails principal,
             @Valid @RequestBody UserDTO.UpdateRequest request) {
-        UserDTO.UserResponse response = userService.updateUser(id, request);
+        UserDTO.UserResponse response = userService.updateUser(id, principal.getUser().getId(), request);
         return ResponseEntity.ok(response);
     }
 
-    // 5. 회원 탈퇴 API
+    // 5. 회원 탈퇴 API (본인만)
     @DeleteMapping("/api/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserInfoUserDetails principal) {
+        userService.deleteUser(id, principal.getUser().getId());
         return ResponseEntity.noContent().build();
     }
 }
