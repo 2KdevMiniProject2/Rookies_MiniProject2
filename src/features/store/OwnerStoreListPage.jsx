@@ -1,19 +1,26 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
+import { useAuthStore } from '../../store/authStore';
 import Logo from '../../components/common/Logo';
 import './OwnerStoreListPage.css';
 
 function OwnerStoreListPage() {
     const navigate = useNavigate();
-
-    const ownerId = 7; // 임시 테스트용, 나중에 로그인 사용자 id로 변경
+    const authUser = useAuthStore((state) => state.user);
+    const logout = useAuthStore((state) => state.logout);
+    const ownerId = authUser?.id;
 
     const [stores, setStores] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
+        if (!ownerId) {
+            setLoading(false);
+            return;
+        }
+
         const fetchStores = async () => {
             try {
                 const response = await apiClient.get(
@@ -30,7 +37,13 @@ function OwnerStoreListPage() {
         };
 
         fetchStores();
-    }, []);
+    }, [ownerId]);
+
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
 
     const handleDeleteStore = async (storeId, storeName) => {
         const confirmed = window.confirm(
@@ -101,7 +114,7 @@ function OwnerStoreListPage() {
                             회원정보
                         </button>
 
-                        <button type="button">
+                        <button type="button" onClick={handleLogout}>
                             로그아웃
                         </button>
                     </nav>

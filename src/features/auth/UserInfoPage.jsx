@@ -9,11 +9,11 @@ function UserInfoPage() {
     const navigate = useNavigate();
 
     const authUser = useAuthStore((state) => state.user);
+    const token = useAuthStore((state) => state.token);
     const login = useAuthStore((state) => state.login);
     const logout = useAuthStore((state) => state.logout);
 
-    // 로그인 연동 전에는 7번 계정으로 테스트
-    const userId = authUser?.id ?? 7;
+    const userId = authUser?.id;
 
     const [user, setUser] = useState(null);
     const [name, setName] = useState('');
@@ -26,6 +26,12 @@ function UserInfoPage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        if (!userId) {
+            setError('로그인 사용자 정보가 없습니다.');
+            setLoading(false);
+            return;
+        }
+
         const fetchUser = async () => {
             try {
                 const response = await apiClient.get(`/api/users/${userId}`);
@@ -93,7 +99,7 @@ function UserInfoPage() {
 
             // 로그인 정보가 이미 연결되어 있으면 전역 사용자 정보도 갱신
             if (authUser) {
-                login(response.data);
+                login(response.data, token);
             }
 
             setNewPassword('');

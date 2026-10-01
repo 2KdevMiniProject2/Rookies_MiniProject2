@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../../api/client';
+import { useAuthStore } from '../../store/authStore';
 import Logo from '../../components/common/Logo';
 import './StoreRegisterPage.css';
 
 function StoreEditPage() {
     const navigate = useNavigate();
     const { storeId } = useParams();
-
-    const ownerId = 7; // 임시 테스트용, 나중에 로그인 사용자 id로 변경
+    const authUser = useAuthStore((state) => state.user);
+    const logout = useAuthStore((state) => state.logout);
+    const ownerId = authUser?.id;
 
     const [storeName, setStoreName] = useState('');
     const [storeCategory, setStoreCategory] = useState('');
@@ -55,6 +57,11 @@ function StoreEditPage() {
     }, [storeId]);
 
     const handleStoreUpdate = async () => {
+        if (!ownerId) {
+            alert('로그인 사용자 정보를 확인할 수 없습니다.');
+            return;
+        }
+
         if (!storeName.trim()) {
             alert('가게명을 입력해주세요.');
             return;
@@ -108,6 +115,11 @@ function StoreEditPage() {
         }
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
         <main className="store-register-page">
             <div className="store-register-layout">
@@ -143,7 +155,7 @@ function StoreEditPage() {
                             회원정보
                         </button>
 
-                        <button type="button">
+                        <button type="button" onClick={handleLogout}>
                             로그아웃
                         </button>
                     </nav>

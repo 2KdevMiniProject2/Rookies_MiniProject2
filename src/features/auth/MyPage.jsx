@@ -1,29 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
+import { useAuthStore } from '../../store/authStore';
 import Logo from '../../components/common/Logo';
 import './MyPage.css';
 
 function MyPage() {
     const navigate = useNavigate();
+    const authUser = useAuthStore((state) => state.user);
+    const logout = useAuthStore((state) => state.logout);
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!authUser?.id) {
+            setLoading(false);
+            return;
+        }
+
         const fetchUser = async () => {
             try {
-                const response = await apiClient.get('/api/users/7');
+                const response = await apiClient.get(`/api/users/${authUser.id}`);
                 setUser(response.data);
             } catch (error) {
                 console.error('사용자 조회 실패:', error);
+                setUser(authUser);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchUser();
-    }, []);
+    }, [authUser]);
 
     const orders = [
         {
@@ -62,6 +71,14 @@ function MyPage() {
         logout();
         navigate('/login');
     };
+
+    if (loading) {
+        return (
+            <main className="mypage">
+                <p>사용자 정보를 불러오는 중입니다.</p>
+            </main>
+        );
+    }
 
     if (!user) {
         return (
@@ -202,7 +219,7 @@ function MyPage() {
                                             </div>
 
                                             <span
-                                                className={`order-status ${order.status.toLowerCase()}`}
+                                                className={`mypage-order-status mypage-order-status--${order.status.toLowerCase()}`}
                                             >
                                                 {getStatusText(order.status)}
                                             </span>

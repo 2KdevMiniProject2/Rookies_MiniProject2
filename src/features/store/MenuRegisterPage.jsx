@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../../api/client';
+import { useAuthStore } from '../../store/authStore';
 import Logo from '../../components/common/Logo';
 import './MenuRegisterPage.css';
 
 function MenuRegisterPage() {
     const navigate = useNavigate();
     const { storeId } = useParams();
-
-    const ownerId = 7; // 임시 테스트용, 나중에 로그인 사용자 id로 변경
+    const authUser = useAuthStore((state) => state.user);
+    const logout = useAuthStore((state) => state.logout);
+    const ownerId = authUser?.id;
     const backendBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     const menuImageInputRef = useRef(null);
@@ -122,6 +124,11 @@ function MenuRegisterPage() {
     };
 
     const handleMenuAdd = async () => {
+        if (!ownerId) {
+            alert('로그인 사용자 정보를 확인할 수 없습니다.');
+            return;
+        }
+
         if (!menuName.trim()) {
             alert('메뉴명을 입력해주세요.');
             return;
@@ -173,6 +180,11 @@ function MenuRegisterPage() {
     };
 
     const handleSoldOutToggle = async (menuId) => {
+        if (!ownerId) {
+            alert('로그인 사용자 정보를 확인할 수 없습니다.');
+            return;
+        }
+
         try {
             const response = await apiClient.patch(
                 `/api/menus/${menuId}/sold-out`,
@@ -249,6 +261,11 @@ function MenuRegisterPage() {
     };
 
     const handleEditSave = async (menu) => {
+        if (!ownerId) {
+            alert('로그인 사용자 정보를 확인할 수 없습니다.');
+            return;
+        }
+
         if (!editName.trim()) {
             alert('메뉴명을 입력해주세요.');
             return;
@@ -304,6 +321,11 @@ function MenuRegisterPage() {
     };
 
     const handleMenuDelete = async (menuId, menuName) => {
+        if (!ownerId) {
+            alert('로그인 사용자 정보를 확인할 수 없습니다.');
+            return;
+        }
+
         const confirmed = window.confirm(
             `${menuName} 메뉴를 삭제하시겠습니까?`
         );
@@ -335,6 +357,11 @@ function MenuRegisterPage() {
         }
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
         <main className="menu-register-page">
             <div className="menu-register-layout">
@@ -360,7 +387,7 @@ function MenuRegisterPage() {
                             회원정보
                         </button>
 
-                        <button type="button">
+                        <button type="button" onClick={handleLogout}>
                             로그아웃
                         </button>
                     </nav>

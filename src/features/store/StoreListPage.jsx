@@ -13,7 +13,7 @@ import styles from './StoreListPage.module.css';
  * 구성: 헤더(로고 · 검색창 · 로그인/마이페이지/로그아웃) → 카테고리 탭 → 가게 카드 그리드 → 페이지 번호
  * 상태: result(서버 응답 한 페이지), keyword(입력칸 값), searchKeyword(실제로 검색한 값),
  *       category(선택 탭), page(현재 페이지) — 모두 로컬 useState
- * 검색·카테고리 필터·페이지네이션 모두 서버에서 처리 (GET /api/stores?keyword=&category=&page=&size=)
+ * 카테고리 필터·페이지네이션은 서버에서 처리하고, 매장명 검색은 현재 백엔드 API에 keyword 파라미터가 없어 storeApi에서 보완합니다.
  * 검색은 디바운스: 타이핑이 SEARCH_DELAY 동안 멈추면 그때 검색어를 확정해 요청
  * 카드 클릭 시 /stores/:storeId (파트 B 가게 상세)로 이동
  */
@@ -98,9 +98,8 @@ function StoreListPage() {
     setReloadKey((k) => k + 1);
   };
 
-  // TODO: 마이페이지 화면(다른 파트) 완성되면 navigate('/mypage')로 연결
   const handleMyPage = () => {
-    console.log('[StoreListPage] 마이페이지 클릭 — 경로 연결 예정');
+    navigate('/mypage');
   };
 
   // "전체 가게 보기" — 기다리지 않고 바로 초기화
