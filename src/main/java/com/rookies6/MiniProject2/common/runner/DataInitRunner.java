@@ -36,6 +36,16 @@ public class DataInitRunner implements CommandLineRunner {
 
         log.info(">>>>> [초기 더미 데이터 자동 생성 시작] <<<<<");
 
+        // 0. 관리자(ADMIN) 계정 생성 — GET /api/users 테스트용
+        User admin = User.builder()
+                .email("admin@rookie.com")
+                .password(passwordEncoder.encode("1234"))
+                .name("시스템관리자")
+                .phone("010-0000-0000")
+                .role(User.Role.ADMIN)
+                .build();
+        userRepository.save(admin);
+
         // 1. 사장님(OWNER) 계정 생성
         User owner = User.builder()
                 .email("owner@rookie.com")
@@ -75,6 +85,7 @@ public class DataInitRunner implements CommandLineRunner {
         bakeryStore.assignStoreDetail(storeDetail);
 
         log.info(">>>>> [초기 더미 데이터 생성 완료!] <<<<<");
+        log.info("0) 관리자 계정: admin@rookie.com / 1234");
         log.info("1) 사장님 계정: owner@rookie.com / 1234");
         log.info("2) 손님 계정: user@rookie.com / 1234");
         log.info("3) 기본 1번 매장: 루키즈 베이커리 (ID: {})", bakeryStore.getId());

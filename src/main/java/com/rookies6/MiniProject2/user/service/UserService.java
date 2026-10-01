@@ -39,6 +39,10 @@ public class UserService {
             throw new BusinessException(ErrorCode.DUPLICATE_EMAIL, request.getEmail());
         }
 
+        if (request.getRole() == User.Role.ADMIN) {
+            throw new BusinessException(ErrorCode.INVALID_SIGNUP_ROLE, request.getRole());
+        }
+
         // 비밀번호 암호화 및 유저 생성
         User user = User.builder()
                 .email(request.getEmail())
@@ -54,10 +58,13 @@ public class UserService {
 
     // 2. 사용자 로그인 처리
     public UserDTO.LoginResponse login(UserDTO.LoginRequest request) {
-        // Spring Security 인증 수행 (비밀번호 검증 및 UserDetails 로드)
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
+        }
 
         // 인증 통과 후 회원 정보 조회
         User user = userRepository.findByEmail(request.getEmail())
@@ -73,7 +80,8 @@ public class UserService {
     }
 
     // 3. 회원 단건 조회
-    public UserDTO.UserResponse getUserById(Long userId) {
+    public UserDTO.UserResponse getUserById(Long userId, Long callerId) {
+        validateSelf(userId, callerId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
         return UserDTO.UserResponse.from(user);
@@ -81,7 +89,8 @@ public class UserService {
 
     // 4. 회원 정보 수정
     @Transactional
-    public UserDTO.UserResponse updateUser(Long userId, UserDTO.UpdateRequest request) {
+    public UserDTO.UserResponse updateUser(Long userId, Long callerId, UserDTO.UpdateRequest request) {
+        validateSelf(userId, callerId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
 
@@ -100,9 +109,16 @@ public class UserService {
 
     // 5. 회원 탈퇴
     @Transactional
-    public void deleteUser(Long userId) {
+    public void deleteUser(Long userId, Long callerId) {
+        validateSelf(userId, callerId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
         userRepository.delete(user);
+    }
+
+    private void validateSelf(Long userId, Long callerId) {
+        if (!userId.equals(callerId)) {
+            throw new BusinessException(ErrorCode.USER_ACCESS_DENIED, userId);
+        }
     }
 }

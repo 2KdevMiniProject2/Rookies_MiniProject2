@@ -11,11 +11,13 @@ public enum ErrorCode {
 
     //로그인 관련 에러 코드
     DUPLICATE_EMAIL("이미 사용 중인 이메일입니다: %s", HttpStatus.CONFLICT),
+    INVALID_SIGNUP_ROLE("가입 시 선택할 수 없는 권한입니다: %s", HttpStatus.BAD_REQUEST),
     INVALID_CREDENTIALS("이메일 또는 비밀번호가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
 
     // 유저 정보 관련 에러 코드
     STORE_NOT_FOUND("존재하지 않는 매장입니다. storeId=%s", HttpStatus.NOT_FOUND),
     USER_NOT_FOUND("존재하지 않는 회원입니다. userId=%s", HttpStatus.NOT_FOUND),
+    USER_ACCESS_DENIED("본인 계정만 조회·수정·삭제할 수 있습니다. userId=%s", HttpStatus.FORBIDDEN),
 
     // 메뉴 관련 에러 코드
     MENU_ITEM_NOT_FOUND("존재하지 않는 메뉴입니다. menuId=%s", HttpStatus.NOT_FOUND),
