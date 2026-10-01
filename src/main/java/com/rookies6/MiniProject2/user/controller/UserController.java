@@ -20,7 +20,8 @@ public class UserController {
 
     private final UserService userService;
 
-    // 0. 회원 전체 목록 조회 API
+    // 0. 회원 전체 목록 조회 API (관리자 전용)
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/users")
     public ResponseEntity<Page<UserDTO.UserResponse>> getAllUsers(
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
@@ -28,8 +29,8 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    // 1. 회원가입 / 회원 추가 API (/api/auth/signup 및 /api/users 둘 다 지원)
-    @PostMapping({"/api/auth/signup", "/api/users"})
+    // 1. 회원가입 API (비로그인 호출 가능 — /api/auth/signup 하나로만 노출)
+    @PostMapping("/api/auth/signup")
     public ResponseEntity<UserDTO.UserResponse> signup(@Valid @RequestBody UserDTO.SignupRequest request) {
         UserDTO.UserResponse response = userService.signup(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
