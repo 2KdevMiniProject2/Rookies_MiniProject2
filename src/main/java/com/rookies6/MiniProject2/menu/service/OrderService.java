@@ -84,9 +84,13 @@ public class OrderService {
         return OrderResponse.from(savedOrder);
     }
 
-    public Page<OrderResponse> getOrdersByStore(Long storeId, Order.OrderStatus status, Pageable pageable) {
-        storeRepository.findByIdAndDeletedAtIsNull(storeId)
+    public Page<OrderResponse> getOrdersByStore(Long storeId, Long ownerId, Order.OrderStatus status, Pageable pageable) {
+        Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
+
+        if (!store.getOwner().getId().equals(ownerId)) {
+            throw new BusinessException(ErrorCode.STORE_ACCESS_DENIED, storeId);
+        }
 
         Page<Order> orders = (status != null)
                 ? orderRepository.findByStoreIdAndStatus(storeId, status, pageable)

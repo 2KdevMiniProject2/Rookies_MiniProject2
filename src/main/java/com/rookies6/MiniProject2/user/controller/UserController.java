@@ -1,7 +1,8 @@
 package com.rookies6.MiniProject2.user.controller;
 
-import com.rookies6.MiniProject2.security.models.UserInfoUserDetails;
+import com.rookies6.MiniProject2.security.annotation.CurrentUser;
 import com.rookies6.MiniProject2.user.dto.UserDTO;
+import com.rookies6.MiniProject2.user.entity.User;
 import com.rookies6.MiniProject2.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -47,8 +47,8 @@ public class UserController {
     @GetMapping("/api/users/{id}")
     public ResponseEntity<UserDTO.UserResponse> getUser(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserInfoUserDetails principal) {
-        UserDTO.UserResponse response = userService.getUserById(id, principal.getUser().getId());
+            @CurrentUser User currentUser) {
+        UserDTO.UserResponse response = userService.getUserById(id, currentUser.getId());
         return ResponseEntity.ok(response);
     }
 
@@ -56,9 +56,9 @@ public class UserController {
     @RequestMapping(value = "/api/users/{id}", method = {RequestMethod.PATCH, RequestMethod.PUT})
     public ResponseEntity<UserDTO.UserResponse> updateUser(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserInfoUserDetails principal,
+            @CurrentUser User currentUser,
             @Valid @RequestBody UserDTO.UpdateRequest request) {
-        UserDTO.UserResponse response = userService.updateUser(id, principal.getUser().getId(), request);
+        UserDTO.UserResponse response = userService.updateUser(id, currentUser.getId(), request);
         return ResponseEntity.ok(response);
     }
 
@@ -66,15 +66,14 @@ public class UserController {
     @DeleteMapping("/api/users/{id}")
     public ResponseEntity<Void> deleteUser(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserInfoUserDetails principal) {
-        userService.deleteUser(id, principal.getUser().getId());
+            @CurrentUser User currentUser) {
+        userService.deleteUser(id, currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 
     // 6. 내 정보 조회 API (교재 Step 14: 새로고침 시 토큰 기반 복원)
     @GetMapping("/api/users/me")
-    public ResponseEntity<UserDTO.UserResponse> getMyInfo(
-            @AuthenticationPrincipal UserInfoUserDetails principal) {
-        return ResponseEntity.ok(UserDTO.UserResponse.from(principal.getUser()));
+    public ResponseEntity<UserDTO.UserResponse> getMyInfo(@CurrentUser User currentUser) {
+        return ResponseEntity.ok(UserDTO.UserResponse.from(currentUser));
     }
 }

@@ -2,6 +2,8 @@ package com.rookies6.MiniProject2.order.controller;
 
 import com.rookies6.MiniProject2.menu.dto.OrderResponse;
 import com.rookies6.MiniProject2.order.service.CustomerOrderService;
+import com.rookies6.MiniProject2.security.annotation.CurrentUser;
+import com.rookies6.MiniProject2.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,28 +18,28 @@ public class CustomerOrderController {
 
     private final CustomerOrderService customerOrderService;
 
-    // [손님] 내 주문 현황 목록 조회
     @GetMapping
     public ResponseEntity<Page<OrderResponse>> getMyOrders(
             @PathVariable Long customerId,
+            @CurrentUser User currentUser,
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(customerOrderService.getMyOrders(customerId, pageable));
+        return ResponseEntity.ok(customerOrderService.getMyOrders(customerId, currentUser.getId(), pageable));
     }
 
-    // [손님] 주문 하나 현재 상태 확인
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getMyOrder(
             @PathVariable Long customerId,
+            @CurrentUser User currentUser,
             @PathVariable Long orderId) {
-        return ResponseEntity.ok(customerOrderService.getMyOrder(customerId, orderId));
+        return ResponseEntity.ok(customerOrderService.getMyOrder(customerId, currentUser.getId(), orderId));
     }
 
-    // [손님] 주문 취소
     @PatchMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelMyOrder(
             @PathVariable Long customerId,
+            @CurrentUser User currentUser,
             @PathVariable Long orderId) {
-        customerOrderService.cancelMyOrder(customerId, orderId);
+        customerOrderService.cancelMyOrder(customerId, currentUser.getId(), orderId);
         return ResponseEntity.noContent().build();
     }
 }

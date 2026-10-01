@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -18,8 +19,19 @@ public class ImageUploadService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    private static final Map<String, String> ALLOWED_IMAGE_TYPES = Map.of(
+            "image/jpeg", ".jpg",
+            "image/png", ".png",
+            "image/webp", ".webp"
+    );
+
     public String uploadMenuImage(MultipartFile image) {
-        if (image.isEmpty() || image.getContentType() == null || !image.getContentType().startsWith("image/")) {
+        if (image.isEmpty()) {
+            throw new BusinessException(ErrorCode.INVALID_IMAGE_FILE);
+        }
+
+        String extension = ALLOWED_IMAGE_TYPES.get(image.getContentType());
+        if (extension == null) {
             throw new BusinessException(ErrorCode.INVALID_IMAGE_FILE);
         }
 
@@ -27,12 +39,7 @@ public class ImageUploadService {
             Path dirPath = Paths.get(uploadDir);
             Files.createDirectories(dirPath);
 
-            String originalName = image.getOriginalFilename();
-            String extension = (originalName != null && originalName.contains("."))
-                    ? originalName.substring(originalName.lastIndexOf('.'))
-                    : "";
             String savedFileName = UUID.randomUUID() + extension;
-
             Path targetPath = dirPath.resolve(savedFileName);
             image.transferTo(targetPath);
 

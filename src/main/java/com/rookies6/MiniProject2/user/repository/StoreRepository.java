@@ -49,15 +49,14 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             "WHERE s.id = :id AND s.deletedAt IS NULL")
     Optional<Store> findByIdAndDeletedAtIsNull(Long id);
 
-    // 3. 사장님(ownerId)의 매장 목록 전체 조회 (다중 매장 소유 지원)
-    List<Store> findByOwnerId(Long ownerId);
 
-    // 4. 사장님(ownerId)의 정상 영업 중인 매장 목록 조회 (페치 조인 적용)
-    @Query("SELECT DISTINCT s FROM Store s " +
+    // 4. 사장님(ownerId)의 정상 영업 중인 매장 목록 조회 (페치 조인 + 페이징 적용)
+    @Query(value = "SELECT DISTINCT s FROM Store s " +
             "LEFT JOIN FETCH s.storeDetail " +
             "JOIN FETCH s.owner " +
-            "WHERE s.owner.id = :ownerId AND s.deletedAt IS NULL")
-    List<Store> findByOwnerIdAndDeletedAtIsNull(Long ownerId);
+            "WHERE s.owner.id = :ownerId AND s.deletedAt IS NULL",
+            countQuery = "SELECT COUNT(s) FROM Store s WHERE s.owner.id = :ownerId AND s.deletedAt IS NULL")
+    Page<Store> findByOwnerIdAndDeletedAtIsNull(Long ownerId, Pageable pageable);
 
     // ===== 파트 C =====
     boolean existsByIdAndOwnerIdAndDeletedAtIsNull(Long storeId, Long ownerId);

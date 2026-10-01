@@ -25,9 +25,10 @@ public class CustomerOrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
-    public Page<OrderResponse> getMyOrders(Long customerId, Pageable pageable) {
-        Page<Order> orders = orderRepository.findByCustomerId(customerId, pageable);
+    public Page<OrderResponse> getMyOrders(Long customerId, Long callerId, Pageable pageable) {
+        validateSelf(customerId, callerId);
 
+        Page<Order> orders = orderRepository.findByCustomerId(customerId, pageable);
         List<Long> orderIds = orders.getContent().stream().map(Order::getId).toList();
 
         Map<Long, List<OrderItemResponse>> itemsByOrderId = orderIds.isEmpty()
@@ -40,17 +41,27 @@ public class CustomerOrderService {
         return orders.map(order -> OrderResponse.from(order, itemsByOrderId.getOrDefault(order.getId(), List.of())));
     }
 
-    public OrderResponse getMyOrder(Long customerId, Long orderId) {
+    public OrderResponse getMyOrder(Long customerId, Long callerId, Long orderId) {
+        validateSelf(customerId, callerId);
+
         Order order = orderRepository.findByIdAndCustomerId(orderId, customerId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND, orderId));
         return OrderResponse.from(order);
     }
 
     @Transactional
-    public void cancelMyOrder(Long customerId, Long orderId) {
+    public void cancelMyOrder(Long customerId, Long callerId, Long orderId) {
+        validateSelf(customerId, callerId);
+
         Order order = orderRepository.findByIdAndCustomerId(orderId, customerId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND, orderId));
 
         order.customerCancel();
+    }
+
+    private void validateSelf(Long customerId, Long callerId) {
+        if (!customerId.equals(callerId)) {
+            throw new BusinessException(ErrorCode.USER_ACCESS_DENIED, customerId);
+        }
     }
 }
