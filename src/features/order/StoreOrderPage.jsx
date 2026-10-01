@@ -1,6 +1,5 @@
 /* ---------------------------------------------------------
    주문 페이지 (손님) — 주소 "/stores/:storeId"
-   가게 정보를 보고 → 메뉴를 담고 → [장바구니 보기]
 
      목데이터·불러오기   → api/storeOrderApi.js   (분리 완료 · 백엔드 연결)
      장바구니           → store/cartStore.js     (zustand, 장바구니 페이지와 공유)
@@ -113,30 +112,37 @@ function StoreOrderPage() {
                     [나중에 분리 → components/StoreInfo.jsx]
                     props: store
                     ================================================= */}
-                <section className="store-order__store">
-                    <div className="store-order__store-title-row">
-                        <h1 className="store-order__store-name">{store.name}</h1>
-                        <span className="store-order__category">{store.category}</span>
+                <section className={"store-order__store" + (store.imageUrl ? " has-photo" : "")}>
+                    <div className="store-order__store-text">
+                        <div className="store-order__store-title-row">
+                            <h1 className="store-order__store-name">{store.name}</h1>
+                            <span className="store-order__category">{store.category}</span>
+                        </div>
+
+                        <ul className="store-order__store-info">
+                            <li>
+                                <span className="store-order__info-label">주소</span>
+                                {store.address}
+                            </li>
+                            {store.phone && (
+                                <li>
+                                    <span className="store-order__info-label">전화</span>
+                                    {store.phone}
+                                </li>
+                            )}
+                            <li>
+                                <span className="store-order__info-label">영업시간</span>
+                                {hhmm(store.openTime)} ~ {hhmm(store.closeTime)}
+                            </li>
+                        </ul>
+
+                        {store.description && <p className="store-order__store-desc">{store.description}</p>}
                     </div>
 
-                    <ul className="store-order__store-info">
-                        <li>
-                            <span className="store-order__info-label">주소</span>
-                            {store.address}
-                        </li>
-                        {store.phone && (
-                            <li>
-                                <span className="store-order__info-label">전화</span>
-                                {store.phone}
-                            </li>
-                        )}
-                        <li>
-                            <span className="store-order__info-label">영업시간</span>
-                            {hhmm(store.openTime)} ~ {hhmm(store.closeTime)}
-                        </li>
-                    </ul>
-
-                    {store.description && <p className="store-order__store-desc">{store.description}</p>}
+                    {/* 가게 사진 — 있을 때만 (사장님이 가게 등록 때 넣은 사진) */}
+                    {store.imageUrl && (
+                        <img className="store-order__store-photo" src={store.imageUrl} alt={`${store.name} 사진`} />
+                    )}
                 </section>
 
                 {/* ── 메뉴 목록 ── */}

@@ -83,6 +83,32 @@
   border-radius: var(--order-radius-hero);
 }
 
+/* 가게 정보 글 영역 (사진이 있으면 왼쪽) */
+.store-order__store-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* 가게 사진이 있으면: 글 왼쪽 · 사진 오른쪽 */
+.store-order__store.has-photo {
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+}
+
+.store-order__store-photo {
+  flex: none;
+  width: 220px;
+  height: 150px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--order-radius-card);
+  background: rgba(255, 255, 255, 0.18);
+}
+
 .store-order__store-title-row {
   display: flex;
   flex-wrap: wrap;
@@ -422,6 +448,19 @@
 
   .store-order__store {
     padding: 22px 20px;
+  }
+
+  /* 폰: 사진을 위로, 가로 꽉 차게 */
+  .store-order__store.has-photo {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .store-order__store-photo {
+    order: -1;
+    width: 100%;
+    height: 160px;
   }
 
   /* 팀 .title 모바일 크기와 같음 */

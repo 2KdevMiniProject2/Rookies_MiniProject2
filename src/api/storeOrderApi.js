@@ -10,6 +10,7 @@ const toStore = (response) => ({
     name: response.name,
     address: response.address,
     category: response.category,
+    imageUrl: toImageUrl(response.imageUrl), // 가게 사진 없으면 null
     openTime: response.openTime,
     closeTime: response.closeTime,
     phone: response.phone ?? null,
