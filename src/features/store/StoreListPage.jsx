@@ -11,81 +11,90 @@ import styles from './StoreListPage.module.css';
  * 메인 홈 — 매장 찾기 (/)
  *
  * 구성: 헤더(로고 · 검색창 · 로그인/마이페이지/로그아웃) → 카테고리 탭 → 가게 카드 그리드 → 페이지 번호
- * 상태: stores(서버 데이터), loading, error, keyword(검색어), category(선택 탭), page(현재 페이지) — 모두 로컬 useState
- * 필터링·페이지네이션은 받아온 전체 목록을 화면에서 처리 (백엔드가 정렬/페이지/검색 파라미터를 지원하지 않음)
+ * 상태: result(서버 응답 한 페이지), keyword(입력칸 값), searchKeyword(실제로 검색한 값),
+ *       category(선택 탭), page(현재 페이지) — 모두 로컬 useState
+ * 검색·카테고리 필터·페이지네이션 모두 서버에서 처리 (GET /api/stores?keyword=&category=&page=&size=)
+ * 검색은 디바운스: 타이핑이 SEARCH_DELAY 동안 멈추면 그때 검색어를 확정해 요청
  * 카드 클릭 시 /stores/:storeId (파트 B 가게 상세)로 이동
  */
 
 const ALL = '전체';
 // 백엔드 매장 카테고리 값과 글자가 정확히 같아야 필터가 동작함
 const CATEGORIES = [ALL, '베이커리', '카페', '분식', '일식', '치킨'];
-const SKELETON_COUNT = 6;
 const PAGE_SIZE = 8;
+// 로딩 스켈레톤 개수 — 한 페이지 개수와 같게
+const SKELETON_COUNT = PAGE_SIZE;
+// 타이핑이 이 시간(ms) 동안 멈추면 검색 요청을 보냄
+const SEARCH_DELAY = 300;
 
 function StoreListPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
 
-  const [stores, setStores] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [reloadKey, setReloadKey] = useState(0);
   const [keyword, setKeyword] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState('');
   const [category, setCategory] = useState(ALL);
   const [page, setPage] = useState(1);
+  const [reloadKey, setReloadKey] = useState(0);
+  // 어떤 요청(requestKey)에 대한 결과인지 함께 저장 → 현재 조건과 다르면 "불러오는 중"
+  const [result, setResult] = useState({ key: null, data: null, error: '' });
 
+  const requestKey = `${searchKeyword}|${category}|${page}|${reloadKey}`;
+  const loading = result.key !== requestKey;
+  const error = loading ? '' : result.error;
+
+  /* 디바운스: 글자를 칠 때마다 타이머를 새로 걸고, 이전 타이머는 정리 함수(clearTimeout)로 취소한다.
+     SEARCH_DELAY 동안 입력이 없으면 검색어를 확정하고 1페이지로 돌아간다.
+     (검색어가 같으면 아무것도 바꾸지 않아 불필요한 요청이 나가지 않음) */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const next = keyword.trim();
+      if (next !== searchKeyword) {
+        setSearchKeyword(next);
+        setPage(1);
+      }
+    }, SEARCH_DELAY);
+    return () => clearTimeout(timer);
+  }, [keyword, searchKeyword]);
+
+  // 검색어·카테고리·페이지가 바뀔 때마다 해당 페이지만 서버에서 받아옴
   useEffect(() => {
     let ignore = false;
 
-    getStores()
+    getStores({ keyword: searchKeyword, category, page, size: PAGE_SIZE })
       .then((data) => {
-        if (!ignore) setStores(data);
+        if (!ignore) setResult({ key: requestKey, data, error: '' });
       })
       .catch(() => {
-        if (!ignore) setError('가게 목록을 불러오지 못했습니다.');
-      })
-      .finally(() => {
-        if (!ignore) setLoading(false);
+        if (!ignore) setResult({ key: requestKey, data: null, error: '가게 목록을 불러오지 못했습니다.' });
       });
 
     return () => {
       ignore = true;
     };
-  }, [reloadKey]);
+  }, [searchKeyword, category, page, requestKey]);
 
-  const filteredStores = useMemo(() => {
-    const q = keyword.trim().toLowerCase();
-    return stores.filter((store) => {
-      const matchCategory = category === ALL || store.category === category;
-      const matchKeyword = !q || store.name.toLowerCase().includes(q);
-      return matchCategory && matchKeyword;
-    });
-  }, [stores, keyword, category]);
-
-  // 필터 결과를 PAGE_SIZE개씩 잘라서 현재 페이지 분량만 표시
-  const totalPages = Math.max(1, Math.ceil(filteredStores.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const pagedStores = filteredStores.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const stores = useMemo(() => (loading ? [] : result.data?.content ?? []), [loading, result]);
+  const totalElements = result.data?.totalElements ?? 0;
+  const totalPages = result.data?.totalPages ?? 0;
 
   const goToPage = (next) => {
     setPage(next);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 카테고리·검색어가 바뀌면 결과가 달라지므로 1페이지로 돌아감
+  // 카테고리가 바뀌면 결과가 달라지므로 1페이지로 돌아감
   const handleCategoryChange = (next) => {
     setCategory(next);
     setPage(1);
   };
 
+  // 입력칸 값만 바꿈 — 실제 검색은 위 디바운스 useEffect가 처리
   const handleKeywordChange = (e) => {
     setKeyword(e.target.value);
-    setPage(1);
   };
 
   const retry = () => {
-    setLoading(true);
-    setError('');
     setReloadKey((k) => k + 1);
   };
 
@@ -94,8 +103,10 @@ function StoreListPage() {
     console.log('[StoreListPage] 마이페이지 클릭 — 경로 연결 예정');
   };
 
+  // "전체 가게 보기" — 기다리지 않고 바로 초기화
   const resetFilters = () => {
     setKeyword('');
+    setSearchKeyword('');
     setCategory(ALL);
     setPage(1);
   };
@@ -122,25 +133,24 @@ function StoreListPage() {
       );
     }
 
-    if (filteredStores.length === 0) {
-      return (
-        <div className={styles.empty}>
-          <p className={styles.emptyTitle}>조건에 맞는 가게가 없어요</p>
-          <p className={styles.emptyDesc}>다른 카테고리를 선택하거나 검색어를 바꿔보세요.</p>
-          <button type="button" className={styles.emptyButton} onClick={resetFilters}>
-            전체 가게 보기
-          </button>
-        </div>
-      );
-    }
-
+    // 결과가 비어도 (없는 페이지 번호 등) 다른 페이지로 갈 수 있도록 페이지 버튼은 계속 보여줌
     return (
       <>
-        <div className={styles.grid}>
-          {pagedStores.map((store) => (
-            <StoreCard key={store.id} store={store} onClick={(id) => navigate(`/stores/${id}`)} />
-          ))}
-        </div>
+        {stores.length === 0 ? (
+          <div className={styles.empty}>
+            <p className={styles.emptyTitle}>조건에 맞는 가게가 없어요</p>
+            <p className={styles.emptyDesc}>다른 카테고리를 선택하거나 검색어를 바꿔보세요.</p>
+            <button type="button" className={styles.emptyButton} onClick={resetFilters}>
+              전체 가게 보기
+            </button>
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {stores.map((store) => (
+              <StoreCard key={store.id} store={store} onClick={(id) => navigate(`/stores/${id}`)} />
+            ))}
+          </div>
+        )}
         {totalPages > 1 && renderPagination()}
       </>
     );
@@ -152,8 +162,8 @@ function StoreListPage() {
       <button
         type="button"
         className={styles.pageButton}
-        onClick={() => goToPage(currentPage - 1)}
-        disabled={currentPage === 1}
+        onClick={() => goToPage(page - 1)}
+        disabled={page <= 1}
       >
         이전
       </button>
@@ -161,9 +171,9 @@ function StoreListPage() {
         <button
           key={n}
           type="button"
-          className={`${styles.pageButton} ${n === currentPage ? styles.pageButtonActive : ''}`}
+          className={`${styles.pageButton} ${n === page ? styles.pageButtonActive : ''}`}
           onClick={() => goToPage(n)}
-          aria-current={n === currentPage ? 'page' : undefined}
+          aria-current={n === page ? 'page' : undefined}
         >
           {n}
         </button>
@@ -171,8 +181,8 @@ function StoreListPage() {
       <button
         type="button"
         className={styles.pageButton}
-        onClick={() => goToPage(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        onClick={() => goToPage(page + 1)}
+        disabled={page >= totalPages}
       >
         다음
       </button>
@@ -236,7 +246,7 @@ function StoreListPage() {
 
         {!loading && !error && (
           <p className={styles.count}>
-            가게 <strong>{filteredStores.length}</strong>곳
+            가게 <strong>{totalElements}</strong>곳
           </p>
         )}
 
