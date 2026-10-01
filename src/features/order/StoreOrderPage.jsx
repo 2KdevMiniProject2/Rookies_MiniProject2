@@ -1,61 +1,21 @@
 /* ---------------------------------------------------------
    주문 페이지 (손님) — 주소 "/stores/:storeId"
-   메인에서 [가게 보러가기] 를 누르면 오는 화면입니다.
-   가게 정보를 보고 → 메뉴를 담고 → [장바구니 보기] 로 넘어갑니다.
+   가게 정보를 보고 → 메뉴를 담고 → [장바구니 보기]
 
-   목표
-     ① 목데이터·불러오기   → api/storeOrderApi.js   (백엔드 연결)
-     ② 장바구니           → store/cartStore.js     (zustand, 장바구니 페이지와 공유)
-     ③ 화면 조각          → components/StoreInfo.jsx · MenuItemCard.jsx · CartBar.jsx
+     목데이터·불러오기   → api/storeOrderApi.js   (분리 완료 · 백엔드 연결)
+     장바구니           → store/cartStore.js     (zustand, 장바구니 페이지와 공유)
+     화면 조각          → components/StoreInfo.jsx · MenuItemCard.jsx · CartBar.jsx
    --------------------------------------------------------- */
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+
+import { fetchStore, fetchMenus } from "../../api/storeOrderApi";
 
 import "./StoreOrderPage.css";
 
-// 장바구니 보기 버튼이 이동할 주소 — 장바구니 담당과 맞출 것
+// 장바구니 보기 버튼이 이동할 주소 (CartPage)
 const CART_PATH = "/cart";
-
-/* =========================================================
-   목데이터 — 백엔드 응답과 같은 이름
-     GET /api/stores/{storeId}        → StoreResponse
-     GET /api/stores/{storeId}/menus  → Page<MenuItemResponse> (content 안에 목록)
-   phone · description 은 아직 백엔드에 없음 (있으면 보이고, 없으면 안 보이게 해 둠)
-   ========================================================= */
-const MOCK_STORE = {
-    id: 1,
-    name: "루키즈 베이커리",
-    address: "서울시 강남구 테헤란로 123 1층",
-    category: "베이커리",
-    openTime: "09:00:00",
-    closeTime: "21:00:00",
-    phone: "02-1234-5678",
-    description: "매일 아침 직접 굽는 빵과 커피를 판매해요.",
-};
-
-const MOCK_MENUS = {
-    content: [
-        { id: 101, name: "바닐라라떼", price: 5500, soldOut: false, imageUrl: null, description: "달콤한 바닐라 시럽을 넣은 부드러운 라떼" },
-        { id: 102, name: "아메리카노", price: 4000, soldOut: false, imageUrl: null, description: "매일 볶은 원두로 내린 기본 커피" },
-        { id: 103, name: "소금빵", price: 3500, soldOut: false, imageUrl: null, description: "겉은 바삭, 속은 버터 향 가득" },
-        // 품절 화면 확인용으로 true (백엔드 더미는 false)
-        { id: 104, name: "크루아상", price: 4500, soldOut: true, imageUrl: null, description: "결이 살아 있는 버터 크루아상" },
-        { id: 105, name: "딸기 생크림 케이크", price: 7500, soldOut: false, imageUrl: null, description: "생딸기를 듬뿍 올린 조각 케이크" },
-    ],
-};
-
-const wait = () => new Promise((resolve) => setTimeout(resolve, 300)); // 서버처럼 잠깐 기다림
-
-async function fetchStore(storeId) {
-    await wait();
-    return { ...MOCK_STORE, id: Number(storeId) };
-}
-
-async function fetchMenus() {
-    await wait();
-    return MOCK_MENUS.content; // 백엔드는 Page 형식 → content 가 메뉴 배열
-}
 
 /* ── 표시용 도우미 ─────────────────────────────────────── */
 // 13000 → "13,000원"
@@ -66,6 +26,7 @@ const hhmm = (time) => (time ? time.slice(0, 5) : "--:--");
 function StoreOrderPage() {
     const { storeId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     /* ── 화면 데이터 (useState) ── */
     const [store, setStore] = useState(null);
@@ -74,11 +35,12 @@ function StoreOrderPage() {
     const [error, setError] = useState(null);
 
     /* =====================================================
-       [나중에 분리 필요 → store/cartStore.js]
-       장바구니 — 장바구니 페이지와 같이 써야 하므로 나중에 zustand 로 옮긴다
+       [나중에 분리 → store/cartStore.js]
+       장바구니 — 장바구니 페이지와 같이 써야 하므로 나중에 zustand 로 옮길 예정
        cartItems: [{ menuItemId, name, price, quantity }]
+       장바구니에서 [메뉴 더 담기] 로 돌아오면 location.state 로 담은 메뉴를 다시 받는다
        ===================================================== */
-    const [cartItems, setCartItems] = useState([]);
+    const [cartItems, setCartItems] = useState(location.state?.cartItems ?? []);
 
     function addToCart(menu) {
         setCartItems((prevItems) => {
@@ -109,12 +71,14 @@ function StoreOrderPage() {
             setLoading(true);
             setError(null);
             try {
+                // 두 요청은 서로 기다릴 필요가 없으므로 동시에 보낸다
                 const [storeData, menuList] = await Promise.all([fetchStore(storeId), fetchMenus(storeId)]);
                 setStore(storeData);
                 setMenus(menuList);
             } catch (loadError) {
-                console.error("Error:", loadError);
-                setError(loadError.message ?? "가게 정보를 불러오지 못했어요.");
+                console.error("가게 정보 불러오기 실패:", loadError);
+                // 서버가 준 문구(예: "존재하지 않는 매장입니다") → 없으면 기본 문구
+                setError(loadError.response?.data?.message ?? "가게 정보를 불러오지 못했어요.");
             } finally {
                 setLoading(false);
             }
@@ -146,7 +110,7 @@ function StoreOrderPage() {
                 </Link>
 
                 {/* =================================================
-                    [나중에 분리 필요→ components/StoreInfo.jsx]
+                    [나중에 분리 → components/StoreInfo.jsx]
                     props: store
                     ================================================= */}
                 <section className="store-order__store">
@@ -189,7 +153,7 @@ function StoreOrderPage() {
                                 const count = countInCart(menu.id);
                                 return (
                                     /* =========================================
-                                       [나중에 분리 필요→ components/MenuItemCard.jsx]
+                                       [나중에 분리 → components/MenuItemCard.jsx]
                                        props: menu, count, onAdd
                                        ========================================= */
                                     <li
@@ -238,7 +202,7 @@ function StoreOrderPage() {
             </div>
 
             {/* =====================================================
-                [나중에 분리 필요→ components/CartBar.jsx]
+                [나중에 분리 → components/CartBar.jsx]
                 props: totalCount, totalPrice, onOpenCart
                 화면 아래에 고정되는 장바구니 미리보기 바
                 ===================================================== */}
@@ -251,7 +215,7 @@ function StoreOrderPage() {
                     <button
                         type="button"
                         className="store-order__cart-button"
-                        onClick={() => navigate(CART_PATH)}
+                        onClick={() => navigate(CART_PATH, { state: { store, cartItems } })}
                         disabled={totalCount === 0}
                     >
                         <span className="store-order__cart-badge">{totalCount}</span>

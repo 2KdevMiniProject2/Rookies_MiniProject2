@@ -1,5 +1,5 @@
 /* =========================================================
-   파트 C(주문) 공통 테마 — 사장님 대시보드 · 손님 주문 상태 페이지가 함께 씀
+   파트 C(주문) 공통 테마 — 사장님 대시보드 · 손님 주문 상태 · 주문(메뉴) · 장바구니 페이지가 함께 씀
    각 페이지 CSS 맨 위에서 @import "./orderTheme.css"; 로 불러옵니다.
 
    ▶ 팀 공통 스타일(승호님 StoreListPage · AuthForm) 과 같은 방식·같은 값
@@ -12,7 +12,8 @@
 
 .order-status,
 .dashboard,
-.store-order {
+.store-order,
+.cart {
   /* ── 무채색 (--home-* 와 같은 값) ── */
   --order-bg: #ffffff;
   --order-surface: #ffffff;
@@ -64,7 +65,8 @@
 /* 이 페이지들이 화면에 있는 동안: 100vw 가로 넘침 자르기 + 브라우저 기본 요소 라이트 고정 */
 html:has(.order-status),
 html:has(.dashboard),
-html:has(.store-order) {
+html:has(.store-order),
+html:has(.cart) {
   overflow-x: clip;
   color-scheme: light;
 }
@@ -77,14 +79,18 @@ html:has(.store-order) {
 .dashboard *::after,
 .store-order *,
 .store-order *::before,
-.store-order *::after {
+.store-order *::after,
+.cart *,
+.cart *::before,
+.cart *::after {
   box-sizing: border-box;
 }
 
 /* 루트의 h1·h2 규칙(색 · 글자 간격 · 여백)이 들어오지 않도록 */
 .order-status :is(h1, h2, h3),
 .dashboard :is(h1, h2, h3),
-.store-order :is(h1, h2, h3) {
+.store-order :is(h1, h2, h3),
+.cart :is(h1, h2, h3) {
   color: inherit;
   font-family: inherit;
   letter-spacing: normal;
@@ -93,7 +99,8 @@ html:has(.store-order) {
 /* 버튼·링크 포커스 테두리 — 팀과 같은 무채색 outline */
 .order-status :is(button, a):focus-visible,
 .dashboard :is(button, a):focus-visible,
-.store-order :is(button, a):focus-visible {
+.store-order :is(button, a):focus-visible,
+.cart :is(button, a):focus-visible {
   outline: 2px solid var(--order-text);
   outline-offset: 2px;
 }
@@ -102,7 +109,8 @@ html:has(.store-order) {
 @media (max-width: 640px) {
   .order-status,
   .dashboard,
-  .store-order {
+  .store-order,
+  .cart {
     --gutter: 16px;
   }
 }

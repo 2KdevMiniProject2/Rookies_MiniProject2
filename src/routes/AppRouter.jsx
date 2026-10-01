@@ -3,6 +3,7 @@ import ProtectedRoute from './ProtectedRoute';
 import DashboardPage from '../features/order/DashboardPage';
 import OrderStatusPage from '../features/order/OrderStatusPage';
 import StoreOrderPage from '../features/order/StoreOrderPage';
+import CartPage from '../features/order/CartPage';
 
 /**
  * 전체 라우팅을 한 곳에 모아두는 파일입니다.
@@ -24,6 +25,8 @@ function AppRouter() {
         {/* [파트 C · 본영] 로그인 기능이 붙기 전까지는 공개 영역에 둠 */}
           {/* 주문 페이지*/}
           <Route path="/stores/:storeId" element={<StoreOrderPage />} />
+          {/* 장바구니 — 주문 페이지에서 담은 메뉴를 넘겨받는다 */}
+          <Route path="/cart" element={<CartPage />} />
           {/* 사장님 주문 대시보드 — 가게 번호를 주소로 받는다 */}
           <Route path="/owner/stores/:storeId/orders" element={<DashboardPage />} />
           {/* 사장님 대시보드 페이지 1번 사장님만 보임. (로그인 붙기 전 임시)*/}

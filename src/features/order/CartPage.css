@@ -1,0 +1,469 @@
+/* =========================================================
+   장바구니 페이지 (손님) — 팀 공통 스타일 적용
+   색 · 모양 · 폭 · 반응형 기준은 orderTheme.css (팀 --home-* 와 같은 값)
+   클래스 이름은 모두 cart__ 로 시작 (다른 페이지와 겹치지 않게)
+   ========================================================= */
+
+@import "./orderTheme.css";
+
+.cart {
+  --inner-max: 1040px;
+  --summary-w: 340px;
+
+  flex: 1;
+  padding: 24px var(--gutter) 56px;
+}
+
+.cart__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: var(--inner-max);
+  margin: 0 auto;
+}
+
+/* ---------- 빈 장바구니 — 팀 .empty 와 같은 모양 ---------- */
+
+.cart__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: var(--inner-max);
+  margin: 40px auto 0;
+  padding: 64px 16px;
+  text-align: center;
+  border: 1px dashed var(--order-border);
+  border-radius: var(--order-radius-card);
+}
+
+.cart__state-text {
+  margin: 0;
+  font-size: 15px;
+  color: var(--order-text-muted);
+}
+
+.cart__state-button {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 20px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--order-on-primary);
+  text-decoration: none;
+  background: var(--order-primary);
+  border: none;
+  border-radius: var(--order-radius-button);
+  cursor: pointer;
+}
+
+/* ---------- 머리말 ---------- */
+
+.cart__back {
+  align-self: flex-start;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--order-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.cart__back:hover {
+  color: var(--order-text);
+}
+
+.cart__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+/* 팀 .title 과 같은 크기 */
+.cart__title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+}
+
+.cart__store {
+  margin: 0;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--order-accent);
+  background: var(--order-accent-soft);
+  border-radius: 999px;
+}
+
+/* ---------- 본문 2단 (웹: 왼쪽 내용 · 오른쪽 요약) ---------- */
+
+.cart__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--summary-w);
+  gap: 24px;
+  align-items: start;
+}
+
+.cart__main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cart__section {
+  padding: 20px;
+  background: var(--order-surface);
+  border: 1px solid var(--order-border);
+  border-radius: var(--order-radius-card);
+}
+
+.cart__section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.cart__count {
+  min-width: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  background: var(--order-fill-strong);
+  border-radius: 999px;
+}
+
+.cart__optional {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--order-text-muted);
+}
+
+.cart__empty {
+  margin: 0;
+  padding: 20px 12px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--order-text-muted);
+  border: 1px dashed var(--order-border);
+  border-radius: var(--order-radius-button);
+}
+
+/* ---------- 담은 메뉴 줄 ---------- */
+
+.cart__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cart__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 96px 32px;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px solid var(--order-border);
+}
+
+.cart__item:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.cart__item-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.cart__item-unit {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--order-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cart__item-price {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 수량 − 1 + */
+.cart__stepper {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  border: 1px solid var(--order-button-border);
+  border-radius: 999px;
+}
+
+.cart__stepper button {
+  width: 36px;
+  height: 100%;
+  padding: 0;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--order-text);
+  background: none;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.cart__stepper button:hover {
+  background: var(--order-fill);
+}
+
+.cart__quantity {
+  min-width: 24px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.cart__remove {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--order-text-muted);
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.cart__remove:hover {
+  color: var(--order-text);
+  background: var(--order-fill);
+}
+
+/* ---------- 픽업 시간 칸 — 팀 카테고리 칩과 같은 모양 ---------- */
+
+.cart__slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+.cart__slot {
+  height: 42px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--order-text);
+  background: var(--order-surface);
+  border: 1px solid var(--order-button-border);
+  border-radius: var(--order-radius-button);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+}
+
+.cart__slot:hover {
+  border-color: var(--order-border-strong);
+  background: var(--order-button-bg);
+}
+
+.cart__slot.is-selected {
+  color: var(--order-on-accent);
+  background: var(--order-accent);
+  border-color: var(--order-accent);
+}
+
+/* ---------- 요청사항 ---------- */
+
+.cart__notes {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--order-text);
+  resize: vertical;
+  background: var(--order-surface);
+  border: 1px solid var(--order-button-border);
+  border-radius: var(--order-radius-button);
+}
+
+.cart__notes:focus-visible {
+  outline: 2px solid var(--order-text);
+  outline-offset: 1px;
+}
+
+.cart__notes-count {
+  margin: 6px 0 0;
+  font-size: 12px;
+  text-align: right;
+  color: var(--order-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 주문 요약 (웹: 스크롤해도 오른쪽에 붙어 있음) ---------- */
+
+.cart__summary {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: var(--order-surface);
+  border: 1px solid var(--order-border);
+  border-radius: var(--order-radius-card);
+  box-shadow: var(--order-shadow);
+}
+
+.cart__summary .cart__section-title {
+  margin: 0;
+}
+
+.cart__summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.cart__summary-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cart__summary-list dt {
+  color: var(--order-text-muted);
+}
+
+.cart__summary-list dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.cart__summary-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0;
+  padding-top: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  border-top: 1px solid var(--order-border);
+}
+
+.cart__summary-total strong {
+  font-size: 24px;
+  letter-spacing: -0.4px;
+  color: var(--order-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 팀 대시보드 에러와 같은 모양 */
+.cart__error {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--order-text);
+  background: var(--order-accent-soft);
+  border: 1px solid var(--order-accent);
+  border-radius: var(--order-radius-button);
+}
+
+/* 팀 .detailButton 과 같은 포인트 컬러 버튼 */
+.cart__submit {
+  height: 52px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--order-on-accent);
+  background: var(--order-accent);
+  border: 1px solid var(--order-accent);
+  border-radius: var(--order-radius-button);
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.cart__submit:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.cart__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- 태블릿 (1024px 이하): 요약을 아래로 ---------- */
+
+@media (max-width: 1024px) {
+  .cart__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cart__summary {
+    position: static;
+  }
+}
+
+/* ---------- 모바일 (640px 이하 — 팀과 같은 기준) ---------- */
+
+@media (max-width: 640px) {
+  .cart {
+    padding-top: 16px;
+  }
+
+  .cart__title {
+    font-size: 22px;
+  }
+
+  .cart__section,
+  .cart__summary {
+    padding: 16px;
+  }
+
+  /* 폰: 이름 · 삭제 윗줄 / 수량 · 금액 아랫줄 */
+  .cart__item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "text remove"
+      "stepper price";
+    gap: 10px 12px;
+  }
+
+  .cart__item-text { grid-area: text; }
+  .cart__remove { grid-area: remove; justify-self: end; }
+  .cart__stepper { grid-area: stepper; justify-self: start; }
+  .cart__item-price { grid-area: price; }
+
+  .cart__slots {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .cart__slot {
+    height: 44px;
+    font-size: 14px;
+  }
+}
