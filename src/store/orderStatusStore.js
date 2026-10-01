@@ -27,8 +27,9 @@ export const useOrderStatusStore = create((set, get) => ({
             const order = await fetchOrder(orderId);
             set({ order: order, error: null });
         } catch (error) {
-            console.error("Error:", error);
-            set({ error: error.message ?? "주문 정보를 불러오지 못했어요." });
+            console.error("주문 상태 불러오기 실패:", error);
+            // 서버 문구(예: "주문을 찾을 수 없습니다") → 없으면 기본 문구
+            set({ error: error.response?.data?.message ?? "주문 정보를 불러오지 못했어요." });
         } finally {
             set({ loading: false });
         }

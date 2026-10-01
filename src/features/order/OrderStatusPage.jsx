@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchOrder } from "../../api/orderApi";
 
 import { useOrderStatusStore } from "../../store/orderStatusStore";
 
@@ -39,11 +38,25 @@ const STATUS_INFO = {
         title: "주문이 거절되었습니다",
         message: "가게 사정으로 주문을 받을 수 없어요. 다른 메뉴나 시간으로 다시 주문해 주세요.",
     },
+    CANCELLED: {
+        step: -1,
+        title: "주문이 취소되었습니다",
+        message: "주문을 취소했어요. 다시 주문하려면 가게 메뉴에서 담아 주세요.",
+    },
 };
 
-// "2026-09-29T15:30:00" → "15:30"
-function formatTime(dateTime) {
-    return dateTime.split("T")[1].slice(0, 5);
+// 진행 단계 없이 끝난 주문 (거절 · 손님 취소)
+const CLOSED_STATUSES = ["REJECTED", "CANCELLED"];
+
+// "2026-09-29T15:30:00" → 오늘이면 "오늘 15:30", 다른 날이면 "09/29 15:30"
+function formatPickup(dateTime) {
+    const [datePart, timePart] = dateTime.split("T");
+    const clock = timePart.slice(0, 5);
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    if (datePart === today) return `오늘 ${clock}`;
+    const [, month, day] = datePart.split("-");
+    return `${month}/${day} ${clock}`;
 }
 
 function OrderStatusPage() {
@@ -97,9 +110,10 @@ function OrderStatusPage() {
         );
     }
 
-    const info = STATUS_INFO[order.status];
-    const isRejected = order.status === "REJECTED";
-    const pickupText = `오늘 ${formatTime(order.pickupTime)}`;
+    // 모르는 상태값이 와도 화면이 깨지지 않게 접수 대기로 표시
+    const info = STATUS_INFO[order.status] ?? STATUS_INFO.PENDING;
+    const isClosed = CLOSED_STATUSES.includes(order.status);
+    const pickupText = formatPickup(order.pickupTime);
     const fillPercent = (info.step / (STEPS.length - 1)) * 100;
 
     return (
@@ -109,7 +123,7 @@ function OrderStatusPage() {
                 <div className="order-status__top">
                     <span className="order-status__store">{order.storeName}</span>
                     <div className="order-status__title-row">
-                        <span className="order-status__icon">{isRejected ? "!" : "✓"}</span>
+                        <span className="order-status__icon">{isClosed ? "!" : "✓"}</span>
                         <h2 className="order-status__title">{info.title}</h2>
                         <span className="order-status__order-no">#{order.id}</span>
                     </div>
@@ -133,7 +147,7 @@ function OrderStatusPage() {
                 </div>
 
                 {/* 진행 단계 */}
-                {!isRejected && (
+                {!isClosed && (
                     <div className="order-status__progress">
                         <div className="order-status__progress-line">
                             <div className="order-status__progress-fill" style={{ width: `${fillPercent}%` }} />
@@ -155,9 +169,9 @@ function OrderStatusPage() {
                 )}
 
                 {/* 상태 안내 문구 */}
-                <p className="order-status__message">{info.message}</p>
+                <p className={"order-status__message" + (isClosed ? " order-status__message--rejected" : "")}>{info.message}</p>
                 {/* 새로고침 중 에러가 나면 지난 정보는 그대로 두고 한 줄로 알린다 */}
-                {error && <p className="order-status__error">{error}</p>}                
+                {error && <p className="order-status__error">{error}</p>}
 
                 {/* 주문 내역 */}
                 <div className="order-status__detail">
