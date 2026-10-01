@@ -17,7 +17,7 @@ import java.util.UUID;
 public class ImageUploadService {
 
     @Value("${file.upload-dir}")
-    private String uploadDir;ㅎ
+    private String uploadDir;
 
     private static final Map<String, String> ALLOWED_IMAGE_TYPES = Map.of(
             "image/jpeg", ".jpg",
