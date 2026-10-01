@@ -1,6 +1,8 @@
 package com.rookies6.MiniProject2.user.controller;
 
+import com.rookies6.MiniProject2.security.annotation.CurrentUser;
 import com.rookies6.MiniProject2.user.dto.StoreDTO;
+import com.rookies6.MiniProject2.user.entity.User;
 import com.rookies6.MiniProject2.user.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,13 +42,13 @@ public class StoreController {
         return ResponseEntity.ok(store);
     }
 
-    // 3. 신규 매장 등록 API (사장님 전용)
-    // TODO: JWT 인증 적용 후 SecurityContext의 인증된 사장님 ID로 자동 연동
+    // 3. 신규 매장 등록 API (사장님 전용 - 교재 Step 9, Step 12, Step 13)
     @PostMapping
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<StoreDTO.StoreResponse> createStore(
-            @RequestParam(defaultValue = "1") Long ownerId,
+            @CurrentUser User currentUser,
             @Valid @RequestBody StoreDTO.StoreCreateRequest request) {
-        StoreDTO.StoreResponse response = storeService.createStore(ownerId, request);
+        StoreDTO.StoreResponse response = storeService.createStore(currentUser.getId(), request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -56,22 +59,24 @@ public class StoreController {
         return ResponseEntity.ok(stores);
     }
 
-    // 매장 정보 수정 API
+    // 5. 매장 정보 수정 API (사장님 전용)
     @PutMapping("/{storeId}")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<StoreDTO.StoreResponse> updateStore(
             @PathVariable Long storeId,
-            @RequestParam(defaultValue = "1") Long ownerId,
+            @CurrentUser User currentUser,
             @Valid @RequestBody StoreDTO.StoreUpdateRequest request) {
-        StoreDTO.StoreResponse response = storeService.updateStore(storeId, ownerId, request);
+        StoreDTO.StoreResponse response = storeService.updateStore(storeId, currentUser.getId(), request);
         return ResponseEntity.ok(response);
     }
 
-    // 매장 삭제 API
+    // 6. 매장 삭제 API (사장님 전용)
     @DeleteMapping("/{storeId}")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> deleteStore(
             @PathVariable Long storeId,
-            @RequestParam(defaultValue = "1") Long ownerId) {
-        storeService.deleteStore(storeId, ownerId);
+            @CurrentUser User currentUser) {
+        storeService.deleteStore(storeId, currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 }
