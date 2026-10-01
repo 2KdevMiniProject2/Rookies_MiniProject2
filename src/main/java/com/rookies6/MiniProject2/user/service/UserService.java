@@ -113,7 +113,7 @@ public class UserService {
         validateSelf(userId, callerId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
-        userRepository.delete(user);
+        user.softDelete();
     }
 
     private void validateSelf(Long userId, Long callerId) {
