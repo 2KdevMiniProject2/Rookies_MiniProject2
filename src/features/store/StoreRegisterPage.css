@@ -1,0 +1,232 @@
+.store-register-page {
+    width: 100%;
+    padding: 48px 24px 70px;
+    box-sizing: border-box;
+    color: #111111;
+    background: #ffffff;
+    text-align: left;
+}
+
+.store-register-layout {
+    display: flex;
+    width: 100%;
+    min-height: 650px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    box-shadow:
+        rgba(0, 0, 0, 0.08) 0 10px 15px -3px,
+        rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+    overflow: hidden;
+}
+
+/* 왼쪽 사이드바 */
+.store-register-sidebar {
+    width: 210px;
+    padding: 32px 24px;
+    box-sizing: border-box;
+    background: #f7f7f7;
+    border-right: 1px solid #e0e0e0;
+}
+
+.store-register-sidebar strong {
+    display: block;
+    margin-bottom: 26px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.store-register-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.store-register-sidebar button {
+    width: 100%;
+    padding: 11px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #555555;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        color 0.15s;
+}
+
+.store-register-sidebar button:hover {
+    background: #ececec;
+    color: #111111;
+}
+
+.store-register-sidebar .active {
+    background: var(--brand-accent);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.store-register-sidebar .active:hover {
+    background: var(--brand-accent-hover);
+    color: #ffffff;
+}
+
+/* 오른쪽 영역 */
+.store-register-main {
+    flex: 1;
+    min-width: 0;
+    background: #ffffff;
+}
+
+.store-register-title {
+    padding: 25px 30px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #111111;
+    background: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.store-register-content {
+    padding: 30px;
+}
+
+/* 입력 영역 */
+.register-section {
+    margin-bottom: 22px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+.register-section h2 {
+    margin: 0 0 6px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.register-section-description {
+    margin: 0 0 24px;
+    color: #777777;
+    font-size: 13px;
+}
+
+/* 폼 */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    height: 44px;
+    padding: 0 13px;
+    box-sizing: border-box;
+    border: 1px solid #d5d5d5;
+    border-radius: 10px;
+    outline: none;
+    background: #ffffff;
+    color: #222222;
+    font-size: 14px;
+    transition:
+        border-color 0.15s,
+        box-shadow 0.15s;
+}
+
+.form-group input::placeholder {
+    color: #aaaaaa;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 3px var(--brand-accent-soft);
+}
+
+/* 영업시간 */
+.time-row {
+    display: flex;
+    gap: 18px;
+}
+
+.time-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* 하단 버튼 */
+.register-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 4px;
+}
+
+.register-buttons button {
+    min-width: 110px;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.cancel-button {
+    border: 1px solid #cfcfcf;
+    background: #ffffff;
+    color: #444444;
+}
+
+.cancel-button:hover {
+    background: #f3f3f3;
+}
+
+.register-button {
+    border: 1px solid var(--brand-accent);
+    background: var(--brand-accent);
+    color: #ffffff;
+}
+
+.register-button:hover {
+    background: var(--brand-accent-hover);
+    border-color: var(--brand-accent-hover);
+}
+
+.store-image-preview {
+    width: 100%;
+    max-width: 420px;
+    height: 220px;
+    margin-top: 12px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #f7f7f7;
+}
+
+.store-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

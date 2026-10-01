@@ -9,6 +9,13 @@ import OrderStatusPage from '../features/order/OrderStatusPage';
 import StoreOrderPage from '../features/order/StoreOrderPage';
 import CartPage from '../features/order/CartPage';
 
+import MyPage from '../features/auth/MyPage';
+import StoreRegisterPage from '../features/store/StoreRegisterPage';
+import MenuRegisterPage from '../features/store/MenuRegisterPage';
+import StoreListPage from '../features/store/OwnerStoreListPage';
+import StoreEditPage from '../features/store/StoreEditPage';
+import UserInfoPage from '../features/auth/UserInfoPage';
+
 /**
  * 전체 라우팅을 한 곳에 모아두는 파일입니다.
  * 각 담당자는 자신의 features/<도메인> 폴더에 페이지 컴포넌트를 만들고,
@@ -31,6 +38,15 @@ function AppRouter() {
         {/* [파트 C · 본영] 가게 메뉴 보고 담기 (가게 · 메뉴 조회는 로그인 없이 가능) */}
         <Route path="/stores/:storeId" element={<StoreOrderPage />} />
 
+        {/* [파트 B · 본영] 마이페이지 부분 */}
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/stores/register"  element={<StoreRegisterPage />} />
+        <Route path="/owner/stores" element={<OwnerStoreListPage />} />
+        <Route path="/owner/stores/:storeId/menus" element={<MenuRegisterPage />} />
+        <Route path="/owner/stores/:storeId/edit" element={<StoreEditPage />} />
+        <Route path="/mypage/profile" element={<UserInfoPage />} />
+
+
         {/* 로그인만 하면 접근 가능한 라우트 예시 */}
         <Route element={<ProtectedRoute />}>
           {/* <Route path="/mypage" element={<MyPage />} /> */}
@@ -50,6 +66,7 @@ function AppRouter() {
         <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
           {/* <Route path="/admin" element={<AdminPage />} /> */}
         </Route>
+        
       </Routes>
     </BrowserRouter>
   );

@@ -1,0 +1,298 @@
+.mypage {
+    width: 100%;
+    padding: 48px 24px 70px;
+    box-sizing: border-box;
+    color: #111111;
+    background: #ffffff;
+    text-align: left;
+}
+
+.mypage-layout {
+    display: flex;
+    width: 100%;
+    min-height: 600px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    box-shadow:
+        rgba(0, 0, 0, 0.08) 0 10px 15px -3px,
+        rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+    overflow: hidden;
+}
+
+/* 왼쪽 사이드바 */
+.mypage-sidebar {
+    width: 210px;
+    padding: 32px 24px;
+    box-sizing: border-box;
+    background: #f7f7f7;
+    border-right: 1px solid #e0e0e0;
+}
+
+.mypage-sidebar strong {
+    display: block;
+    margin-bottom: 26px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.mypage-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mypage-sidebar button {
+    width: 100%;
+    padding: 11px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #555555;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        color 0.15s;
+}
+
+.mypage-sidebar .active {
+    background: var(--brand-accent);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.mypage-sidebar .active:hover {
+    background: var(--brand-accent-hover);
+    color: #ffffff;
+}
+
+.mypage-sidebar button:hover {
+    background: #ececec;
+    color: #111111;
+}
+
+/* 오른쪽 영역 */
+.mypage-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.mypage-main-title {
+    padding: 25px 30px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #111111;
+    background: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+/* 회원 정보 */
+.profile-section {
+    display: flex;
+    align-items: center;
+    margin: 30px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+.profile-image {
+    width: 74px;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 20px;
+    border-radius: 50%;
+    background: var(--brand-accent);
+    color: #ffffff;
+}
+
+.profile-image span {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info strong {
+    display: inline-block;
+    margin-bottom: 9px;
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: var(--brand-accent-soft);
+    color: var(--brand-accent);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.profile-info p {
+    margin: 4px 0;
+    color: #666666;
+    font-size: 14px;
+}
+
+.profile-info p:first-of-type {
+    color: #111111;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.profile-edit-button {
+    padding: 10px 15px;
+    border: 1px solid #bdbdbd;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.profile-edit-button:hover {
+    background: #f3f3f3;
+    border-color: #8c8c8c;
+}
+
+/* 주문 내역 */
+.order-history-section {
+    margin: 0 30px 30px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.section-title h2 {
+    margin: 0;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.section-title span {
+    color: #777777;
+    font-size: 13px;
+}
+
+.order-history-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.order-history-card {
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #ffffff;
+    transition:
+        box-shadow 0.15s,
+        transform 0.15s;
+}
+
+.order-history-card:hover {
+    box-shadow:
+        rgba(0, 0, 0, 0.06) 0 6px 12px -2px;
+    transform: translateY(-1px);
+}
+
+.order-history-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.order-number {
+    color: #888888;
+    font-size: 12px;
+}
+
+.order-history-top h3 {
+    margin: 5px 0 17px;
+    color: #111111;
+    font-size: 16px;
+}
+
+.order-status {
+    padding: 5px 9px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.order-status.pending {
+    background: #eeeeee;
+    color: #555555;
+}
+
+.order-status.accepted {
+    background: #dddddd;
+    color: #333333;
+}
+
+.order-status.completed {
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+.order-history-info {
+    padding-top: 12px;
+    border-top: 1px solid #eeeeee;
+}
+
+.order-history-info p {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+    font-size: 13px;
+}
+
+.order-history-info span {
+    color: #777777;
+}
+
+.order-history-info strong {
+    color: #333333;
+}
+
+/* 사장님 안내 */
+.owner-guide-section {
+    margin: 0 30px 30px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+.owner-guide-section h2 {
+    margin: 0 0 10px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.owner-guide-section p {
+    margin: 0;
+    color: #666666;
+    font-size: 14px;
+    line-height: 1.6;
+}

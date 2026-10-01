@@ -1,0 +1,219 @@
+.user-info-page {
+    width: 100%;
+    padding: 48px 24px 70px;
+    box-sizing: border-box;
+    color: #111111;
+    background: #ffffff;
+    text-align: left;
+}
+
+.user-info-layout {
+    display: flex;
+    width: 100%;
+    min-height: 650px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    box-shadow:
+        rgba(0, 0, 0, 0.08) 0 10px 15px -3px,
+        rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+    overflow: hidden;
+}
+
+.user-info-sidebar {
+    width: 210px;
+    padding: 32px 24px;
+    box-sizing: border-box;
+    background: #f7f7f7;
+    border-right: 1px solid #e0e0e0;
+}
+
+.user-info-sidebar strong {
+    display: block;
+    margin-bottom: 26px;
+    color: #111111;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.user-info-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.user-info-sidebar button {
+    width: 100%;
+    padding: 11px 12px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #555555;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.user-info-sidebar button:hover {
+    background: #ececec;
+    color: #111111;
+}
+
+.user-info-sidebar .active {
+    background: var(--brand-accent);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.user-info-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-info-title {
+    padding: 25px 30px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #111111;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.user-info-content {
+    padding: 30px;
+}
+
+.user-info-section {
+    margin-bottom: 20px;
+    padding: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+.user-info-section h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.user-info-description {
+    margin-bottom: 24px;
+    color: #777777;
+    font-size: 13px;
+}
+
+.user-info-form-group {
+    margin-bottom: 20px;
+}
+
+.user-info-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.user-info-form-group input {
+    width: 100%;
+    height: 44px;
+    padding: 0 13px;
+    box-sizing: border-box;
+    border: 1px solid #d6d6d6;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #222222;
+    font-size: 14px;
+    outline: none;
+}
+
+.user-info-form-group input:focus {
+    border-color: var(--brand-accent);
+}
+
+.user-info-form-group input:disabled {
+    background: #f5f5f5;
+    color: #888888;
+    cursor: not-allowed;
+}
+
+.input-guide {
+    display: block;
+    margin-top: 6px;
+    color: #999999;
+    font-size: 11px;
+}
+
+.user-info-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.cancel-button,
+.save-button {
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cancel-button {
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #555555;
+}
+
+.save-button {
+    border: 1px solid var(--brand-accent);
+    background: var(--brand-accent);
+    color: #ffffff;
+}
+
+.save-button:hover {
+    background: var(--brand-accent-hover);
+}
+
+.save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.withdraw-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+}
+
+.withdraw-section h2 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.withdraw-section p {
+    color: #777777;
+    font-size: 13px;
+}
+
+.withdraw-button {
+    padding: 10px 15px;
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #777777;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.withdraw-button:hover {
+    border-color: #999999;
+    background: #f5f5f5;
+    color: #333333;
+}
