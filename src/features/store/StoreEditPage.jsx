@@ -21,18 +21,20 @@ function StoreEditPage() {
     setLoading(true);
 
     try {
-      await apiClient.post('/api/stores', {
-        ...form,
-        ownerId: user?.id || 1,
-        openTime: form.openTime + ':00',
-        closeTime: form.closeTime + ':00',
+      const ownerId = user?.id || 1;
+      await apiClient.post(`/api/stores?ownerId=${ownerId}`, {
+        name: form.name.trim(),
+        category: form.category,
+        address: form.address.trim(),
+        openTime: form.openTime ? form.openTime + ':00' : null,
+        closeTime: form.closeTime ? form.closeTime + ':00' : null,
       });
-      alert('매장이 성공적으로 등록되었습니다!');
-      navigate('/owner/dashboard');
+      alert('🎉 새로운 매장이 성공적으로 등록되었습니다!\n마이페이지에서 등록된 매장 목록을 확인하세요.');
+      navigate('/mypage');
     } catch (err) {
       console.warn('API 매장 등록 폴백 처리', err);
       alert('매장 정보가 등록되었습니다! (시연 모드)');
-      navigate('/owner/dashboard');
+      navigate('/mypage');
     } finally {
       setLoading(false);
     }

@@ -17,9 +17,8 @@ function Header() {
     <header className="header-bar">
       <div className="header-inner">
         {/* 로고 */}
-        <Link to="/" className="logo-badge">
-          <span style={{ fontSize: '26px' }}>🥐</span>
-          <span>루키즈 오더</span>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <img src="/logo.svg" alt="루키즈 오더" style={{ height: '42px', width: 'auto' }} />
         </Link>
 
         {/* 내비게이션 & 계정 상태 */}

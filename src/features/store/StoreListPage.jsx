@@ -57,43 +57,68 @@ function StoreListPage() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [stores, setStores] = useState(FALLBACK_STORES);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(FALLBACK_STORES.length);
   const [loading, setLoading] = useState(false);
 
-  // 백엔드 매장 목록 API 조회
+  // 카테고리 변경 시 1페이지(0)로 리셋
+  const handleSelectCategory = (category) => {
+    setSelectedCategory(category);
+    setCurrentPage(0);
+  };
+
+  // 백엔드 매장 목록 API 조회 (페이징 연동)
   useEffect(() => {
     const fetchStores = async () => {
       setLoading(true);
       try {
-        const params = {};
+        const params = {
+          page: currentPage,
+          size: 9, // 한 페이지당 9개 (3x3 그리드)
+        };
         if (selectedCategory !== '전체') {
           params.category = selectedCategory;
         }
+
         const res = await apiClient.get('/api/stores', { params });
-        const list = res.data?.data || res.data;
-        if (Array.isArray(list) && list.length > 0) {
-          setStores(list);
+        const resData = res.data?.data || res.data;
+
+        // 1. Spring Data Page 객체 ({ content: [...], totalPages, totalElements })
+        if (resData && Array.isArray(resData.content)) {
+          setStores(resData.content);
+          setTotalPages(resData.totalPages || 1);
+          setTotalElements(resData.totalElements || resData.content.length);
+        }
+        // 2. 일반 배열 응답
+        else if (Array.isArray(resData) && resData.length > 0) {
+          setStores(resData);
+          setTotalPages(1);
+          setTotalElements(resData.length);
         } else {
           // 카테고리 필터링 폴백
-          if (selectedCategory === '전체') {
-            setStores(FALLBACK_STORES);
-          } else {
-            setStores(FALLBACK_STORES.filter((s) => s.category === selectedCategory));
-          }
+          const fallback = selectedCategory === '전체'
+            ? FALLBACK_STORES
+            : FALLBACK_STORES.filter((s) => s.category === selectedCategory);
+          setStores(fallback);
+          setTotalPages(1);
+          setTotalElements(fallback.length);
         }
       } catch (err) {
         console.warn('API 매장 조회 폴백 처리', err);
-        if (selectedCategory === '전체') {
-          setStores(FALLBACK_STORES);
-        } else {
-          setStores(FALLBACK_STORES.filter((s) => s.category === selectedCategory));
-        }
+        const fallback = selectedCategory === '전체'
+          ? FALLBACK_STORES
+          : FALLBACK_STORES.filter((s) => s.category === selectedCategory);
+        setStores(fallback);
+        setTotalPages(1);
+        setTotalElements(fallback.length);
       } finally {
         setLoading(false);
       }
     };
 
     fetchStores();
-  }, [selectedCategory]);
+  }, [selectedCategory, currentPage]);
 
   return (
     <div>
@@ -122,7 +147,7 @@ function StoreListPage() {
       {/* 카테고리 필터 */}
       <CategoryFilter
         selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+        onSelectCategory={handleSelectCategory}
       />
 
       {/* 매장 목록 그리드 */}
@@ -130,7 +155,7 @@ function StoreListPage() {
         <h2 style={{ fontSize: '18px', fontWeight: '700' }}>
           🔥 {selectedCategory === '전체' ? '지금 주문 가능한 동네 매장' : `${selectedCategory} 매장`}
           <span style={{ fontSize: '14px', color: 'var(--text-muted)', marginLeft: '8px', fontWeight: '500' }}>
-            ({stores.length}곳)
+            (총 {totalElements}곳)
           </span>
         </h2>
       </div>
@@ -144,15 +169,68 @@ function StoreListPage() {
           선택하신 카테고리의 매장이 아직 없습니다.
         </div>
       ) : (
-        <div className="grid-cards">
-          {stores.map((store) => (
-            <StoreCard
-              key={store.id}
-              store={store}
-              onClick={(id) => navigate(`/stores/${id}`)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid-cards">
+            {stores.map((store) => (
+              <StoreCard
+                key={store.id}
+                store={store}
+                onClick={(id) => navigate(`/stores/${id}`)}
+              />
+            ))}
+          </div>
+
+          {/* 🌟 페이징 네비게이션 컨트롤러 */}
+          {totalPages > 1 && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '36px',
+                marginBottom: '20px',
+              }}
+            >
+              <button
+                type="button"
+                className="btn btn-outline"
+                disabled={currentPage === 0}
+                onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+                style={{ padding: '8px 14px', fontSize: '14px' }}
+              >
+                ◀ 이전
+              </button>
+
+              {Array.from({ length: totalPages }, (_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setCurrentPage(idx)}
+                  className={`btn ${currentPage === idx ? 'btn-primary' : 'btn-outline'}`}
+                  style={{
+                    minWidth: '38px',
+                    height: '38px',
+                    padding: 0,
+                    fontWeight: currentPage === idx ? '700' : '500',
+                  }}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+
+              <button
+                type="button"
+                className="btn btn-outline"
+                disabled={currentPage >= totalPages - 1}
+                onClick={() => setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))}
+                style={{ padding: '8px 14px', fontSize: '14px' }}
+              >
+                다음 ▶
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

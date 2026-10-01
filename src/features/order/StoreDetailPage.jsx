@@ -75,11 +75,17 @@ function StoreDetailPage() {
         const storeData = storeRes.data?.data || storeRes.data;
         if (storeData) setStore(storeData);
 
-        // 2. 메뉴 목록 조회
+        // 2. 메뉴 목록 조회 (Spring Data Page 객체 및 배열 모두 지원)
         const menuRes = await apiClient.get(`/api/stores/${storeId}/menus`);
-        const menuList = menuRes.data?.data || menuRes.data;
-        if (Array.isArray(menuList) && menuList.length > 0) {
-          setMenus(menuList);
+        const resData = menuRes.data?.data || menuRes.data;
+        const list = Array.isArray(resData) ? resData : (resData?.content || []);
+        if (list.length > 0) {
+          // soldOut / isSoldOut 호환 처리
+          const formattedList = list.map((item) => ({
+            ...item,
+            isSoldOut: item.isSoldOut !== undefined ? item.isSoldOut : !!item.soldOut,
+          }));
+          setMenus(formattedList);
         }
       } catch (err) {
         console.warn('API 매장 상세/메뉴 폴백 데이터 유지', err);

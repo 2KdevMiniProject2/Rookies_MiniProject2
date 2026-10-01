@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
@@ -30,15 +30,54 @@ const MOCK_CUSTOMER_ORDERS = [
   },
 ];
 
+// 수업 교재(ch06_form.html, validation.js) 표준 전화번호 정규식
+const PHONE_PATTERN = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
+
 function MyPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, updateUser } = useAuthStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || '');
-  const [phone, setPhone] = useState(user?.phone || '010-1234-5678');
+  const [phone, setPhone] = useState(user?.phone || '');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+
+  // 사장님 소유 매장 목록 상태 (1:N 다중 매장 지원)
+  const [myStores, setMyStores] = useState([]);
+  const [loadingStores, setLoadingStores] = useState(false);
+
+  const isOwner = user?.role === 'OWNER';
+
+  // 사장님 소유 매장 목록 조회 (1:N 다중 매장 지원)
+  useEffect(() => {
+    if (isOwner && user?.id) {
+      setLoadingStores(true);
+      apiClient
+        .get(`/api/stores/owner/${user.id}`)
+        .then((res) => {
+          setMyStores(res.data || []);
+        })
+        .catch((err) => {
+          console.warn('사장님 매장 목록 조회 실패, 폴백 사용:', err);
+          if (user.storeName) {
+            setMyStores([
+              {
+                id: 1,
+                name: user.storeName,
+                category: '베이커리',
+                address: '서울시 강남구 테헤란로 123 1층',
+                openTime: '09:00:00',
+                closeTime: '21:00:00',
+              },
+            ]);
+          }
+        })
+        .finally(() => {
+          setLoadingStores(false);
+        });
+    }
+  }, [isOwner, user?.id, user?.storeName]);
 
   // 로그인하지 않은 경우
   if (!isAuthenticated || !user) {
@@ -60,13 +99,18 @@ function MyPage() {
     );
   }
 
-  const isOwner = user.role === 'OWNER';
-
   // 회원 정보 수정 제출
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ text: '', type: '' });
+
+    // 전화번호 형식 유효성 검사 (교재 기준)
+    if (phone && !PHONE_PATTERN.test(phone.trim())) {
+      setMessage({ text: '⚠️ 올바른 전화번호 형식(예: 010-1234-5678)으로 입력해 주세요.', type: 'error' });
+      setLoading(false);
+      return;
+    }
 
     try {
       if (user.id) {
@@ -211,10 +255,16 @@ function MyPage() {
                 type="tel"
                 className="form-input"
                 required
+                pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="010-1234-5678"
               />
+              {phone && !PHONE_PATTERN.test(phone.trim()) && (
+                <div style={{ color: 'var(--danger)', fontSize: '12px', marginTop: '6px' }}>
+                  ⚠️ 올바른 전화번호 형식(예: 010-1234-5678)으로 입력해 주세요.
+                </div>
+              )}
             </div>
             <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
               <button type="submit" className="btn btn-primary" disabled={loading}>
@@ -244,21 +294,156 @@ function MyPage() {
               <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>회원 유형</span>
               <strong style={{ fontSize: '14px' }}>{isOwner ? '매장 운영자 (OWNER)' : '주문 고객 (CUSTOMER)'}</strong>
             </div>
-            {isOwner && user.storeName && (
+            {isOwner && (
               <div>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>운영 매장</span>
-                <strong style={{ fontSize: '14px', color: 'var(--primary)' }}>{user.storeName}</strong>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>운영 매장 수</span>
+                <strong style={{ fontSize: '14px', color: 'var(--primary)' }}>
+                  {loadingStores ? '불러오는 중...' : `${myStores.length}개 매장 운영 중`}
+                </strong>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* 2. 사장님 전용 관리 퀵 패널 */}
+      {/* 2. 사장님 전용: 내가 운영 중인 매장 목록 (1:N 다중 매장 지원) */}
+      {isOwner && (
+        <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <h2 style={{ fontSize: '18px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🏪</span> 내가 운영 중인 매장 목록
+                <span className="badge badge-primary" style={{ fontSize: '12px', padding: '3px 8px' }}>
+                  {myStores.length}개
+                </span>
+              </h2>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                한 사장님 계정으로 여러 매장을 등록하고 관리할 수 있습니다.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/owner/store/edit')}
+              className="btn btn-primary btn-sm"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <span>➕</span> 새 매장 추가 등록
+            </button>
+          </div>
+
+          {loadingStores ? (
+            <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+              매장 목록을 불러오는 중입니다...
+            </div>
+          ) : myStores.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {myStores.map((store) => (
+                <div
+                  key={store.id}
+                  style={{
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '20px',
+                    backgroundColor: 'var(--bg)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <h3 style={{ fontSize: '17px', fontWeight: '800', color: 'var(--text-main)' }}>
+                          {store.name}
+                        </h3>
+                        <span className="badge" style={{ backgroundColor: '#fef3c7', color: '#92400e', fontSize: '12px' }}>
+                          {store.category || '기타'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        <div>📍 {store.address}</div>
+                        <div>
+                          ⏰ 영업시간:{' '}
+                          {store.openTime && store.closeTime
+                            ? `${store.openTime.slice(0, 5)} ~ ${store.closeTime.slice(0, 5)}`
+                            : '영업시간 미등록'}
+                        </div>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)', background: 'var(--card-bg)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border)' }}>
+                      매장 ID: #{store.id}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '8px',
+                      flexWrap: 'wrap',
+                      paddingTop: '12px',
+                      borderTop: '1px dashed var(--border)',
+                    }}
+                  >
+                    <button
+                      onClick={() => navigate('/owner/dashboard')}
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: '13px' }}
+                    >
+                      🔔 주문 접수 대시보드
+                    </button>
+                    <button
+                      onClick={() => navigate('/owner/menus')}
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '13px' }}
+                    >
+                      📋 메뉴 관리
+                    </button>
+                    <button
+                      onClick={() => navigate('/owner/store/edit')}
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '13px' }}
+                    >
+                      ⚙️ 매장 정보 수정
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '40px 20px',
+                border: '1px dashed var(--border)',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--bg)',
+              }}
+            >
+              <div style={{ fontSize: '40px', marginBottom: '12px' }}>🏪</div>
+              <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '6px' }}>
+                아직 등록된 매장이 없습니다
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px' }}>
+                첫 번째 매장을 등록하고 맛있는 메뉴와 함께 손님들의 주문을 받아보세요!
+              </p>
+              <button
+                onClick={() => navigate('/owner/store/edit')}
+                className="btn btn-primary"
+              >
+                + 첫 매장 등록하기
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 2-1. 사장님 전용 퀵 패널 */}
       {isOwner && (
         <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
           <h2 style={{ fontSize: '17px', fontWeight: '800', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>🏪</span> 사장님 전용 바로가기
+            <span>⚡</span> 사장님 빠른 바로가기
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
             <div

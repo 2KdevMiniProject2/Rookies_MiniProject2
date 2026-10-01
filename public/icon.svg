@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <!-- 배경 아이콘 그라데이션 -->
+    <linearGradient id="iconBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A30" />
+      <stop offset="100%" stop-color="#FF512F" />
+    </linearGradient>
+
+    <!-- 크루아상/빵 금빛 그라데이션 -->
+    <linearGradient id="iconBreadGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2D6" />
+      <stop offset="100%" stop-color="#FFE099" />
+    </linearGradient>
+
+    <!-- 스파클 그라데이션 -->
+    <linearGradient id="iconSparkleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD166" />
+      <stop offset="100%" stop-color="#FF9F1C" />
+    </linearGradient>
+
+    <!-- 그림자 필터 -->
+    <filter id="iconShadow" x="-10%" y="-10%" width="120%" height="130%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#FF512F" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- 둥근 스퀘어 배경 -->
+  <g filter="url(#iconShadow)">
+    <rect x="4" y="4" width="56" height="56" rx="18" fill="url(#iconBgGrad)" />
+    <rect x="5" y="5" width="54" height="54" rx="17" stroke="white" stroke-width="1.5" stroke-opacity="0.3" />
+
+    <!-- 크루아상 중앙 바디 -->
+    <path d="M 21 38 C 19 29, 28 21, 39 22 C 47 23, 50 28, 48 35 C 46 41, 37 44, 28 43 C 24 42, 21 40, 21 38 Z" 
+          fill="url(#iconBreadGrad)" />
+
+    <!-- 크루아상 겹겹 결 -->
+    <path d="M 27 27 C 32 25, 39 28, 40 35" 
+          stroke="#FF7A30" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.85" />
+    <path d="M 34 23 C 38 24, 43 28, 43 33" 
+          stroke="#FF7A30" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.85" />
+
+    <!-- 따뜻한 김 & 오더 시그널 -->
+    <path d="M 30 17 C 31 15, 33 15, 34 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-opacity="0.9" />
+    <path d="M 37 18 C 38 16, 40 16, 41 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-opacity="0.9" />
+
+    <!-- 반짝이는 스파클 별 -->
+    <path d="M 48 16 L 49.5 19.5 L 53 21 L 49.5 22.5 L 48 26 L 46.5 22.5 L 43 21 L 46.5 19.5 Z" 
+          fill="url(#iconSparkleGrad)" />
+  </g>
+</svg>

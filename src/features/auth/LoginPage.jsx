@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 
+// 수업 교재(ch06_form.html, validation.js) 표준 전화번호 정규식
+const PHONE_PATTERN = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
+
 function LoginPage() {
   const navigate = useNavigate();
   const { login, loginAsOwner, loginAsCustomer } = useAuthStore();
@@ -21,7 +24,7 @@ function LoginPage() {
     password: '',
     name: '',
     phone: '',
-    role: 'CUSTOMER', // CUSTOMER or OWNER
+    role: 'USER', // 백엔드 User.Role Enum: USER 또는 OWNER
   });
   const [signupLoading, setSignupLoading] = useState(false);
   const [signupError, setSignupError] = useState('');
@@ -70,15 +73,33 @@ function LoginPage() {
     setSignupLoading(true);
     setSignupError('');
 
+    // 전화번호 형식 유효성 검사 (교재 기준)
+    if (signupForm.phone && !PHONE_PATTERN.test(signupForm.phone.trim())) {
+      setSignupError('⚠️ 전화번호 형식이 올바르지 않습니다. (예: 010-1234-5678)');
+      setSignupLoading(false);
+      return;
+    }
+
     try {
-      await apiClient.post('/api/auth/signup', signupForm);
-      alert('회원가입이 완료되었습니다! 로그인해 주세요.');
+      const payload = {
+        ...signupForm,
+        role: signupForm.role === 'OWNER' ? 'OWNER' : 'USER',
+      };
+
+      await apiClient.post('/api/auth/signup', payload);
+      alert('회원가입이 완료되었습니다! 가입하신 정보로 로그인해 주세요. 🎉');
       setActiveTab('login');
       setLoginEmail(signupForm.email);
+      setLoginPassword(signupForm.password);
     } catch (err) {
       console.error('회원가입 오류', err);
-      const errMsg = err.response?.data?.message || err.response?.data?.error?.message || '회원가입 중 오류가 발생했습니다.';
-      setSignupError(errMsg);
+      const resData = err.response?.data;
+      let errMsg = resData?.message || resData?.error?.message;
+      if (resData?.errors && typeof resData.errors === 'object') {
+        const detail = Object.values(resData.errors).join(', ');
+        errMsg = detail ? `${errMsg || '입력 오류'}: ${detail}` : errMsg;
+      }
+      setSignupError(errMsg || '회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setSignupLoading(false);
     }
@@ -204,8 +225,8 @@ function LoginPage() {
                   <input
                     type="radio"
                     name="role"
-                    value="CUSTOMER"
-                    checked={signupForm.role === 'CUSTOMER'}
+                    value="USER"
+                    checked={signupForm.role === 'USER'}
                     onChange={(e) => setSignupForm({ ...signupForm, role: e.target.value })}
                   />
                   손님 (주문자)
@@ -265,10 +286,16 @@ function LoginPage() {
                 type="tel"
                 className="form-input"
                 required
+                pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}"
                 value={signupForm.phone}
                 onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
                 placeholder="010-1234-5678"
               />
+              {signupForm.phone && !PHONE_PATTERN.test(signupForm.phone.trim()) && (
+                <div style={{ color: 'var(--danger)', fontSize: '12px', marginTop: '6px' }}>
+                  ⚠️ 올바른 전화번호 형식(예: 010-1234-5678)으로 입력해 주세요.
+                </div>
+              )}
             </div>
 
             {signupError && (

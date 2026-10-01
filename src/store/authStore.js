@@ -81,7 +81,7 @@ export const useAuthStore = create((set) => ({
       id: 2,
       email: 'customer1@rookie.com',
       name: '김손님',
-      role: 'CUSTOMER',
+      role: 'USER',
       phone: '010-3333-4444',
     };
     const authData = { user: customerUser, token: 'mock-jwt-token-for-customer1@rookie.com', isAuthenticated: true };

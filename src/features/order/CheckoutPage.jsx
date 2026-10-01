@@ -26,25 +26,30 @@ function CheckoutPage() {
 
     setSubmitting(true);
 
-    // 픽업 시간 계산 (현재 시간 + 선택 분)
+    // 픽업 시간 계산 (현재 시간 + 선택 분) -> 백엔드 LocalDateTime 규격
     const now = new Date();
     now.setMinutes(now.getMinutes() + parseInt(pickupMinutes, 10));
-    const pickupTimeString = now.toTimeString().slice(0, 5); // "15:30"
+    const pickupTimeString = now.toTimeString().slice(0, 5); // 화면 표시용 "15:30"
+    
+    // YYYY-MM-DDTHH:mm:ss 형식 생성
+    const pad = (n) => String(n).padStart(2, '0');
+    const localDateTimeString = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
     const orderPayload = {
       storeId: storeId || 1,
-      pickupTime: pickupTimeString,
+      pickupTime: localDateTimeString,
       requestNotes: requestNotes || '요청사항 없음',
-      totalAmount: totalPrice,
       items: items.map((item) => ({
         menuItemId: item.id,
         quantity: item.quantity,
-        orderPrice: item.price,
       })),
     };
 
     try {
-      const res = await apiClient.post('/api/orders', orderPayload);
+      const customerId = user?.id || 1;
+      const res = await apiClient.post('/api/orders', orderPayload, {
+        params: { customerId },
+      });
       const resData = res.data?.data || res.data;
       const orderId = resData?.orderId || resData?.id || Math.floor(5000 + Math.random() * 500);
 
