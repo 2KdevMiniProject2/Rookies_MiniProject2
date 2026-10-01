@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 public class MenuController {
-
     private final MenuService menuService;
     private final ImageUploadService imageUploadService;
 
