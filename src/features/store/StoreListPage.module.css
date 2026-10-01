@@ -1,0 +1,476 @@
+/*
+ * 색상은 팀 공통 루트 변수(--accent 등) 대신 아래 .page에 정의한 무채색 로컬 변수(--home-*)를 사용합니다.
+ * (로그인/회원가입 AuthForm.module.css와 같은 방식)
+ * StoreCard.module.css, CategoryFilter.module.css도 이 --home-* 변수를 사용하므로
+ * 두 컴포넌트는 이 페이지(.page) 안에서 렌더링된다는 전제입니다.
+ */
+
+.page {
+  /*
+   * 무채색 로컬 색상 변수
+   * 다크 모드 블록은 아래에 주석으로 보관 중 → 현재는 OS 테마와 무관하게 항상 라이트로 고정
+   * 예외(의미 전달용 색): StoreCard의 "주문 가능"(초록)·"준비 중"(회색) 뱃지는 그대로 유지
+   */
+  --home-bg: #ffffff;
+  --home-surface: #ffffff;
+  --home-text: #111111;
+  --home-text-muted: #666666;
+  --home-border: #e0e0e0;
+  --home-border-strong: #8c8c8c;
+  --home-primary: #1a1a1a;
+  --home-on-primary: #ffffff;
+  --home-soft: rgba(0, 0, 0, 0.06);
+  --home-glow: rgba(0, 0, 0, 0.04);
+  --home-fill: #f2f2f2;
+  --home-fill-strong: #e6e6e6;
+  --home-button-bg: #ececec;
+  --home-button-bg-hover: #e0e0e0;
+  --home-button-border: #bdbdbd;
+  --home-shadow:
+    rgba(0, 0, 0, 0.08) 0 10px 15px -3px, rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
+  /*
+   * 브랜드 포인트 컬러 (선택된 카테고리 칩 · 현재 페이지 버튼 · 가게 상세보기 버튼 · 헤더 로그인/로그아웃)
+   * — AuthForm의 --auth-accent와 같은 값 (색조 16° · 채도 85% · 명도 53%, 흰 글자 대비 3.49:1)
+   */
+  --home-accent: #ed5821;
+  --home-on-accent: #ffffff;
+  /*
+   * 히어로 배너 그라데이션 — 버튼 포인트 컬러 기준 (왼쪽 위 → 오른쪽 아래)
+   * from: --home-accent 그대로 / to: #ff8f66 (색조 16° · 채도 100% · 명도 70%) — 오른쪽으로 갈수록 확실히 밝아지도록
+   */
+  --home-hero-from: var(--home-accent);
+  --home-hero-to: #ff8f66;
+
+  /* 메인 홈 콘텐츠 최대 너비 (로그인/회원가입 카드와 별개) */
+  --content-max: 1400px;
+  --gutter: 32px;
+
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  /* 루트(:root)의 보라빛 회색 글자색이 상속되지 않도록 무채색으로 고정 */
+  color: var(--home-text);
+
+  /*
+   * breakout: #root(최대 1126px) 박스를 벗어나 화면 전체 폭을 사용
+   * 50%는 부모(#root) 폭 기준 → 부모 중앙에서 화면 절반만큼 왼쪽으로 당김
+   * background는 #root의 좌우 테두리 선이 페이지 위로 비치지 않도록 덮는 용도
+   */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  background: var(--home-bg);
+}
+
+/*
+ * [비활성] 다크 모드 — 다시 쓰려면 이 주석을 풀고, 아래 html 규칙의 `color-scheme: light`도 제거할 것
+ *
+ * @media (prefers-color-scheme: dark) {
+ *   .page {
+ *     --home-bg: #111111;
+ *     --home-surface: #1a1a1a;
+ *     --home-text: #f2f2f2;
+ *     --home-text-muted: #a0a0a0;
+ *     --home-border: #333333;
+ *     --home-border-strong: #6e6e6e;
+ *     --home-primary: #e6e6e6;
+ *     --home-on-primary: #111111;
+ *     --home-soft: rgba(255, 255, 255, 0.08);
+ *     --home-glow: rgba(255, 255, 255, 0.05);
+ *     --home-fill: #1f1f1f;
+ *     --home-fill-strong: #2a2a2a;
+ *     --home-button-bg: #262626;
+ *     --home-button-bg-hover: #303030;
+ *     --home-button-border: #4a4a4a;
+ *     --home-shadow:
+ *       rgba(0, 0, 0, 0.5) 0 10px 15px -3px, rgba(0, 0, 0, 0.3) 0 4px 6px -2px;
+ *     --home-accent: #ed5821;
+ *     --home-on-accent: #ffffff;
+ *     --home-hero-from: var(--home-accent);
+ *     --home-hero-to: #ff8f66;
+ *   }
+ * }
+ */
+
+/*
+ * 메인 홈이 화면에 있는 동안에만 적용
+ * - overflow-x: 100vw는 세로 스크롤바 폭까지 포함해서, Windows처럼 스크롤바가 자리를 차지하는
+ *   환경에선 가로 스크롤이 생김 → 가로 넘침을 잘라냄
+ * - color-scheme: 루트의 `light dark` 때문에 OS 다크 모드에서 스크롤바·검색창 지우기(×) 버튼 등
+ *   브라우저 기본 요소가 어둡게 그려지는 것을 막고 라이트로 고정
+ */
+:global(html):has(.page) {
+  overflow-x: clip;
+  color-scheme: light;
+}
+
+/* 버튼·링크의 브라우저 기본 포커스 테두리(파란색) 대신 무채색 테두리 (StoreCard·CategoryFilter 버튼 포함) */
+.page button:focus-visible,
+.page a:focus-visible {
+  outline: 2px solid var(--home-text);
+  outline-offset: 2px;
+}
+
+/* ---------- 헤더 ---------- */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  /* 로고(좌) · 검색창(정중앙) · 메뉴(우) — 좌우 칸을 같은 1fr로 두어 검색창이 항상 가운데 */
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 640px) 1fr;
+  align-items: center;
+  gap: 20px;
+  /* 배경·하단선은 화면 끝까지, 내용은 --content-max 안에 정렬 */
+  padding: 14px max(var(--gutter), calc((100% - var(--content-max)) / 2));
+  background: color-mix(in srgb, var(--home-bg) 85%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--home-border);
+}
+
+.logo {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/*
+ * 헤더 로고 이미지 (components/common/Logo) — 공용 Logo 기본값보다 우선하도록 .logo 아래로 지정
+ * logo.svg 안쪽에 빈 여백(위 14% · 아래 11% · 왼쪽 7%)이 있어서, 그만큼 음수 margin으로 상쇄
+ * → 로고는 크게 보이면서 헤더 높이는 늘지 않고, 왼쪽 끝이 본문 콘텐츠 줄과 맞음
+ */
+.logo .logoImage {
+  height: 60px;
+  margin: -9px 0 -7px -13px;
+}
+
+.search {
+  position: relative;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--home-text-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px 0 40px;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 15px;
+  color: var(--home-text);
+  background: var(--home-fill);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.searchInput::placeholder {
+  color: var(--home-text-muted);
+  opacity: 0.7;
+}
+
+.searchInput:focus {
+  background: var(--home-surface);
+  border-color: var(--home-primary);
+  box-shadow: 0 0 0 3px var(--home-soft);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 10px;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--home-text);
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  /* 헤더 로그인/로그아웃: 포인트 컬러 바탕 + 흰 글자 (메인 홈 전용 헤더) */
+  color: var(--home-on-accent);
+  background: var(--home-accent);
+  border: 1px solid var(--home-accent);
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--home-text);
+  background: transparent;
+  border: 1px solid var(--home-button-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.iconButton svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.iconButton:hover {
+  background: var(--home-button-bg);
+  border-color: var(--home-border-strong);
+}
+
+/* 호버 시 밝게 하면 흰 글자 대비가 기준 아래로 떨어지므로 살짝 어둡게 */
+.navButton:hover {
+  filter: brightness(0.92);
+}
+
+/* ---------- 본문 ---------- */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: calc(var(--content-max) + var(--gutter) * 2);
+  margin: 0 auto;
+  padding: 32px var(--gutter);
+  box-sizing: border-box;
+}
+
+/* 히어로 배너: 진한 주황 → 포인트 컬러 대각선 그라데이션 + 흰 글자 (참고 이미지 스타일) */
+/*
+ * 히어로 배너 — 소개글(작게) → 제목(크고 굵게, 2줄) → 설명글 3단 구조
+ * 글자 크기 비율은 design-reference_1.png 기준 (소개글 : 제목 : 설명글 ≈ 1 : 2.4 : 1.15)
+ */
+.hero {
+  /* 상하만 줄여 콤팩트하게 (좌우 40px 유지) */
+  padding: 30px 40px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--home-hero-from), var(--home-hero-to));
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  /* 줄 높이를 글자에 가깝게 → 배너 위쪽 여백이 덜 벌어짐 */
+  line-height: 1.3;
+  letter-spacing: 0.5px;
+  color: var(--home-on-accent);
+  opacity: 0.9;
+}
+
+/* h1은 루트의 h1 규칙(color: var(--text-h))을 받으므로 직접 지정 — 없으면 루트 색이 들어감 */
+.title {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.32;
+  letter-spacing: -0.8px;
+  color: var(--home-on-accent);
+}
+
+.subtitle {
+  margin: 12px 0 0;
+  font-size: 17px;
+  /* 한 줄일 때 아래쪽 여백이 덜 벌어지도록 줄 높이 축소 */
+  line-height: 1.4;
+  color: var(--home-on-accent);
+  opacity: 0.95;
+}
+
+.count {
+  font-size: 14px;
+  color: var(--home-text-muted);
+}
+
+.count strong {
+  color: var(--home-text);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.skeleton {
+  height: 340px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, var(--home-fill) 25%, var(--home-fill-strong) 50%, var(--home-fill) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 64px 16px;
+  text-align: center;
+  border: 1px dashed var(--home-border);
+  border-radius: 16px;
+}
+
+.emptyTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--home-text);
+}
+
+.emptyDesc {
+  font-size: 14px;
+  color: var(--home-text-muted);
+}
+
+.emptyButton {
+  margin-top: 8px;
+  height: 40px;
+  padding: 0 20px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--home-on-primary);
+  background: var(--home-primary);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.emptyButton:hover {
+  filter: brightness(1.08);
+}
+
+/* ---------- 페이지네이션 (기존 --home-* 무채색 변수만 사용) ---------- */
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.pageButton {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--home-text);
+  background: var(--home-surface);
+  border: 1px solid var(--home-button-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: var(--home-button-bg);
+  border-color: var(--home-border-strong);
+}
+
+/* 현재 페이지: 포인트 컬러 바탕 + 흰 글자로 구분 */
+.pageButtonActive,
+.pageButtonActive:hover:not(:disabled) {
+  color: var(--home-on-accent);
+  background: var(--home-accent);
+  border-color: var(--home-accent);
+  cursor: default;
+}
+
+.pageButton:disabled {
+  color: var(--home-text-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- 모바일 ---------- */
+
+@media (max-width: 640px) {
+  .page {
+    --gutter: 16px;
+  }
+
+  /* 모바일: 1행 로고 · 메뉴, 2행 검색창 전체 폭 */
+  .header {
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    padding-block: 12px;
+  }
+
+  .search {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  .logo .logoImage {
+    height: 52px;
+    margin: -7px 0 -6px -11px;
+  }
+
+  .userName {
+    display: none;
+  }
+
+  .main {
+    padding-block: 20px;
+  }
+
+  .hero {
+    padding: 20px 22px;
+  }
+
+  .eyebrow {
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+}
