@@ -102,12 +102,12 @@ CREATE TABLE order_items (
 
 -- 2.1 회원 (총 6명: 사장님 3명, 손님 3명 / 비밀번호는 모두 1234)
 INSERT INTO users (id, email, password, name, phone, role) VALUES
-(1, 'owner@rookie.com', '$2a$10$wE99o7zRvhT5wS3tYh6z4.Xv18vF5K.gX8bS5F1Rj1V8b7F4K.X0G', '김루키 사장님', '010-1111-2222', 'OWNER'),
-(2, 'customer@rookie.com', '$2a$10$wE99o7zRvhT5wS3tYh6z4.Xv18vF5K.gX8bS5F1Rj1V8b7F4K.X0G', '이수강 손님', '010-3333-4444', 'USER'),
-(3, 'customer2@rookie.com', '$2a$10$wE99o7zRvhT5wS3tYh6z4.Xv18vF5K.gX8bS5F1Rj1V8b7F4K.X0G', '박영희 손님', '010-5555-6666', 'USER'),
-(4, 'owner2@rookie.com', '$2a$10$wE99o7zRvhT5wS3tYh6z4.Xv18vF5K.gX8bS5F1Rj1V8b7F4K.X0G', '최사장 사장님', '010-7777-8888', 'OWNER'),
-(5, 'customer3@rookie.com', '$2a$10$wE99o7zRvhT5wS3tYh6z4.Xv18vF5K.gX8bS5F1Rj1V8b7F4K.X0G', '정민우 손님', '010-9999-0000', 'USER'),
-(6, 'owner3@rookie.com', '$2a$10$wE99o7zRvhT5wS3tYh6z4.Xv18vF5K.gX8bS5F1Rj1V8b7F4K.X0G', '강대표 사장님', '010-2222-3333', 'OWNER');
+(1, 'owner@rookie.com', '$2a$10$P4nSfOHDM8lNQkFzSIZB6eepCP1Fv7rGzyp3PGPTfrlxDWGKe2GJu', '김루키 사장님', '010-1111-2222', 'OWNER'),
+(2, 'customer@rookie.com', '$2a$10$P4nSfOHDM8lNQkFzSIZB6eepCP1Fv7rGzyp3PGPTfrlxDWGKe2GJu', '이수강 손님', '010-3333-4444', 'USER'),
+(3, 'customer2@rookie.com', '$2a$10$P4nSfOHDM8lNQkFzSIZB6eepCP1Fv7rGzyp3PGPTfrlxDWGKe2GJu', '박영희 손님', '010-5555-6666', 'USER'),
+(4, 'owner2@rookie.com', '$2a$10$P4nSfOHDM8lNQkFzSIZB6eepCP1Fv7rGzyp3PGPTfrlxDWGKe2GJu', '최사장 사장님', '010-7777-8888', 'OWNER'),
+(5, 'customer3@rookie.com', '$2a$10$P4nSfOHDM8lNQkFzSIZB6eepCP1Fv7rGzyp3PGPTfrlxDWGKe2GJu', '정민우 손님', '010-9999-0000', 'USER'),
+(6, 'owner3@rookie.com', '$2a$10$P4nSfOHDM8lNQkFzSIZB6eepCP1Fv7rGzyp3PGPTfrlxDWGKe2GJu', '강대표 사장님', '010-2222-3333', 'OWNER');
 
 -- 2.2 가게 목록 (총 30개 매장: 페이징 테스트 지원 및 고화질 이미지 URL 포함)
 INSERT INTO stores (id, owner_id, name, address, category, image_url) VALUES
