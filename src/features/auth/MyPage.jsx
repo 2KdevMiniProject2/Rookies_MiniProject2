@@ -8,11 +8,13 @@ import './MyPage.css';
 
 function MyPage() {
     const navigate = useNavigate();
+
     const authUser = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+
     const [orders, setOrders] = useState([]);
     const [orderLoading, setOrderLoading] = useState(false);
     const [orderError, setOrderError] = useState('');
@@ -27,11 +29,15 @@ function MyPage() {
             let currentUser = authUser;
 
             try {
-                const response = await apiClient.get(`/api/users/${authUser.id}`);
+                const response = await apiClient.get(
+                    `/api/users/${authUser.id}`
+                );
+
                 currentUser = response.data;
                 setUser(response.data);
             } catch (error) {
                 console.error('사용자 조회 실패:', error);
+
                 setUser(authUser);
             }
 
@@ -40,11 +46,18 @@ function MyPage() {
                 setOrderError('');
 
                 try {
-                    const result = await fetchOrders({ page: 0, size: 10 });
+                    const result = await fetchOrders({
+                        page: 0,
+                        size: 10,
+                    });
+
                     setOrders(result.orders);
                 } catch (error) {
                     console.error('주문 내역 조회 실패:', error);
-                    setOrderError('주문 내역을 불러오지 못했습니다.');
+
+                    setOrderError(
+                        '주문 내역을 불러오지 못했습니다.'
+                    );
                 } finally {
                     setOrderLoading(false);
                 }
@@ -117,6 +130,17 @@ function MyPage() {
         navigate('/login');
     };
 
+    const handleLogoClick = () => {
+        navigate('/');
+    };
+
+    const handleLogoKeyDown = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            navigate('/');
+        }
+    };
+
     if (loading) {
         return (
             <main className="mypage">
@@ -137,10 +161,21 @@ function MyPage() {
         <main className="mypage">
             <div className="mypage-layout">
                 <aside className="mypage-sidebar">
-                    <Logo className="owner-sidebar-logo" />
+                    <div
+                        className="mypage-logo-link"
+                        role="button"
+                        tabIndex={0}
+                        aria-label="메인 화면으로 이동"
+                        onClick={handleLogoClick}
+                        onKeyDown={handleLogoKeyDown}
+                    >
+                        <Logo className="owner-sidebar-logo" />
+                    </div>
 
                     <strong>
-                        {user.role === 'OWNER' ? '사장님 마이페이지' : '마이페이지'}
+                        {user.role === 'OWNER'
+                            ? '사장님 마이페이지'
+                            : '마이페이지'}
                     </strong>
 
                     <nav>
@@ -149,28 +184,42 @@ function MyPage() {
                                 <button
                                     type="button"
                                     className="active"
-                                    onClick={() => navigate('/mypage')}
+                                    onClick={() =>
+                                        navigate('/mypage')
+                                    }
                                 >
                                     마이페이지
                                 </button>
 
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/stores/register')}
+                                    onClick={() =>
+                                        navigate(
+                                            '/stores/register'
+                                        )
+                                    }
                                 >
                                     가게 등록
                                 </button>
 
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/owner/stores')}
+                                    onClick={() =>
+                                        navigate(
+                                            '/owner/stores'
+                                        )
+                                    }
                                 >
                                     가게별 메뉴 관리
                                 </button>
 
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/mypage/profile')}
+                                    onClick={() =>
+                                        navigate(
+                                            '/mypage/profile'
+                                        )
+                                    }
                                 >
                                     회원정보
                                 </button>
@@ -187,6 +236,9 @@ function MyPage() {
                                 <button
                                     type="button"
                                     className="active"
+                                    onClick={() =>
+                                        navigate('/mypage')
+                                    }
                                 >
                                     마이페이지
                                 </button>
@@ -194,17 +246,10 @@ function MyPage() {
                                 <button
                                     type="button"
                                     onClick={() =>
-                                        document
-                                            .getElementById('order-history')
-                                            ?.scrollIntoView({ behavior: 'smooth' })
+                                        navigate(
+                                            '/mypage/profile'
+                                        )
                                     }
-                                >
-                                    이용내역
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('/mypage/profile')}
                                 >
                                     회원정보
                                 </button>
@@ -227,13 +272,18 @@ function MyPage() {
 
                     <section className="profile-section">
                         <div className="profile-image">
-                            <span>{user.name.charAt(0)}</span>
+                            <span>
+                                {user.name?.charAt(0) || '?'}
+                            </span>
                         </div>
 
                         <div className="profile-info">
                             <strong>
-                                {user.role === 'OWNER' ? 'OWNER' : 'USER'}
+                                {user.role === 'OWNER'
+                                    ? 'OWNER'
+                                    : 'USER'}
                             </strong>
+
                             <p>{user.name}</p>
                             <p>{user.email}</p>
                             <p>{user.phone}</p>
@@ -242,7 +292,9 @@ function MyPage() {
                         <button
                             type="button"
                             className="profile-edit-button"
-                            onClick={() => navigate('/mypage/profile')}
+                            onClick={() =>
+                                navigate('/mypage/profile')
+                            }
                         >
                             정보 수정
                         </button>
@@ -255,12 +307,15 @@ function MyPage() {
                         >
                             <div className="section-title">
                                 <h2>주문 내역</h2>
-                                <span>{orders.length}건</span>
+                                <span>
+                                    {orders.length}건
+                                </span>
                             </div>
 
                             {orderLoading ? (
                                 <div className="order-history-message">
-                                    주문 내역을 불러오는 중입니다.
+                                    주문 내역을 불러오는
+                                    중입니다.
                                 </div>
                             ) : orderError ? (
                                 <div className="order-history-message">
@@ -280,31 +335,52 @@ function MyPage() {
                                             <div className="order-history-top">
                                                 <div>
                                                     <span className="order-number">
-                                                        주문 #{order.id}
+                                                        주문 #
+                                                        {
+                                                            order.id
+                                                        }
                                                     </span>
 
-                                                    <h3>{getOrderTitle(order)}</h3>
+                                                    <h3>
+                                                        {getOrderTitle(
+                                                            order
+                                                        )}
+                                                    </h3>
                                                 </div>
 
                                                 <span
-                                                    className={`mypage-order-status mypage-order-status--${order.status.toLowerCase()}`}
+                                                    className={`mypage-order-status mypage-order-status--${order.status?.toLowerCase()}`}
                                                 >
-                                                    {getStatusText(order.status)}
+                                                    {getStatusText(
+                                                        order.status
+                                                    )}
                                                 </span>
                                             </div>
 
                                             <div className="order-history-info">
                                                 <p>
-                                                    <span>픽업 시간</span>
+                                                    <span>
+                                                        픽업 시간
+                                                    </span>
+
                                                     <strong>
-                                                        {formatPickupTime(order.pickupTime)}
+                                                        {formatPickupTime(
+                                                            order.pickupTime
+                                                        )}
                                                     </strong>
                                                 </p>
 
                                                 <p>
-                                                    <span>총 금액</span>
+                                                    <span>
+                                                        총 금액
+                                                    </span>
+
                                                     <strong>
-                                                        {(order.totalPrice ?? 0).toLocaleString()}원
+                                                        {(
+                                                            order.totalPrice ??
+                                                            0
+                                                        ).toLocaleString()}
+                                                        원
                                                     </strong>
                                                 </p>
                                             </div>
@@ -318,8 +394,11 @@ function MyPage() {
                     {user.role === 'OWNER' && (
                         <section className="owner-guide-section">
                             <h2>가게 관리</h2>
+
                             <p>
-                                왼쪽 메뉴에서 가게 등록과 메뉴 관리 기능을 이용할 수 있습니다.
+                                왼쪽 메뉴에서 가게 등록과
+                                메뉴 관리 기능을 이용할 수
+                                있습니다.
                             </p>
                         </section>
                     )}
