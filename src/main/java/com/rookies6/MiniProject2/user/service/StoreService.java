@@ -27,15 +27,26 @@ public class StoreService {
     private final StoreDetailRepository storeDetailRepository;
     private final UserRepository userRepository;
 
-    // 1. 매장 전체 목록 조회 (카테고리 필터링 + 페이징 지원)
-    public Page<StoreDTO.StoreResponse> getAllStores(String category, Pageable pageable) {
+    // 1. 매장 전체 목록 조회 (카테고리 필터링 + 검색어 + 페이징 지원)
+    public Page<StoreDTO.StoreResponse> getAllStores(String category, String keyword, Pageable pageable) {
         Page<Store> stores;
-        if (category != null && !category.isBlank() && !category.equalsIgnoreCase("전체")) {
-            stores = storeRepository.findByCategoryAndDeletedAtIsNull(category, pageable);
+        boolean hasCategory = category != null && !category.isBlank() && !category.equalsIgnoreCase("전체");
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+
+        if (hasCategory && hasKeyword) {
+            stores = storeRepository.findByCategoryAndNameContainingAndDeletedAtIsNull(category.trim(), keyword.trim(), pageable);
+        } else if (hasCategory) {
+            stores = storeRepository.findByCategoryAndDeletedAtIsNull(category.trim(), pageable);
+        } else if (hasKeyword) {
+            stores = storeRepository.findByNameContainingAndDeletedAtIsNull(keyword.trim(), pageable);
         } else {
             stores = storeRepository.findByDeletedAtIsNull(pageable);
         }
         return stores.map(StoreDTO.StoreResponse::from);
+    }
+
+    public Page<StoreDTO.StoreResponse> getAllStores(String category, Pageable pageable) {
+        return getAllStores(category, null, pageable);
     }
 
     // 2. 매장 단건 상세 조회

@@ -27,6 +27,22 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             countQuery = "SELECT COUNT(s) FROM Store s WHERE s.category = :category AND s.deletedAt IS NULL")
     Page<Store> findByCategoryAndDeletedAtIsNull(String category, Pageable pageable);
 
+    // 2-1. 매장명 검색 (페이징)
+    @Query(value = "SELECT DISTINCT s FROM Store s " +
+            "LEFT JOIN FETCH s.storeDetail " +
+            "JOIN FETCH s.owner " +
+            "WHERE s.name LIKE %:keyword% AND s.deletedAt IS NULL",
+            countQuery = "SELECT COUNT(s) FROM Store s WHERE s.name LIKE %:keyword% AND s.deletedAt IS NULL")
+    Page<Store> findByNameContainingAndDeletedAtIsNull(String keyword, Pageable pageable);
+
+    // 2-2. 카테고리 + 매장명 복합 검색 (페이징)
+    @Query(value = "SELECT DISTINCT s FROM Store s " +
+            "LEFT JOIN FETCH s.storeDetail " +
+            "JOIN FETCH s.owner " +
+            "WHERE s.category = :category AND s.name LIKE %:keyword% AND s.deletedAt IS NULL",
+            countQuery = "SELECT COUNT(s) FROM Store s WHERE s.category = :category AND s.name LIKE %:keyword% AND s.deletedAt IS NULL")
+    Page<Store> findByCategoryAndNameContainingAndDeletedAtIsNull(String category, String keyword, Pageable pageable);
+
     @Query("SELECT s FROM Store s " +
             "LEFT JOIN FETCH s.storeDetail " +
             "JOIN FETCH s.owner " +

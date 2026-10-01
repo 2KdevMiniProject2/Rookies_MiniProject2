@@ -70,4 +70,11 @@ public class UserController {
         userService.deleteUser(id, principal.getUser().getId());
         return ResponseEntity.noContent().build();
     }
+
+    // 6. 내 정보 조회 API (교재 Step 14: 새로고침 시 토큰 기반 복원)
+    @GetMapping("/api/users/me")
+    public ResponseEntity<UserDTO.UserResponse> getMyInfo(
+            @AuthenticationPrincipal UserInfoUserDetails principal) {
+        return ResponseEntity.ok(UserDTO.UserResponse.from(principal.getUser()));
+    }
 }
