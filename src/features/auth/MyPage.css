@@ -296,3 +296,22 @@
     font-size: 14px;
     line-height: 1.6;
 }
+.order-history-message {
+    padding: 36px 20px;
+    border: 1px dashed #cccccc;
+    border-radius: 12px;
+    color: #888888;
+    text-align: center;
+    font-size: 13px;
+}
+
+.mypage-order-status--ready {
+    background: #e7e7e7;
+    color: #333333;
+}
+
+.mypage-order-status--rejected,
+.mypage-order-status--cancelled {
+    background: #f3f3f3;
+    color: #777777;
+}

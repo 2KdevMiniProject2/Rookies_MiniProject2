@@ -38,7 +38,7 @@ function AppRouter() {
           <Route path="/owner/stores/:storeId/menus" element={<MenuRegisterPage />} />
           <Route path="/owner/stores/:storeId/edit" element={<StoreEditPage />} />
           <Route path="/owner/stores/:storeId/orders" element={<DashboardPage />} />
-          <Route path="/owner/dashboard" element={<Navigate to="/owner/stores/1/orders" replace />} />
+          <Route path="/owner/dashboard" element={<Navigate to="/owner/stores" replace />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>

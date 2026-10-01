@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
+import { fetchOrders } from '../../api/orderApi';
 import { useAuthStore } from '../../store/authStore';
 import Logo from '../../components/common/Logo';
 import './MyPage.css';
@@ -12,6 +13,9 @@ function MyPage() {
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [orders, setOrders] = useState([]);
+    const [orderLoading, setOrderLoading] = useState(false);
+    const [orderError, setOrderError] = useState('');
 
     useEffect(() => {
         if (!authUser?.id) {
@@ -19,37 +23,38 @@ function MyPage() {
             return;
         }
 
-        const fetchUser = async () => {
+        const fetchPageData = async () => {
+            let currentUser = authUser;
+
             try {
                 const response = await apiClient.get(`/api/users/${authUser.id}`);
+                currentUser = response.data;
                 setUser(response.data);
             } catch (error) {
                 console.error('사용자 조회 실패:', error);
                 setUser(authUser);
-            } finally {
-                setLoading(false);
             }
+
+            if (currentUser.role === 'USER') {
+                setOrderLoading(true);
+                setOrderError('');
+
+                try {
+                    const result = await fetchOrders({ page: 0, size: 10 });
+                    setOrders(result.orders);
+                } catch (error) {
+                    console.error('주문 내역 조회 실패:', error);
+                    setOrderError('주문 내역을 불러오지 못했습니다.');
+                } finally {
+                    setOrderLoading(false);
+                }
+            }
+
+            setLoading(false);
         };
 
-        fetchUser();
+        fetchPageData();
     }, [authUser]);
-
-    const orders = [
-        {
-            id: 5001,
-            storeName: '루키즈 베이커리',
-            pickupTime: '2026-09-28 15:30',
-            totalPrice: 11000,
-            status: 'PENDING',
-        },
-        {
-            id: 5002,
-            storeName: '루키즈 카페',
-            pickupTime: '2026-09-27 14:00',
-            totalPrice: 8000,
-            status: 'COMPLETED',
-        },
-    ];
 
     const getStatusText = (status) => {
         if (status === 'PENDING') {
@@ -60,11 +65,51 @@ function MyPage() {
             return '준비 중';
         }
 
+        if (status === 'READY') {
+            return '픽업 대기';
+        }
+
         if (status === 'COMPLETED') {
             return '완료';
         }
 
+        if (status === 'REJECTED') {
+            return '주문 거절';
+        }
+
+        if (status === 'CANCELLED') {
+            return '취소';
+        }
+
         return status;
+    };
+
+    const getOrderTitle = (order) => {
+        if (order.storeName) {
+            return order.storeName;
+        }
+
+        const firstMenuName = order.items?.[0]?.menuName;
+
+        if (!firstMenuName) {
+            return '주문 상품';
+        }
+
+        const additionalCount = order.items.length - 1;
+
+        if (additionalCount > 0) {
+            return `${firstMenuName} 외 ${additionalCount}개`;
+        }
+
+        return firstMenuName;
+    };
+
+    const formatPickupTime = (pickupTime) => {
+        if (!pickupTime) {
+            return '-';
+        }
+
+        return pickupTime.replace('T', ' ').slice(0, 16);
     };
 
     const handleLogout = () => {
@@ -146,7 +191,14 @@ function MyPage() {
                                     마이페이지
                                 </button>
 
-                                <button type="button">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        document
+                                            .getElementById('order-history')
+                                            ?.scrollIntoView({ behavior: 'smooth' })
+                                    }
+                                >
                                     이용내역
                                 </button>
 
@@ -197,50 +249,69 @@ function MyPage() {
                     </section>
 
                     {user.role === 'USER' && (
-                        <section className="order-history-section">
+                        <section
+                            id="order-history"
+                            className="order-history-section"
+                        >
                             <div className="section-title">
                                 <h2>주문 내역</h2>
                                 <span>{orders.length}건</span>
                             </div>
 
-                            <div className="order-history-list">
-                                {orders.map((order) => (
-                                    <article
-                                        className="order-history-card"
-                                        key={order.id}
-                                    >
-                                        <div className="order-history-top">
-                                            <div>
-                                                <span className="order-number">
-                                                    주문 #{order.id}
-                                                </span>
+                            {orderLoading ? (
+                                <div className="order-history-message">
+                                    주문 내역을 불러오는 중입니다.
+                                </div>
+                            ) : orderError ? (
+                                <div className="order-history-message">
+                                    {orderError}
+                                </div>
+                            ) : orders.length === 0 ? (
+                                <div className="order-history-message">
+                                    주문 내역이 없습니다.
+                                </div>
+                            ) : (
+                                <div className="order-history-list">
+                                    {orders.map((order) => (
+                                        <article
+                                            className="order-history-card"
+                                            key={order.id}
+                                        >
+                                            <div className="order-history-top">
+                                                <div>
+                                                    <span className="order-number">
+                                                        주문 #{order.id}
+                                                    </span>
 
-                                                <h3>{order.storeName}</h3>
+                                                    <h3>{getOrderTitle(order)}</h3>
+                                                </div>
+
+                                                <span
+                                                    className={`mypage-order-status mypage-order-status--${order.status.toLowerCase()}`}
+                                                >
+                                                    {getStatusText(order.status)}
+                                                </span>
                                             </div>
 
-                                            <span
-                                                className={`mypage-order-status mypage-order-status--${order.status.toLowerCase()}`}
-                                            >
-                                                {getStatusText(order.status)}
-                                            </span>
-                                        </div>
+                                            <div className="order-history-info">
+                                                <p>
+                                                    <span>픽업 시간</span>
+                                                    <strong>
+                                                        {formatPickupTime(order.pickupTime)}
+                                                    </strong>
+                                                </p>
 
-                                        <div className="order-history-info">
-                                            <p>
-                                                <span>픽업 시간</span>
-                                                <strong>{order.pickupTime}</strong>
-                                            </p>
-
-                                            <p>
-                                                <span>총 금액</span>
-                                                <strong>
-                                                    {order.totalPrice.toLocaleString()}원
-                                                </strong>
-                                            </p>
-                                        </div>
-                                    </article>
-                                ))}
-                            </div>
+                                                <p>
+                                                    <span>총 금액</span>
+                                                    <strong>
+                                                        {(order.totalPrice ?? 0).toLocaleString()}원
+                                                    </strong>
+                                                </p>
+                                            </div>
+                                        </article>
+                                    ))}
+                                </div>
+                            )}
                         </section>
                     )}
 
