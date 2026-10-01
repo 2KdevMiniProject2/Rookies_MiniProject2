@@ -20,12 +20,15 @@ public class StoreController {
 
     private final StoreService storeService;
 
-    // 1. 매장 전체 목록 조회 API (카테고리 필터링 지원: ?category=베이커리)
+    // 1. 매장 전체 목록 조회 API (카테고리 필터링 및 매장명 검색 지원: ?category=베이커리&keyword=루키)
     @GetMapping
     public ResponseEntity<Page<StoreDTO.StoreResponse>> getAllStores(
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        Page<StoreDTO.StoreResponse> stores = storeService.getAllStores(category, pageable);
+        String searchKeyword = (keyword != null && !keyword.isBlank()) ? keyword : search;
+        Page<StoreDTO.StoreResponse> stores = storeService.getAllStores(category, searchKeyword, pageable);
         return ResponseEntity.ok(stores);
     }
 
