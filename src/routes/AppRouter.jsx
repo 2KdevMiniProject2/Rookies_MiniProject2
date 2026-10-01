@@ -6,7 +6,7 @@ import StoreRegisterPage from '../features/store/StoreRegisterPage';
 import MenuRegisterPage from '../features/store/MenuRegisterPage';
 import StoreListPage from '../features/store/StoreListPage';
 import StoreEditPage from '../features/store/StoreEditPage';
-
+import UserInfoPage from '../features/auth/UserInfoPage';
 
 /**
  * 전체 라우팅을 한 곳에 모아두는 파일입니다.
@@ -30,6 +30,7 @@ function AppRouter() {
         <Route path="/owner/stores" element={<StoreListPage />} />
         <Route path="/owner/stores/:storeId/menus" element={<MenuRegisterPage />} />
         <Route path="/owner/stores/:storeId/edit" element={<StoreEditPage />} />
+        <Route path="/mypage/profile" element={<UserInfoPage />} />
 
 
         {/* 로그인만 하면 접근 가능한 라우트 예시 */}

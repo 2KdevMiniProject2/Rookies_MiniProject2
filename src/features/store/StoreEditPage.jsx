@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../../api/client';
+import Logo from '../../components/common/Logo';
 import './StoreRegisterPage.css';
 
 function StoreEditPage() {
@@ -111,6 +112,8 @@ function StoreEditPage() {
         <main className="store-register-page">
             <div className="store-register-layout">
                 <aside className="store-register-sidebar">
+                    <Logo className="owner-sidebar-logo" />
+
                     <strong>사장님 마이페이지</strong>
 
                     <nav>
@@ -136,7 +139,7 @@ function StoreEditPage() {
                             가게별 메뉴 관리
                         </button>
 
-                        <button type="button">
+                        <button type="button" onClick={() => navigate('/mypage/profile')}>
                             회원정보
                         </button>
 

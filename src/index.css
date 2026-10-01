@@ -7,6 +7,10 @@
   --accent: #aa3bff;
   --accent-bg: rgba(170, 59, 255, 0.1);
   --accent-border: rgba(170, 59, 255, 0.5);
+
+  --brand-accent: #ed5821;
+  --brand-accent-hover: #d94d1b;
+  --brand-accent-soft: rgba(237, 88, 33, 0.10);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
@@ -108,4 +112,13 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+
+/* 팀 공통 브랜드 로고 - 사장님 관리 화면 사이드바 */
+.owner-sidebar-logo {
+  height: 52px;
+  width: auto;
+  max-width: 160px;
+  margin: -4px 0 20px -7px;
 }

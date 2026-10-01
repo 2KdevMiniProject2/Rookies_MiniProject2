@@ -63,13 +63,13 @@
 }
 
 .store-list-sidebar .active {
-    background: #1a1a1a;
+    background: var(--brand-accent);
     color: #ffffff;
     font-weight: 600;
 }
 
 .store-list-sidebar .active:hover {
-    background: #1a1a1a;
+    background: var(--brand-accent-hover);
     color: #ffffff;
 }
 
@@ -121,9 +121,9 @@
 
 .store-add-button {
     padding: 10px 15px;
-    border: 1px solid #1a1a1a;
+    border: 1px solid var(--brand-accent);
     border-radius: 10px;
-    background: #1a1a1a;
+    background: var(--brand-accent);
     color: #ffffff;
     font-size: 13px;
     font-weight: 600;
@@ -131,7 +131,8 @@
 }
 
 .store-add-button:hover {
-    background: #333333;
+    background: var(--brand-accent-hover);
+    border-color: var(--brand-accent-hover);
 }
 
 .store-card-list {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
+import Logo from '../../components/common/Logo';
 import './StoreListPage.css';
 
 function StoreListPage() {
@@ -64,6 +65,8 @@ function StoreListPage() {
         <main className="store-list-page">
             <div className="store-list-layout">
                 <aside className="store-list-sidebar">
+                    <Logo className="owner-sidebar-logo" />
+
                     <strong>사장님 마이페이지</strong>
 
                     <nav>
@@ -88,7 +91,7 @@ function StoreListPage() {
                             가게별 메뉴 관리
                         </button>
 
-                        <button type="button">
+                        <button type="button" onClick={() => navigate('/mypage/profile')}>
                             회원정보
                         </button>
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../../api/client';
+import Logo from '../../components/common/Logo';
 import './MenuRegisterPage.css';
 
 function MenuRegisterPage() {
@@ -338,6 +339,8 @@ function MenuRegisterPage() {
         <main className="menu-register-page">
             <div className="menu-register-layout">
                 <aside className="menu-register-sidebar">
+                    <Logo className="owner-sidebar-logo" />
+
                     <strong>사장님 마이페이지</strong>
 
                     <nav>
@@ -353,7 +356,7 @@ function MenuRegisterPage() {
                             가게별 메뉴 관리
                         </button>
 
-                        <button type="button">
+                        <button type="button" onClick={() => navigate('/mypage/profile')}>
                             회원정보
                         </button>
 

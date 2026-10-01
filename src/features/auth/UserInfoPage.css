@@ -1,4 +1,4 @@
-.store-register-page {
+.user-info-page {
     width: 100%;
     padding: 48px 24px 70px;
     box-sizing: border-box;
@@ -7,7 +7,7 @@
     text-align: left;
 }
 
-.store-register-layout {
+.user-info-layout {
     display: flex;
     width: 100%;
     min-height: 650px;
@@ -20,8 +20,7 @@
     overflow: hidden;
 }
 
-/* 왼쪽 사이드바 */
-.store-register-sidebar {
+.user-info-sidebar {
     width: 210px;
     padding: 32px 24px;
     box-sizing: border-box;
@@ -29,7 +28,7 @@
     border-right: 1px solid #e0e0e0;
 }
 
-.store-register-sidebar strong {
+.user-info-sidebar strong {
     display: block;
     margin-bottom: 26px;
     color: #111111;
@@ -37,13 +36,13 @@
     font-weight: 700;
 }
 
-.store-register-sidebar nav {
+.user-info-sidebar nav {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.store-register-sidebar button {
+.user-info-sidebar button {
     width: 100%;
     padding: 11px 12px;
     border: none;
@@ -53,180 +52,168 @@
     font-size: 14px;
     text-align: left;
     cursor: pointer;
-    transition:
-        background 0.15s,
-        color 0.15s;
 }
 
-.store-register-sidebar button:hover {
+.user-info-sidebar button:hover {
     background: #ececec;
     color: #111111;
 }
 
-.store-register-sidebar .active {
+.user-info-sidebar .active {
     background: var(--brand-accent);
     color: #ffffff;
     font-weight: 600;
 }
 
-.store-register-sidebar .active:hover {
-    background: var(--brand-accent-hover);
-    color: #ffffff;
-}
-
-/* 오른쪽 영역 */
-.store-register-main {
+.user-info-main {
     flex: 1;
     min-width: 0;
-    background: #ffffff;
 }
 
-.store-register-title {
+.user-info-title {
     padding: 25px 30px;
     border-bottom: 1px solid #e0e0e0;
     color: #111111;
-    background: #ffffff;
     font-size: 20px;
     font-weight: 700;
 }
 
-.store-register-content {
+.user-info-content {
     padding: 30px;
 }
 
-/* 입력 영역 */
-.register-section {
-    margin-bottom: 22px;
+.user-info-section {
+    margin-bottom: 20px;
     padding: 28px;
     border: 1px solid #e0e0e0;
     border-radius: 16px;
     background: #ffffff;
 }
 
-.register-section h2 {
-    margin: 0 0 6px;
-    color: #111111;
+.user-info-section h2 {
+    margin: 0 0 8px;
     font-size: 18px;
     font-weight: 700;
 }
 
-.register-section-description {
-    margin: 0 0 24px;
+.user-info-description {
+    margin-bottom: 24px;
     color: #777777;
     font-size: 13px;
 }
 
-/* 폼 */
-.form-group {
-    display: flex;
-    flex-direction: column;
+.user-info-form-group {
     margin-bottom: 20px;
 }
 
-.form-group:last-child {
-    margin-bottom: 0;
-}
-
-.form-group label {
+.user-info-form-group label {
+    display: block;
     margin-bottom: 8px;
     color: #333333;
     font-size: 13px;
     font-weight: 600;
 }
 
-.form-group input,
-.form-group select {
+.user-info-form-group input {
     width: 100%;
     height: 44px;
     padding: 0 13px;
     box-sizing: border-box;
-    border: 1px solid #d5d5d5;
+    border: 1px solid #d6d6d6;
     border-radius: 10px;
-    outline: none;
     background: #ffffff;
     color: #222222;
     font-size: 14px;
-    transition:
-        border-color 0.15s,
-        box-shadow 0.15s;
+    outline: none;
 }
 
-.form-group input::placeholder {
-    color: #aaaaaa;
-}
-
-.form-group input:focus,
-.form-group select:focus {
+.user-info-form-group input:focus {
     border-color: var(--brand-accent);
-    box-shadow: 0 0 0 3px var(--brand-accent-soft);
 }
 
-/* 영업시간 */
-.time-row {
-    display: flex;
-    gap: 18px;
+.user-info-form-group input:disabled {
+    background: #f5f5f5;
+    color: #888888;
+    cursor: not-allowed;
 }
 
-.time-row .form-group {
-    flex: 1;
-    margin-bottom: 0;
+.input-guide {
+    display: block;
+    margin-top: 6px;
+    color: #999999;
+    font-size: 11px;
 }
 
-/* 하단 버튼 */
-.register-buttons {
+.user-info-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    padding-top: 4px;
+    margin-top: 28px;
 }
 
-.register-buttons button {
-    min-width: 110px;
+.cancel-button,
+.save-button {
     padding: 11px 18px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition:
-        background 0.15s,
-        border-color 0.15s;
 }
 
 .cancel-button {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #cccccc;
     background: #ffffff;
-    color: #444444;
+    color: #555555;
 }
 
-.cancel-button:hover {
-    background: #f3f3f3;
-}
-
-.register-button {
+.save-button {
     border: 1px solid var(--brand-accent);
     background: var(--brand-accent);
     color: #ffffff;
 }
 
-.register-button:hover {
+.save-button:hover {
     background: var(--brand-accent-hover);
-    border-color: var(--brand-accent-hover);
 }
 
-.store-image-preview {
-    width: 100%;
-    max-width: 420px;
-    height: 220px;
-    margin-top: 12px;
-    overflow: hidden;
+.save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.withdraw-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
     border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    background: #f7f7f7;
+    border-radius: 16px;
 }
 
-.store-image-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+.withdraw-section h2 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.withdraw-section p {
+    color: #777777;
+    font-size: 13px;
+}
+
+.withdraw-button {
+    padding: 10px 15px;
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #777777;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.withdraw-button:hover {
+    border-color: #999999;
+    background: #f5f5f5;
+    color: #333333;
 }

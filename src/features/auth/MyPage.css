@@ -59,13 +59,13 @@
 }
 
 .mypage-sidebar .active {
-    background: #1a1a1a;
+    background: var(--brand-accent);
     color: #ffffff;
     font-weight: 600;
 }
 
 .mypage-sidebar .active:hover {
-    background: #1a1a1a;
+    background: var(--brand-accent-hover);
     color: #ffffff;
 }
 
@@ -110,7 +110,7 @@
     flex-shrink: 0;
     margin-right: 20px;
     border-radius: 50%;
-    background: #1a1a1a;
+    background: var(--brand-accent);
     color: #ffffff;
 }
 
@@ -128,8 +128,8 @@
     margin-bottom: 9px;
     padding: 4px 9px;
     border-radius: 6px;
-    background: #ececec;
-    color: #333333;
+    background: var(--brand-accent-soft);
+    color: var(--brand-accent);
     font-size: 12px;
     font-weight: 700;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
+import Logo from '../../components/common/Logo';
 import './MyPage.css';
 
 function MyPage() {
@@ -74,6 +75,8 @@ function MyPage() {
         <main className="mypage">
             <div className="mypage-layout">
                 <aside className="mypage-sidebar">
+                    <Logo className="owner-sidebar-logo" />
+
                     <strong>
                         {user.role === 'OWNER' ? '사장님 마이페이지' : '마이페이지'}
                     </strong>
@@ -103,7 +106,10 @@ function MyPage() {
                                     가게별 메뉴 관리
                                 </button>
 
-                                <button type="button">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/mypage/profile')}
+                                >
                                     회원정보
                                 </button>
 
@@ -127,7 +133,10 @@ function MyPage() {
                                     이용내역
                                 </button>
 
-                                <button type="button">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/mypage/profile')}
+                                >
                                     회원정보
                                 </button>
 
@@ -164,6 +173,7 @@ function MyPage() {
                         <button
                             type="button"
                             className="profile-edit-button"
+                            onClick={() => navigate('/mypage/profile')}
                         >
                             정보 수정
                         </button>

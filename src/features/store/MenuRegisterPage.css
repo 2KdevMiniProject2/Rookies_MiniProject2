@@ -64,13 +64,13 @@
 }
 
 .menu-register-sidebar .active {
-    background: #1a1a1a;
+    background: var(--brand-accent);
     color: #ffffff;
     font-weight: 600;
 }
 
 .menu-register-sidebar .active:hover {
-    background: #1a1a1a;
+    background: var(--brand-accent-hover);
     color: #ffffff;
 }
 
@@ -194,8 +194,8 @@
 }
 
 .menu-form-group input:focus {
-    border-color: #555555;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 3px var(--brand-accent-soft);
 }
 
 /* 버튼 */
@@ -226,13 +226,14 @@
 }
 
 .menu-save-button {
-    border: 1px solid #1a1a1a;
-    background: #1a1a1a;
+    border: 1px solid var(--brand-accent);
+    background: var(--brand-accent);
     color: #ffffff;
 }
 
 .menu-save-button:hover {
-    background: #333333;
+    background: var(--brand-accent-hover);
+    border-color: var(--brand-accent-hover);
 }
 
 /* 메뉴 목록 */
@@ -462,7 +463,8 @@
 }
 
 .menu-edit-fields input:focus {
-    border-color: #555555;
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 3px var(--brand-accent-soft);
 }
 
 .menu-edit-buttons {
@@ -483,9 +485,14 @@
 }
 
 .menu-edit-buttons button:first-child {
-    border-color: #1a1a1a;
-    background: #1a1a1a;
+    border-color: var(--brand-accent);
+    background: var(--brand-accent);
     color: #ffffff;
+}
+
+.menu-edit-buttons button:first-child:hover {
+    border-color: var(--brand-accent-hover);
+    background: var(--brand-accent-hover);
 }
 
 .menu-edit-buttons button:disabled,
