@@ -16,12 +16,9 @@ import { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import apiClient from "../../api/client";
+import { useAuthStore } from "../../store/authStore";
 
 import "./CartPage.css";
-
-// 로그인 연결 전 임시 손님 번호 (더미데이터 2번 = 이수강 손님)
-// TODO: 병합 후 useAuthStore 의 user.id 로 교체
-const TEMP_CUSTOMER_ID = 2;
 
 const PICKUP_STEP_MINUTES = 10;   // 픽업 시간 간격
 const PICKUP_READY_MINUTES = 15;  // 지금부터 최소 준비 시간
@@ -71,6 +68,9 @@ function makePickupSlots(openTime, closeTime) {
 function CartPage() {
     const location = useLocation();
     const navigate = useNavigate();
+
+    // 로그인한 손님 (이 페이지는 ProtectedRoute 안이라 항상 로그인 상태)
+    const user = useAuthStore((state) => state.user);
 
     /* =====================================================
        [나중에 분리 → store/cartStore.js]
@@ -139,7 +139,7 @@ function CartPage() {
                     pickupTime: toLocalDateTime(pickupSlot),
                     requestNotes: requestNotes.trim() || null,
                 },
-                { params: { customerId: TEMP_CUSTOMER_ID } }
+                { params: { customerId: user.id } }
             );
             // 주문 성공 → 주문 상태 페이지로 (뒤로가기로 장바구니에 다시 오지 않게 replace)
             navigate(`/orders/${response.data.orderId}`, { replace: true });

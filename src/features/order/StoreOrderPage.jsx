@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { fetchStore, fetchMenus } from "../../api/storeOrderApi";
+import { useAuthStore } from "../../store/authStore";
 
 import "./StoreOrderPage.css";
 
@@ -26,6 +27,8 @@ function StoreOrderPage() {
     const { storeId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
+    // 장바구니는 로그인해야 볼 수 있음 → 로그인 전이면 버튼이 로그인 화면으로 보냄
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     /* ── 화면 데이터 (useState) ── */
     const [store, setStore] = useState(null);
@@ -221,11 +224,15 @@ function StoreOrderPage() {
                     <button
                         type="button"
                         className="store-order__cart-button"
-                        onClick={() => navigate(CART_PATH, { state: { store, cartItems } })}
+                        onClick={() =>
+                            isAuthenticated
+                                ? navigate(CART_PATH, { state: { store, cartItems } })
+                                : navigate("/login")
+                        }
                         disabled={totalCount === 0}
                     >
                         <span className="store-order__cart-badge">{totalCount}</span>
-                        장바구니 보기
+                        {isAuthenticated ? "장바구니 보기" : "로그인하고 장바구니 보기"}
                     </button>
                 </div>
             </div>

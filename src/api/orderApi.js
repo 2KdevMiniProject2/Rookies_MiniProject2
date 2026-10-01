@@ -1,8 +1,5 @@
 import apiClient from "./client";
-
-// 로그인 연결 전 임시 손님 번호 (더미데이터 2번 = 이수강 손님, 장바구니와 같은 값)
-// TODO: 병합 후 useAuthStore 의 user.id 로 교체
-const TEMP_CUSTOMER_ID = 2;
+import { useAuthStore } from "../store/authStore";
 
 const toOrder = (response) => ({
     id: response.orderId,
@@ -17,7 +14,11 @@ const toOrder = (response) => ({
     })),
 });
 
+/* 주문 1건 조회 — 로그인한 손님의 주문만 (남의 주문 번호면 404)
+   GET /api/customers/{customerId}/orders/{orderId}
+   customerId: 로그인 정보(authStore)의 user.id — client.js 가 토큰을 읽는 방식과 같음 */
 export const fetchOrder = async (orderId) => {
-    const response = await apiClient.get(`/api/customers/${TEMP_CUSTOMER_ID}/orders/${orderId}`);
+    const customerId = useAuthStore.getState().user?.id;
+    const response = await apiClient.get(`/api/customers/${customerId}/orders/${orderId}`);
     return toOrder(response.data);
 };
