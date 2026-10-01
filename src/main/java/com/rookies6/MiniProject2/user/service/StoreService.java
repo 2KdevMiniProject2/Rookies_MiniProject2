@@ -82,15 +82,13 @@ public class StoreService {
         return StoreDTO.StoreResponse.from(savedStore);
     }
 
-    // 4. 사장님(ownerId)의 매장 목록 전체 조회 (다중 매장 소유 지원, 본인 소유만 가능)
-    public List<StoreDTO.StoreResponse> getStoresByOwnerId(Long ownerId, Long callerId) {
+    // 4. 사장님(ownerId)의 매장 목록 전체 조회 (다중 매장 소유 지원, 본인 소유만 가능, 페이징)
+    public Page<StoreDTO.StoreResponse> getStoresByOwnerId(Long ownerId, Long callerId, Pageable pageable) {
         if (!ownerId.equals(callerId)) {
             throw new BusinessException(ErrorCode.STORE_ACCESS_DENIED, ownerId);
         }
-        List<Store> stores = storeRepository.findByOwnerIdAndDeletedAtIsNull(ownerId);
-        return stores.stream()
-                .map(StoreDTO.StoreResponse::from)
-                .collect(Collectors.toList());
+        return storeRepository.findByOwnerIdAndDeletedAtIsNull(ownerId, pageable)
+                .map(StoreDTO.StoreResponse::from);
     }
 
     // 5. 매장 정보 수정 (사장님 본인 소유 매장만 가능)

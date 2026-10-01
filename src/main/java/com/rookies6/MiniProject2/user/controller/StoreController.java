@@ -52,13 +52,14 @@ public class StoreController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // 4. 사장님 소유 매장 목록 조회 API (1:N 다중 매장 지원, 본인 소유만 조회 가능)
+    // 4. 사장님 소유 매장 목록 조회 API (1:N 다중 매장 지원, 본인 소유만 조회 가능, 페이징)
     @GetMapping("/owner/{ownerId}")
     @PreAuthorize("hasRole('OWNER')")
-    public ResponseEntity<List<StoreDTO.StoreResponse>> getStoresByOwner(
+    public ResponseEntity<Page<StoreDTO.StoreResponse>> getStoresByOwner(
             @PathVariable Long ownerId,
-            @CurrentUser User currentUser) {
-        List<StoreDTO.StoreResponse> stores = storeService.getStoresByOwnerId(ownerId, currentUser.getId());
+            @CurrentUser User currentUser,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<StoreDTO.StoreResponse> stores = storeService.getStoresByOwnerId(ownerId, currentUser.getId(), pageable);
         return ResponseEntity.ok(stores);
     }
 
