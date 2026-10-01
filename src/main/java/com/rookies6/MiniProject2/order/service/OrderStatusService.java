@@ -4,9 +4,13 @@ import com.rookies6.MiniProject2.common.exception.BusinessException;
 import com.rookies6.MiniProject2.common.exception.ErrorCode;
 import com.rookies6.MiniProject2.menu.entity.Order;
 import com.rookies6.MiniProject2.menu.repository.OrderRepository;
+import com.rookies6.MiniProject2.order.dto.OwnerOrderResponse;
+import com.rookies6.MiniProject2.user.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -14,6 +18,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderStatusService {
 
     private final OrderRepository orderRepository;
+    private final StoreRepository storeRepository;
+
+    // [사장님] 가게 주문 목록 조회 (최신순)
+    public List<OwnerOrderResponse> getOwnerOrders(Long ownerId, Long storeId) {
+        // 이 사장님 소유의 영업 중인 가게인지 확인. 없는 가게이거나 남의 가게면 404
+        if (!storeRepository.existsByIdAndOwnerIdAndDeletedAtIsNull(storeId, ownerId)) {
+            throw new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId);
+        }
+
+        return orderRepository.findAllWithItemsByStoreId(storeId).stream()
+                .map(OwnerOrderResponse::from)
+                .toList();
+    }
 
     // [사장님] 주문 상태 변경
     @Transactional
