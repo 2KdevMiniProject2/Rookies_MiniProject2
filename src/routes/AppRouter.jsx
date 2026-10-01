@@ -4,7 +4,7 @@ import ProtectedRoute from './ProtectedRoute';
 import MyPage from '../features/auth/MyPage';
 import StoreRegisterPage from '../features/store/StoreRegisterPage';
 import MenuRegisterPage from '../features/store/MenuRegisterPage';
-import StoreListPage from '../features/store/StoreListPage';
+import StoreListPage from '../features/store/OwnerStoreListPage';
 import StoreEditPage from '../features/store/StoreEditPage';
 import UserInfoPage from '../features/auth/UserInfoPage';
 

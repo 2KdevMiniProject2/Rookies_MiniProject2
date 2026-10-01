@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
 import Logo from '../../components/common/Logo';
-import './StoreListPage.css';
+import './OwnerStoreListPage.css';
 
-function StoreListPage() {
+function OwnerStoreListPage() {
     const navigate = useNavigate();
 
     const ownerId = 7; // 임시 테스트용, 나중에 로그인 사용자 id로 변경
@@ -16,7 +16,10 @@ function StoreListPage() {
     useEffect(() => {
         const fetchStores = async () => {
             try {
-                const response = await apiClient.get(`/api/stores/owner/${ownerId}`);
+                const response = await apiClient.get(
+                    `/api/stores/owner/${ownerId}`
+                );
+
                 setStores(response.data);
             } catch (error) {
                 console.error('가게 목록 조회 실패:', error);
@@ -62,9 +65,9 @@ function StoreListPage() {
     };
 
     return (
-        <main className="store-list-page">
-            <div className="store-list-layout">
-                <aside className="store-list-sidebar">
+        <main className="owner-store-list-page">
+            <div className="owner-store-list-layout">
+                <aside className="owner-store-list-sidebar">
                     <Logo className="owner-sidebar-logo" />
 
                     <strong>사장님 마이페이지</strong>
@@ -91,7 +94,10 @@ function StoreListPage() {
                             가게별 메뉴 관리
                         </button>
 
-                        <button type="button" onClick={() => navigate('/mypage/profile')}>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/mypage/profile')}
+                        >
                             회원정보
                         </button>
 
@@ -101,14 +107,14 @@ function StoreListPage() {
                     </nav>
                 </aside>
 
-                <section className="store-list-main">
-                    <div className="store-list-title">
+                <section className="owner-store-list-main">
+                    <div className="owner-store-list-title">
                         가게별 메뉴 관리
                     </div>
 
-                    <div className="store-list-content">
-                        <section className="store-list-section">
-                            <div className="store-list-heading">
+                    <div className="owner-store-list-content">
+                        <section className="owner-store-list-section">
+                            <div className="owner-store-list-heading">
                                 <div>
                                     <h2>내 가게</h2>
                                     <p>관리할 가게를 선택해주세요.</p>
@@ -116,7 +122,7 @@ function StoreListPage() {
 
                                 <button
                                     type="button"
-                                    className="store-add-button"
+                                    className="owner-store-add-button"
                                     onClick={() => navigate('/stores/register')}
                                 >
                                     가게 등록
@@ -124,36 +130,36 @@ function StoreListPage() {
                             </div>
 
                             {loading ? (
-                                <div className="empty-store">
+                                <div className="owner-empty-store">
                                     가게 목록을 불러오는 중입니다.
                                 </div>
                             ) : error ? (
-                                <div className="empty-store">
+                                <div className="owner-empty-store">
                                     {error}
                                 </div>
                             ) : stores.length === 0 ? (
-                                <div className="empty-store">
+                                <div className="owner-empty-store">
                                     등록된 가게가 없습니다.
                                 </div>
                             ) : (
-                                <div className="store-card-list">
+                                <div className="owner-store-card-list">
                                     {stores.map((store) => (
                                         <article
-                                            className="store-card"
+                                            className="owner-store-card"
                                             key={store.id}
                                         >
                                             {store.imageUrl && (
-                                                <div className="store-card-image-wrap">
+                                                <div className="owner-store-card-image-wrap">
                                                     <img
                                                         src={store.imageUrl}
                                                         alt={`${store.name} 가게 이미지`}
-                                                        className="store-card-image"
+                                                        className="owner-store-card-image"
                                                     />
                                                 </div>
                                             )}
 
-                                            <div className="store-card-info">
-                                                <span className="store-category">
+                                            <div className="owner-store-card-info">
+                                                <span className="owner-store-category">
                                                     {store.category}
                                                 </span>
 
@@ -161,34 +167,50 @@ function StoreListPage() {
 
                                                 <p>{store.address}</p>
 
-                                                {(store.openTime || store.closeTime) && (
-                                                    <p className="store-time">
-                                                        영업시간 {store.openTime || '-'} ~ {store.closeTime || '-'}
+                                                {(store.openTime ||
+                                                    store.closeTime) && (
+                                                    <p className="owner-store-time">
+                                                        영업시간{' '}
+                                                        {store.openTime || '-'} ~{' '}
+                                                        {store.closeTime || '-'}
                                                     </p>
                                                 )}
                                             </div>
 
-                                            <div className="store-card-actions">
+                                            <div className="owner-store-card-actions">
                                                 <button
                                                     type="button"
-                                                    className="store-menu-button"
-                                                    onClick={() => navigate(`/owner/stores/${store.id}/menus`)}
+                                                    className="owner-store-menu-button"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/owner/stores/${store.id}/menus`
+                                                        )
+                                                    }
                                                 >
                                                     메뉴 관리
                                                 </button>
 
                                                 <button
                                                     type="button"
-                                                    className="store-menu-button"
-                                                    onClick={() => navigate(`/owner/stores/${store.id}/edit`)}
+                                                    className="owner-store-menu-button"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/owner/stores/${store.id}/edit`
+                                                        )
+                                                    }
                                                 >
                                                     가게 수정
                                                 </button>
 
                                                 <button
                                                     type="button"
-                                                    className="store-delete-button"
-                                                    onClick={() => handleDeleteStore(store.id, store.name)}
+                                                    className="owner-store-delete-button"
+                                                    onClick={() =>
+                                                        handleDeleteStore(
+                                                            store.id,
+                                                            store.name
+                                                        )
+                                                    }
                                                 >
                                                     가게 삭제
                                                 </button>
@@ -205,4 +227,4 @@ function StoreListPage() {
     );
 }
 
-export default StoreListPage;
+export default OwnerStoreListPage;
