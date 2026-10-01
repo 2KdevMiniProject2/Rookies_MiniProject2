@@ -5,6 +5,7 @@ import com.rookies6.MiniProject2.menu.dto.MenuItemResponse;
 import com.rookies6.MiniProject2.menu.dto.MenuItemUpdateRequest;
 import com.rookies6.MiniProject2.menu.service.ImageUploadService;
 import com.rookies6.MiniProject2.menu.service.MenuService;
+import com.rookies6.MiniProject2.user.entity.User;
 import com.rookies6.MiniProject2.security.annotation.CurrentUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
