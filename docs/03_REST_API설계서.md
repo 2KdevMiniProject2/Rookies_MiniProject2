@@ -1,21 +1,46 @@
 # REST API 설계서
 
-프로젝트: 소상공인 예약/주문 관리 SaaS (Rookies_MiniProject2)
-작성일: 2026-10-01
-작성자: 인선 (Part B — 메뉴/주문 도메인)
+- **팀명**: Rookies_MiniProject2 (소상공인 예약/주문 관리 SaaS)
+- **작성자**: 인선 (Part B — 메뉴/주문 도메인)
+- **문서버전**: v2.0 (컨트롤러별 상세 포맷으로 전면 개편)
+- **작성일**: 2026-10-01
+- **API 베이스 URL**: `http://localhost:8080`
+- **포맷**: JSON (UTF-8)
+- **인증**: JWT Bearer (`Authorization: Bearer <token>`)
 
 ---
 
-## 1. API 개요
+## 목차
 
-- **Base URL**: `http://localhost:8080` (운영 환경은 배포 시 확정)
-- **인증 방식**: JWT (JSON Web Token) 기반 STATELESS 인증. 로그인 성공 시 발급되는 `accessToken`을 이후 모든 요청의 `Authorization: Bearer <token>` 헤더에 담아 전송한다. 세션/쿠키를 사용하지 않는다.
-- **인가 방식**: 역할 기반(`USER`/`OWNER`/`ADMIN`) `@PreAuthorize` + 리소스 소유권 검증(본인 계정/본인 소유 매장인지 서버가 직접 확인)의 이중 구조.
-- **공개(비로그인) 엔드포인트**: 회원가입/로그인, 매장 목록/상세 조회(GET), 메뉴 목록 조회(GET). 그 외 전부 토큰 필요.
-- **응답 형식**: 성공 시 요청 리소스에 해당하는 DTO를 그대로 반환, 실패 시 아래 공통 에러 형식(`ErrorResponse`)을 반환한다.
-- **페이징**: 목록 조회 API는 Spring Data의 `Page<T>` 표준 응답(`content`, `totalElements`, `totalPages`, `number`, `size` 등)을 사용하며, 쿼리 파라미터 `page`(0-base), `size`, `sort`로 제어한다.
+1. 공통 규약
+2. 인증/권한
+3. 에러 응답 규약
+4. 엔드포인트 상세
+5. 페이징/정렬 규약
+6. 변경 이력
 
-### 공통 에러 응답 형식
+---
+
+## 1) 공통 규약
+
+- 컬렉션 복수형, 소문자-하이픈 경로 (`/api/stores`, `/api/menus/{menuId}/sold-out` 등).
+- 메서드-의미 매핑: GET=조회, POST=생성/액션, PUT/PATCH=수정, DELETE=삭제.
+- 서버시간: `LocalDateTime` 직렬화 기준 `yyyy-MM-ddTHH:mm:ss` (UTC 변환 없이 서버 로컬 타임존 그대로 사용 — 운영 환경에서 타임존 고정 여부는 배포 시 확정).
+- 모든 쓰기 요청은 CSRF 무관 (STATELESS REST + JWT, 세션/쿠키 미사용).
+- 목록 조회는 전부 Spring Data `Page<T>` 표준 응답을 사용 (5장 참고).
+
+## 2) 인증/권한
+
+- 로그인(`POST /api/auth/login`) 성공 시 `accessToken`(JWT)을 발급하며, 이후 모든 보호된 요청은 `Authorization: Bearer <token>` 헤더가 필요하다.
+- **사용자 식별은 클라이언트가 보낸 id가 아니라 토큰에서 직접 추출한다.** 커스텀 애너테이션 `@CurrentUser`(`@AuthenticationPrincipal` 기반)가 `UserInfoUserDetails`에서 로그인한 `User` 엔티티를 바로 꺼내주며, 컨트롤러는 이 값만 신뢰한다.
+- 인가는 두 단계로 이루어진다.
+  1. **역할 기반**: `@PreAuthorize("hasRole('OWNER')")` / `hasRole('ADMIN')` — 메서드 단위로 역할이 부족하면 403.
+  2. **리소스 소유권 검증**: 경로의 `{id}`/`{storeId}`/`{customerId}` 등이 토큰의 로그인 사용자(또는 그 사용자가 소유한 리소스)와 일치하는지 서비스 레이어에서 직접 대조 — 불일치 시 `USER_ACCESS_DENIED`/`STORE_ACCESS_DENIED` (403).
+- 비로그인(공개) 엔드포인트: 회원가입, 로그인, 매장 목록/상세 조회(GET), 매장 메뉴 목록 조회(GET). 그 외 전부 토큰 필요.
+
+## 3) 에러 응답 규약
+
+실제 `ErrorResponse` 클래스 기준 응답 형식 (템플릿의 `error.code`/`path` 필드는 우리 프로젝트에는 없음 — 아래가 실제 응답 그대로입니다):
 
 ```json
 {
@@ -26,7 +51,8 @@
 }
 ```
 
-`errors`는 `@Valid` 검증 실패(400) 시에만 필드별 메시지 맵으로 채워진다. 예:
+`@Valid` 검증 실패(400) 시에만 `errors`가 필드별 메시지 맵으로 채워진다:
+
 ```json
 {
   "status": 400,
@@ -36,257 +62,539 @@
 }
 ```
 
-### 상황별 HTTP 상태 코드
+> 참고: 응답 본문에 에러 코드 문자열(`VALIDATION_ERROR` 같은)은 노출하지 않지만, 서버 내부적으로는 `ErrorCode` enum으로 에러 종류를 구분한다. 필요하면 추후 `ErrorResponse`에 `code` 필드를 추가해 `ErrorCode.name()`을 내려주는 것도 가능 (현재는 미적용).
 
-| 상태 코드 | 의미 | 발생 상황 |
+### 내부 `ErrorCode` 전체 목록 (HTTP 상태 매핑)
+
+| ErrorCode | HTTP 상태 | 메시지 템플릿 |
 |---|---|---|
-| 200 OK | 조회/수정/로그인 성공 | |
-| 201 Created | 생성 성공 (회원가입, 매장/메뉴 등록, 주문 생성) | |
-| 204 No Content | 삭제/취소 성공 | |
-| 400 Bad Request | 입력값 검증 실패, 잘못된 요청 본문 | `@Valid` 실패, JSON 파싱 실패 |
-| 401 Unauthorized | 인증 실패 | 토큰 없음/만료/위조, 로그인 비밀번호 불일치 |
-| 403 Forbidden | 인가 실패 | 역할 부족(`@PreAuthorize`), 본인 소유 아님 |
-| 404 Not Found | 리소스 없음 | 존재하지 않는 id 조회 |
-| 405 Method Not Allowed | 지원하지 않는 HTTP 메서드 | URL에 id 누락 등 |
-| 409 Conflict | 상태 충돌 | 이메일/메뉴명 중복, FK 제약 위반, 잘못된 주문 상태 전이 |
+| `INVALID_INPUT` | 400 | 잘못된 요청입니다: %s |
+| `DUPLICATE_EMAIL` | 409 | 이미 사용 중인 이메일입니다: %s |
+| `INVALID_SIGNUP_ROLE` | 400 | 가입 시 선택할 수 없는 권한입니다: %s |
+| `INVALID_CREDENTIALS` | 401 | 이메일 또는 비밀번호가 일치하지 않습니다. |
+| `STORE_NOT_FOUND` | 404 | 존재하지 않는 매장입니다. storeId=%s |
+| `USER_NOT_FOUND` | 404 | 존재하지 않는 회원입니다. userId=%s |
+| `USER_ACCESS_DENIED` | 403 | 본인 계정만 조회·수정·삭제할 수 있습니다. userId=%s |
+| `MENU_ITEM_NOT_FOUND` | 404 | 존재하지 않는 메뉴입니다. menuId=%s |
+| `MENU_SOLD_OUT` | 409 | 품절된 메뉴가 포함되어 있습니다: %s |
+| `DUPLICATE_MENU_NAME` | 409 | 이미 등록된 메뉴 이름입니다: %s |
+| `ORDER_ITEMS_EMPTY` | 400 | 주문 항목은 1개 이상이어야 합니다. |
+| `ORDER_NOT_FOUND` | 404 | 존재하지 않는 주문입니다. orderId=%s |
+| `INVALID_ORDER_STATUS` | 409 | 올바르지 않은 주문 변경입니다. = %s |
+| `INVALID_STORE_MENU_OR_NOT_FOUND` | 400 | 주문할 수 없는 메뉴가 포함되어 있습니다. (품절/삭제 등) |
+| `STORE_ACCESS_DENIED` | 403 | 본인 소유의 매장만 조회·수정·삭제할 수 있습니다. (id=%s) |
+| `INVALID_IMAGE_FILE` | 400 | 이미지 파일만 업로드할 수 있습니다. |
+| `IMAGE_UPLOAD_FAILED` | 500 | 이미지 업로드에 실패했습니다: %s |
+
+그 외 프레임워크 레벨 공통 처리 (`GlobalExceptionHandler`):
+
+| 상황 | HTTP 상태 | 메시지 |
+|---|---|---|
+| `@Valid` 검증 실패 | 400 | 입력값 검증에 실패했습니다. (+ `errors` 필드) |
+| 요청 본문 파싱 실패/빈 본문 | 400 | 요청 본문이 비어있거나 형식이 올바르지 않습니다. |
+| 필수 쿼리 파라미터 누락 | 400 | 필수 요청 파라미터가 누락되었습니다: {파라미터명} |
+| FK 제약 위반 등 데이터 무결성 충돌 | 409 | 연관된 데이터(매장 또는 주문 내역 등)가 존재하여 삭제 또는 수정할 수 없습니다. |
+| 지원하지 않는 HTTP 메서드 | 405 | 지원하지 않는 HTTP 요청 방식입니다. |
+| `@PreAuthorize` 역할 부족 (`AccessDeniedException`) | 403 | 접근 권한이 없습니다 |
+| 그 외 미처리 예외 | 500 | 오류가 발생했습니다. 잠시 기다려주세요. |
 
 ---
 
-## 2. 인증 (Auth)
+## 4) 엔드포인트 상세
 
-### POST `/api/auth/signup` — 회원가입 (비로그인 호출 가능)
+### UserController (`user/controller/UserController.java`)
 
-Request Body:
+> 참고: 클래스 레벨 `@RequestMapping`이 없어 메서드마다 전체 경로를 명시한다. 인증(`/api/auth/*`)과 회원 관리(`/api/users/*`)가 한 클래스에 같이 있음 — 추후 `AuthController`로 분리하는 것도 리팩터링 후보지만 기능상 문제는 없음(보안 이슈 아님).
+
+#### POST `/api/auth/signup` — signup
+
+- **Consumes**: application/json / **Produces**: application/json
+- **Auth**: 불필요
+- **Request Body**:
 ```json
-{
-  "email": "user@example.com",
-  "password": "1234",
-  "name": "홍길동",
-  "phone": "010-1234-5678",
-  "role": "USER"
-}
+{ "email": "newuser@example.com", "password": "1234", "name": "홍길동", "phone": "010-1234-5678", "role": "USER" }
 ```
 - `role`은 `USER` 또는 `OWNER`만 허용 (`ADMIN` 선택 시 400)
 
-Response (201 Created):
+**Response Type**: `ResponseEntity<UserDTO.UserResponse>`
 ```json
-{ "id": 1, "email": "user@example.com", "name": "홍길동", "phone": "010-1234-5678", "role": "USER" }
+{ "id": 4, "email": "newuser@example.com", "name": "홍길동", "phone": "010-1234-5678", "role": "USER" }
+```
+**Status Codes**: 201 Created / 400 (검증 실패, `INVALID_SIGNUP_ROLE`) / 409 (`DUPLICATE_EMAIL`)
+
+```bash
+curl -X POST "http://localhost:8080/api/auth/signup" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"newuser@example.com","password":"1234","name":"홍길동","phone":"010-1234-5678","role":"USER"}'
 ```
 
-에러: 이메일 중복 → 409, `role: "ADMIN"` → 400, 필드 검증 실패 → 400
+#### POST `/api/auth/login` — login
 
-### POST `/api/auth/login` — 로그인 (비로그인 호출 가능)
-
-Request Body:
+- **Consumes**: application/json / **Produces**: application/json
+- **Auth**: 불필요
+- **Request Body**:
 ```json
-{ "email": "user@example.com", "password": "1234" }
+{ "email": "owner@rookie.com", "password": "1234" }
 ```
 
-Response (200 OK):
+**Response Type**: `ResponseEntity<UserDTO.LoginResponse>`
 ```json
 {
   "accessToken": "eyJhbGciOi...",
-  "user": { "id": 1, "email": "user@example.com", "name": "홍길동", "phone": "010-1234-5678", "role": "USER" }
+  "user": { "id": 2, "email": "owner@rookie.com", "name": "루키즈사장님", "phone": "010-1111-2222", "role": "OWNER" }
 }
 ```
+**Status Codes**: 200 OK / 401 (`INVALID_CREDENTIALS`)
 
-에러: 이메일/비밀번호 불일치 → 401
+```bash
+curl -X POST "http://localhost:8080/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"owner@rookie.com","password":"1234"}'
+```
+
+#### GET `/api/users` — getAllUsers
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, **ADMIN 전용**
+- **Query Params**: `page`(기본 0), `size`(기본 10), `sort`(기본 `id`)
+
+**Response Type**: `ResponseEntity<Page<UserDTO.UserResponse>>`
+**Status Codes**: 200 OK / 401 (토큰 없음) / 403 (ADMIN 아님)
+
+```bash
+curl -X GET "http://localhost:8080/api/users?page=0&size=10" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### GET `/api/users/{id}` — getUser
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, 본인만
+- **Path Params**: `id` (Long) — required
+
+**Response Type**: `ResponseEntity<UserDTO.UserResponse>`
+**Status Codes**: 200 OK / 401 / 403 (`USER_ACCESS_DENIED`) / 404 (`USER_NOT_FOUND`)
+
+```bash
+curl -X GET "http://localhost:8080/api/users/3" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### PUT/PATCH `/api/users/{id}` — updateUser
+
+- **Consumes**: application/json / **Produces**: application/json
+- **Auth**: Bearer JWT, 본인만
+- **Path Params**: `id` (Long) — required
+- **Request Body** (모든 필드 선택):
+```json
+{ "name": "김손님", "phone": "010-9999-8888", "password": "새비밀번호" }
+```
+
+**Response Type**: `ResponseEntity<UserDTO.UserResponse>`
+**Status Codes**: 200 OK / 400 (검증 실패) / 401 / 403 (`USER_ACCESS_DENIED`) / 404 (`USER_NOT_FOUND`)
+
+```bash
+curl -X PATCH "http://localhost:8080/api/users/3" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"김손님","phone":"010-9999-8888"}'
+```
+
+#### DELETE `/api/users/{id}` — deleteUser
+
+- **Consumes**: N/A / **Produces**: N/A
+- **Auth**: Bearer JWT, 본인만
+- **Path Params**: `id` (Long) — required
+
+**Response Type**: `ResponseEntity<Void>` (소프트 삭제 — `deletedAt` 기록)
+**Status Codes**: 204 No Content / 401 / 403 (`USER_ACCESS_DENIED`) / 404 (`USER_NOT_FOUND`)
+
+```bash
+curl -X DELETE "http://localhost:8080/api/users/3" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### GET `/api/users/me` — getMyInfo
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT (로그인만 하면 됨, 별도 본인 확인 불필요 — 토큰 자체가 본인)
+
+**Response Type**: `ResponseEntity<UserDTO.UserResponse>`
+**Status Codes**: 200 OK / 401 (토큰 없음/만료)
+
+```bash
+curl -X GET "http://localhost:8080/api/users/me" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
 
 ---
 
-## 3. 회원 (User)
+### StoreController (`user/controller/StoreController.java`)
 
-모든 엔드포인트는 토큰 필요 (`GET /api/users` 제외하면 본인 확인까지 필요).
+- **Base Path**: `/api/stores`
 
-| 메서드 | 경로 | 권한 | 설명 |
-|---|---|---|---|
-| GET | `/api/users` | ADMIN | 전체 회원 목록 (페이징) |
-| GET | `/api/users/{id}` | 본인만 | 회원 단건 조회 |
-| PUT/PATCH | `/api/users/{id}` | 본인만 | 회원 정보 수정 |
-| DELETE | `/api/users/{id}` | 본인만 | 회원 탈퇴 (소프트 삭제) |
-| GET | `/api/users/me` | 로그인만 하면 됨 | 내 정보 조회 (새로고침 시 토큰으로 복원) |
+#### GET `` — getAllStores
 
-본인 확인은 클라이언트가 보낸 값이 아니라 **JWT 토큰에서 추출한 로그인 사용자**(`@CurrentUser`)를 기준으로 서버가 직접 수행한다 (경로의 `{id}`가 토큰의 사용자와 다르면 403).
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: 불필요
+- **Query Params**: `category`(선택), `keyword`/`search`(선택, 매장명 검색), `page`(기본 0), `size`(기본 10), `sort`(기본 `id`)
 
-#### PATCH/PUT `/api/users/{id}` Request Body (모든 필드 선택)
-```json
-{ "name": "홍길동", "phone": "010-9999-8888", "password": "새비밀번호" }
-```
-
-#### 공통 UserResponse
-```json
-{ "id": 1, "email": "user@example.com", "name": "홍길동", "phone": "010-1234-5678", "role": "USER" }
-```
-
-에러: 본인 아님 → 403, 존재하지 않는 id → 404
-
----
-
-## 4. 매장 (Store) — Base: `/api/stores`
-
-| 메서드 | 경로 | 권한 | 설명 |
-|---|---|---|---|
-| GET | `` | 공개 | 매장 전체 목록 (페이징, `category`/`keyword` 필터) |
-| GET | `/{storeId}` | 공개 | 매장 단건 상세 (영업시간 포함) |
-| POST | `` | OWNER | 신규 매장 등록 |
-| GET | `/owner/{ownerId}` | OWNER, 본인만 | 내 매장 목록 (페이징) |
-| PUT | `/{storeId}` | OWNER, 본인 소유만 | 매장 정보 수정 |
-| DELETE | `/{storeId}` | OWNER, 본인 소유만 | 매장 삭제 (소프트 삭제) |
-
-#### GET `/api/stores?category=베이커리&keyword=루키&page=0&size=10`
-
-Response (200 OK, `Page<StoreResponse>`):
+**Response Type**: `ResponseEntity<Page<StoreDTO.StoreResponse>>`
 ```json
 {
   "content": [
-    { "id": 1, "name": "루키 베이커리", "address": "서울시 ...", "category": "베이커리",
-      "imageUrl": "/images/xxx.png", "openTime": "09:00:00", "closeTime": "21:00:00",
-      "ownerId": 2, "ownerName": "김사장" }
+    { "id": 1, "name": "루키즈 베이커리", "address": "서울시 강남구 테헤란로 123", "category": "베이커리",
+      "imageUrl": null, "openTime": "08:30:00", "closeTime": "21:00:00", "ownerId": 2, "ownerName": "루키즈사장님" }
   ],
   "totalElements": 1, "totalPages": 1, "number": 0, "size": 10
 }
 ```
+**Status Codes**: 200 OK
 
-#### POST `/api/stores` Request Body
-```json
-{
-  "name": "루키 베이커리", "address": "서울시 ...", "category": "베이커리",
-  "imageUrl": "/images/xxx.png", "openTime": "09:00:00", "closeTime": "21:00:00"
-}
+```bash
+curl -X GET "http://localhost:8080/api/stores?category=베이커리&keyword=루키즈&page=0&size=10"
 ```
-소유자(`ownerId`)는 요청에 포함하지 않는다 — 토큰의 로그인 사용자로 서버가 자동 지정한다.
 
-Response: 201 Created, `StoreResponse` (위와 동일 형식)
+#### GET `/{storeId}` — getStore
 
-에러: 필드 검증 실패 → 400, OWNER 아님 → 403, 본인 소유 아닌 매장 수정/삭제 시도 → 403, 존재하지 않는 매장 → 404
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: 불필요
+- **Path Params**: `storeId` (Long) — required
+
+**Response Type**: `ResponseEntity<StoreDTO.StoreResponse>`
+**Status Codes**: 200 OK / 404 (`STORE_NOT_FOUND`)
+
+```bash
+curl -X GET "http://localhost:8080/api/stores/1"
+```
+
+#### POST `` — createStore
+
+- **Consumes**: application/json / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER
+- **Request Body**:
+```json
+{ "name": "새 매장", "address": "서울시 ...", "category": "베이커리", "imageUrl": null, "openTime": "09:00:00", "closeTime": "20:00:00" }
+```
+소유자(`ownerId`)는 요청에 없음 — 토큰의 로그인 사용자로 서버가 자동 지정.
+
+**Response Type**: `ResponseEntity<StoreDTO.StoreResponse>`
+**Status Codes**: 201 Created / 400 (검증 실패) / 401 / 403 (OWNER 아님)
+
+```bash
+curl -X POST "http://localhost:8080/api/stores" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"새 매장","address":"서울시 ...","category":"베이커리","openTime":"09:00:00","closeTime":"20:00:00"}'
+```
+
+#### GET `/owner/{ownerId}` — getStoresByOwner
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER 본인만
+- **Path Params**: `ownerId` (Long) — required
+- **Query Params**: `page`(기본 0), `size`(기본 10), `sort`(기본 `id`)
+
+**Response Type**: `ResponseEntity<Page<StoreDTO.StoreResponse>>`
+**Status Codes**: 200 OK / 401 / 403 (OWNER 아님, 또는 `STORE_ACCESS_DENIED`로 타인 매장 조회 시도)
+
+```bash
+curl -X GET "http://localhost:8080/api/stores/owner/2?page=0&size=10" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### PUT `/{storeId}` — updateStore
+
+- **Consumes**: application/json / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER 본인 소유만
+- **Path Params**: `storeId` (Long) — required
+- **Request Body** (모든 필드 선택):
+```json
+{ "name": "루키즈 베이커리(이전)", "address": null, "category": null, "imageUrl": null, "openTime": "09:00:00", "closeTime": "22:00:00" }
+```
+
+**Response Type**: `ResponseEntity<StoreDTO.StoreResponse>`
+**Status Codes**: 200 OK / 400 / 401 / 403 (`STORE_ACCESS_DENIED`) / 404 (`STORE_NOT_FOUND`)
+
+```bash
+curl -X PUT "http://localhost:8080/api/stores/1" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"루키즈 베이커리(이전)","openTime":"09:00:00","closeTime":"22:00:00"}'
+```
+
+#### DELETE `/{storeId}` — deleteStore
+
+- **Consumes**: N/A / **Produces**: N/A
+- **Auth**: Bearer JWT, OWNER 본인 소유만
+- **Path Params**: `storeId` (Long) — required
+
+**Response Type**: `ResponseEntity<Void>` (소프트 삭제)
+**Status Codes**: 204 No Content / 401 / 403 (`STORE_ACCESS_DENIED`) / 404 (`STORE_NOT_FOUND`)
+
+```bash
+curl -X DELETE "http://localhost:8080/api/stores/1" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
 
 ---
 
-## 5. 메뉴 (Menu)
+### MenuController (`menu/controller/MenuController.java`)
 
-| 메서드 | 경로 | 권한 | 설명 |
-|---|---|---|---|
-| POST | `/api/menus/images` | OWNER | 메뉴 이미지 업로드 (URL 반환) |
-| GET | `/api/stores/{storeId}/menus` | 공개 | 매장 메뉴 목록 (페이징) |
-| POST | `/api/stores/{storeId}/menus` | OWNER ⚠️ | 메뉴 등록 |
-| PATCH | `/api/menus/{menuId}/sold-out` | OWNER ⚠️ | 품절 토글 |
-| PATCH | `/api/menus/{menuId}` | OWNER ⚠️ | 메뉴 수정 |
-| DELETE | `/api/menus/{menuId}` | OWNER ⚠️ | 메뉴 삭제 (소프트 삭제) |
+> 참고: 클래스 레벨 `@RequestMapping`이 없어 메서드마다 전체 경로를 명시한다(보안 이슈 아님).
 
-> ⚠️ **현재 상태(2026-10-01) 기준 주의**: 위 4개 쓰기 엔드포인트는 아직 `ownerId`를 **요청 쿼리 파라미터**로 받아 소유권을 확인하는 구식 패턴이다 (User/Store API처럼 JWT 토큰에서 직접 추출하도록 전환 예정, 아직 미완료). 현재는 `ownerId` 값을 호출자가 직접 보내야 하며, 이 값이 조작 가능하다는 한계가 남아있다.
+#### POST `/api/menus/images` — uploadMenuImage
 
-#### POST `/api/menus/images` (multipart/form-data, part명: `image`)
-Response (200 OK): `"/images/550e8400-....png"` (문자열, 저장된 이미지 URL)
-에러: 빈 파일/허용되지 않은 형식(jpeg/png/webp 외) → 400
+- **Consumes**: multipart/form-data (part명: `image`) / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER
 
-#### POST `/api/stores/{storeId}/menus?ownerId=2` Request Body
+**Response Type**: `ResponseEntity<String>` (저장된 이미지 URL)
+```json
+"/images/550e8400-e29b-41d4-a716-446655440000.png"
+```
+**Status Codes**: 200 OK / 400 (`INVALID_IMAGE_FILE` — 빈 파일 또는 jpeg/png/webp 외 형식) / 401 / 403 (OWNER 아님) / 500 (`IMAGE_UPLOAD_FAILED`)
+
+```bash
+curl -X POST "http://localhost:8080/api/menus/images" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -F "image=@/path/to/bread.png"
+```
+
+#### GET `/api/stores/{storeId}/menus` — getMenus
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: 불필요
+- **Path Params**: `storeId` (Long) — required
+- **Query Params**: `page`(기본 0), `size`(기본 10), `sort`(기본 `id`)
+
+**Response Type**: `ResponseEntity<Page<MenuItemResponse>>`
+**Status Codes**: 200 OK
+
+```bash
+curl -X GET "http://localhost:8080/api/stores/1/menus?page=0&size=10"
+```
+
+#### POST `/api/stores/{storeId}/menus` — createMenu
+
+- **Consumes**: application/json / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER 본인 소유 매장만
+- **Path Params**: `storeId` (Long) — required
+- **Request Body**:
 ```json
 { "name": "소금빵", "price": 3500, "imageUrl": "/images/xxx.png" }
 ```
-Response (201 Created):
+
+**Response Type**: `ResponseEntity<MenuItemResponse>`
 ```json
 { "id": 10, "name": "소금빵", "price": 3500, "soldOut": false, "imageUrl": "/images/xxx.png" }
 ```
+**Status Codes**: 201 Created / 400 (검증 실패, 가격 0 이하) / 401 / 403 (`STORE_ACCESS_DENIED`) / 404 (`STORE_NOT_FOUND`) / 409 (`DUPLICATE_MENU_NAME`)
 
-#### PATCH `/api/menus/{menuId}?ownerId=2` Request Body (모든 필드 선택)
+```bash
+curl -X POST "http://localhost:8080/api/stores/1/menus" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"소금빵","price":3500,"imageUrl":"/images/xxx.png"}'
+```
+
+#### PATCH `/api/menus/{menuId}/sold-out` — toggleSoldOut
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER 본인 소유만
+- **Path Params**: `menuId` (Long) — required
+
+**Response Type**: `ResponseEntity<MenuItemResponse>`
+**Status Codes**: 200 OK / 401 / 403 (`STORE_ACCESS_DENIED`) / 404 (`MENU_ITEM_NOT_FOUND`)
+
+```bash
+curl -X PATCH "http://localhost:8080/api/menus/10/sold-out" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### PATCH `/api/menus/{menuId}` — updateMenu
+
+- **Consumes**: application/json / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER 본인 소유만
+- **Path Params**: `menuId` (Long) — required
+- **Request Body** (모든 필드 선택):
 ```json
 { "name": "소금빵(대)", "price": 4000, "imageUrl": null }
 ```
 
-에러: 메뉴명 중복(같은 매장 내) → 409, 가격 0 이하 → 400, 존재하지 않는 메뉴 → 404, 소유자 아님 → 403
+**Response Type**: `ResponseEntity<MenuItemResponse>`
+**Status Codes**: 200 OK / 400 (가격 0 이하) / 401 / 403 (`STORE_ACCESS_DENIED`) / 404 (`MENU_ITEM_NOT_FOUND`) / 409 (`DUPLICATE_MENU_NAME`)
+
+```bash
+curl -X PATCH "http://localhost:8080/api/menus/10" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"소금빵(대)","price":4000}'
+```
+
+#### DELETE `/api/menus/{menuId}` — deleteMenu
+
+- **Consumes**: N/A / **Produces**: N/A
+- **Auth**: Bearer JWT, OWNER 본인 소유만
+- **Path Params**: `menuId` (Long) — required
+
+**Response Type**: `ResponseEntity<Void>` (소프트 삭제)
+**Status Codes**: 204 No Content / 401 / 403 (`STORE_ACCESS_DENIED`) / 404 (`MENU_ITEM_NOT_FOUND`)
+
+```bash
+curl -X DELETE "http://localhost:8080/api/menus/10" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
 
 ---
 
-## 6. 주문 (Order)
+### OrderController (`menu/controller/OrderController.java`)
 
-### 6.1 주문 생성/매장별 목록 — `menu.controller.OrderController`
+> 참고: 클래스 레벨 `@RequestMapping`이 없음(보안 이슈 아님).
 
-| 메서드 | 경로 | 권한 | 설명 |
-|---|---|---|---|
-| POST | `/api/orders` | 로그인(손님) ⚠️ | 주문 생성 |
-| GET | `/api/stores/{storeId}/orders` | 로그인 | 매장별 주문 목록 (페이징, `status` 필터) |
+#### POST `/api/orders` — createOrder
 
-> ⚠️ `POST /api/orders`도 `customerId`를 요청 쿼리 파라미터로 받는 구식 패턴이 남아있다 (Menu API와 동일한 전환 작업 대상).
-
-#### POST `/api/orders?customerId=1` Request Body
+- **Consumes**: application/json / **Produces**: application/json
+- **Auth**: Bearer JWT, 로그인(손님)
+- **Request Body**:
 ```json
 {
   "storeId": 1,
   "items": [ { "menuItemId": 10, "quantity": 2 }, { "menuItemId": 11, "quantity": 1 } ],
-  "pickupTime": "2026-10-01T18:30:00",
+  "pickupTime": "2026-10-02T18:30:00",
   "requestNotes": "빵 바삭하게 부탁드려요"
 }
 ```
-Response (201 Created):
+
+**Response Type**: `ResponseEntity<OrderResponse>`
 ```json
 {
   "orderId": 100, "status": "PENDING", "totalAmount": 10500,
-  "pickupTime": "2026-10-01T18:30:00",
+  "pickupTime": "2026-10-02T18:30:00",
   "items": [
     { "menuItemId": 10, "menuName": "소금빵", "quantity": 2, "orderPrice": 3500 },
     { "menuItemId": 11, "menuName": "크로아상", "quantity": 1, "orderPrice": 3500 }
   ]
 }
 ```
-에러: 품절 메뉴 포함 → 409, 존재하지 않는 메뉴/매장 → 400/404, 픽업시간이 과거 → 400
+**Status Codes**: 201 Created / 400 (검증 실패, 픽업시간 과거, `INVALID_STORE_MENU_OR_NOT_FOUND`) / 401 / 404 (`STORE_NOT_FOUND`, `USER_NOT_FOUND`) / 409 (`MENU_SOLD_OUT`)
 
-### 6.2 손님 주문 조회/취소 — `CustomerOrderController` (Base: `/api/customers/{customerId}/orders`)
-
-| 메서드 | 경로 | 설명 |
-|---|---|---|
-| GET | `` | 내 주문 목록 (페이징) |
-| GET | `/{orderId}` | 주문 단건 현재 상태 |
-| PATCH | `/{orderId}/cancel` | 주문 취소 (PENDING 상태에서만 가능) |
-
-Response 형식은 6.1의 `OrderResponse`와 동일. 취소 성공 시 204 No Content. 에러: 존재하지 않는 주문/본인 주문 아님 → 404, PENDING이 아닌 주문 취소 시도 → 409
-
-### 6.3 사장님 주문 상태 변경 — `OwnerOrderController` (Base: `/api/owner`)
-
-| 메서드 | 경로 | 권한 | 설명 |
-|---|---|---|---|
-| PATCH | `/orders/{orderId}/status` | 로그인(사장님) ⚠️ | 주문 상태 변경 (수락/거절/호출/픽업완료) |
-
-> ⚠️ 이 엔드포인트도 `ownerId`를 요청 쿼리 파라미터로 받는다 (전환 예정, JWT 완성 후 작업하기로 팀 내 TODO로 남아있음).
-
-#### PATCH `/api/owner/orders/{orderId}/status?ownerId=2` Request Body
-```json
-{ "status": "ACCEPTED" }
+```bash
+curl -X POST "http://localhost:8080/api/orders" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"storeId":1,"items":[{"menuItemId":10,"quantity":2}],"pickupTime":"2026-10-02T18:30:00","requestNotes":"빵 바삭하게 부탁드려요"}'
 ```
-허용되는 `status` 값: `ACCEPTED`, `REJECTED`, `READY`, `COMPLETED` (각 값은 `Order`의 상태 머신 규칙을 따름 — 도메인 설계서 4.4 참고)
 
-Response: 200 OK (본문 없음)
-에러: 잘못된 상태 전이 → 409, 존재하지 않거나 본인 매장이 아닌 주문 → 404, `status` 누락 → 400
+#### GET `/api/stores/{storeId}/orders` — getOrdersByStore
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER 본인 소유 매장만
+- **Path Params**: `storeId` (Long) — required
+- **Query Params**: `status`(선택, `PENDING`/`ACCEPTED`/`READY`/`COMPLETED`/`REJECTED`/`CANCELLED`), `page`(기본 0), `size`(기본 10), `sort`(기본 `createdAt`)
+
+**Response Type**: `ResponseEntity<Page<OrderResponse>>`
+**Status Codes**: 200 OK / 401 / 403 (`STORE_ACCESS_DENIED`) / 404 (`STORE_NOT_FOUND`)
+
+```bash
+curl -X GET "http://localhost:8080/api/stores/1/orders?status=PENDING&page=0&size=10" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
 
 ---
 
-## 7. 엔드포인트 전체 요약표
+### CustomerOrderController (`order/controller/CustomerOrderController.java`)
 
-| 도메인 | 메서드 | 경로 | 인증 | 권한/소유권 |
-|---|---|---|---|---|
-| Auth | POST | /api/auth/signup | 불필요 | - |
-| Auth | POST | /api/auth/login | 불필요 | - |
-| User | GET | /api/users | 필요 | ADMIN |
-| User | GET | /api/users/{id} | 필요 | 본인 |
-| User | PUT/PATCH | /api/users/{id} | 필요 | 본인 |
-| User | DELETE | /api/users/{id} | 필요 | 본인 |
-| User | GET | /api/users/me | 필요 | - |
-| Store | GET | /api/stores | 불필요 | - |
-| Store | GET | /api/stores/{storeId} | 불필요 | - |
-| Store | POST | /api/stores | 필요 | OWNER |
-| Store | GET | /api/stores/owner/{ownerId} | 필요 | OWNER, 본인 |
-| Store | PUT | /api/stores/{storeId} | 필요 | OWNER, 본인 소유 |
-| Store | DELETE | /api/stores/{storeId} | 필요 | OWNER, 본인 소유 |
-| Menu | POST | /api/menus/images | 필요 | OWNER |
-| Menu | GET | /api/stores/{storeId}/menus | 불필요 | - |
-| Menu | POST | /api/stores/{storeId}/menus | 필요 | OWNER ⚠️파라미터 기반 |
-| Menu | PATCH | /api/menus/{menuId}/sold-out | 필요 | OWNER ⚠️파라미터 기반 |
-| Menu | PATCH | /api/menus/{menuId} | 필요 | OWNER ⚠️파라미터 기반 |
-| Menu | DELETE | /api/menus/{menuId} | 필요 | OWNER ⚠️파라미터 기반 |
-| Order | POST | /api/orders | 필요 | 로그인 ⚠️파라미터 기반 |
-| Order | GET | /api/stores/{storeId}/orders | 필요 | 로그인 |
-| Order | GET | /api/customers/{customerId}/orders | 필요 | 본인 |
-| Order | GET | /api/customers/{customerId}/orders/{orderId} | 필요 | 본인 |
-| Order | PATCH | /api/customers/{customerId}/orders/{orderId}/cancel | 필요 | 본인 |
-| Order | PATCH | /api/owner/orders/{orderId}/status | 필요 | OWNER ⚠️파라미터 기반 |
+- **Base Path**: `/api/customers/{customerId}/orders`
 
-⚠️ 표시된 6개 엔드포인트는 다음 작업에서 User/Store API와 동일하게 JWT 기반(`@CurrentUser`)으로 전환 예정 (팀 todo에 등록됨).
+#### GET `` — getMyOrders
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, 본인만
+- **Path Params**: `customerId` (Long) — required
+- **Query Params**: `page`(기본 0), `size`(기본 10), `sort`(기본 `createdAt`)
+
+**Response Type**: `ResponseEntity<Page<OrderResponse>>`
+**Status Codes**: 200 OK / 401 / 403 (`USER_ACCESS_DENIED`)
+
+```bash
+curl -X GET "http://localhost:8080/api/customers/3/orders?page=0&size=10" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### GET `/{orderId}` — getMyOrder
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, 본인만
+- **Path Params**: `customerId` (Long), `orderId` (Long) — required
+
+**Response Type**: `ResponseEntity<OrderResponse>`
+**Status Codes**: 200 OK / 401 / 403 (`USER_ACCESS_DENIED`) / 404 (`ORDER_NOT_FOUND`)
+
+```bash
+curl -X GET "http://localhost:8080/api/customers/3/orders/100" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### PATCH `/{orderId}/cancel` — cancelMyOrder
+
+- **Consumes**: N/A / **Produces**: N/A
+- **Auth**: Bearer JWT, 본인만
+- **Path Params**: `customerId` (Long), `orderId` (Long) — required
+
+**Response Type**: `ResponseEntity<Void>`
+**Status Codes**: 204 No Content / 401 / 403 (`USER_ACCESS_DENIED`) / 404 (`ORDER_NOT_FOUND`) / 409 (`INVALID_ORDER_STATUS` — PENDING이 아닌 주문)
+
+```bash
+curl -X PATCH "http://localhost:8080/api/customers/3/orders/100/cancel" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+---
+
+### OwnerOrderController (`order/controller/OwnerOrderController.java`)
+
+- **Base Path**: `/api/owner`
+
+#### PATCH `/orders/{orderId}/status` — updateStatus
+
+- **Consumes**: application/json / **Produces**: N/A
+- **Auth**: Bearer JWT, OWNER 본인 소유 매장 주문만
+- **Path Params**: `orderId` (Long) — required
+- **Request Body**:
+```json
+{ "status": "ACCEPTED" }
+```
+허용 값: `ACCEPTED`, `REJECTED`, `READY`, `COMPLETED` (상태 머신 규칙은 도메인 설계서 4.4 참고)
+
+**Response Type**: `ResponseEntity<Void>`
+**Status Codes**: 200 OK / 400 (`status` 누락) / 401 / 403 (OWNER 아님, 본인 매장 아님) / 404 (`ORDER_NOT_FOUND`) / 409 (`INVALID_ORDER_STATUS`)
+
+```bash
+curl -X PATCH "http://localhost:8080/api/owner/orders/100/status" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"status":"ACCEPTED"}'
+```
+
+---
+
+## 5) 페이징/정렬 규약
+
+- Spring Data `Pageable`을 그대로 사용 — 커스텀 응답 포맷이 아니라 Spring의 기본 `Page<T>` 직렬화 결과를 그대로 반환한다.
+- 쿼리 파라미터: `page`(0-base, 기본 0), `size`(엔드포인트별 `@PageableDefault`로 기본값 지정, 대부분 10), `sort`(예: `createdAt,desc`, 다중 정렬도 `sort=a,asc&sort=b,desc` 형태로 가능).
+- 응답 예시 (주요 필드만 — 실제로는 `pageable`, `sort`, `first`, `last`, `empty`, `numberOfElements` 등도 함께 내려감):
+
+```json
+{
+  "content": [ { "id": 1 } ],
+  "totalElements": 123,
+  "totalPages": 13,
+  "number": 0,
+  "size": 10
+}
+```
+
+## 6) 변경 이력
+
+- v2.0 (2026-10-01): 도메인별 표 형식(v1.0)에서 컨트롤러별 상세 + cURL 예시 포맷으로 전면 개편. Menu/Order API의 `@CurrentUser` 전환 완료분 반영.
+- v1.0 (2026-10-01): 최초 작성 (도메인별 요약 표 + 요청/응답 스펙).

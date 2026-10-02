@@ -4,25 +4,20 @@ import com.rookies6.MiniProject2.common.exception.BusinessException;
 import com.rookies6.MiniProject2.common.exception.ErrorCode;
 import com.rookies6.MiniProject2.menu.dto.OrderCreateRequest;
 import com.rookies6.MiniProject2.menu.dto.OrderItemRequest;
-import com.rookies6.MiniProject2.menu.dto.OrderItemResponse;
 import com.rookies6.MiniProject2.menu.dto.OrderResponse;
 import com.rookies6.MiniProject2.menu.entity.MenuItem;
 import com.rookies6.MiniProject2.menu.entity.Order;
 import com.rookies6.MiniProject2.menu.entity.OrderItem;
 import com.rookies6.MiniProject2.menu.repository.MenuItemRepository;
-import com.rookies6.MiniProject2.menu.repository.OrderItemRepository;
 import com.rookies6.MiniProject2.menu.repository.OrderRepository;
 import com.rookies6.MiniProject2.user.entity.Store;
 import com.rookies6.MiniProject2.user.entity.User;
 import com.rookies6.MiniProject2.user.repository.StoreRepository;
 import com.rookies6.MiniProject2.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +28,6 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final MenuItemRepository menuItemRepository;
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
@@ -82,33 +76,5 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
         return OrderResponse.from(savedOrder);
-    }
-
-    public Page<OrderResponse> getOrdersByStore(Long storeId, Long ownerId, Order.OrderStatus status, Pageable pageable) {
-        Store store = storeRepository.findByIdAndDeletedAtIsNull(storeId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId));
-
-        if (!store.getOwner().getId().equals(ownerId)) {
-            throw new BusinessException(ErrorCode.STORE_ACCESS_DENIED, storeId);
-        }
-
-        Page<Order> orders = (status != null)
-                ? orderRepository.findByStoreIdAndStatus(storeId, status, pageable)
-                : orderRepository.findByStoreId(storeId, pageable);
-
-        Map<Long, List<OrderItemResponse>> itemsByOrderId = groupItemsByOrderId(orders.getContent());
-
-        return orders.map(order -> OrderResponse.from(order, itemsByOrderId.getOrDefault(order.getId(), List.of())));
-    }
-
-    private Map<Long, List<OrderItemResponse>> groupItemsByOrderId(List<Order> orders) {
-        List<Long> orderIds = orders.stream().map(Order::getId).toList();
-        if (orderIds.isEmpty()) {
-            return Map.of();
-        }
-        return orderItemRepository.findAllWithMenuItemByOrderIdIn(orderIds).stream()
-                .collect(Collectors.groupingBy(
-                        oi -> oi.getOrder().getId(),
-                        Collectors.mapping(OrderItemResponse::from, Collectors.toList())));
     }
 }

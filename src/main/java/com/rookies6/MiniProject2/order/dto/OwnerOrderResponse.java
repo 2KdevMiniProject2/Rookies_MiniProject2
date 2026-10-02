@@ -19,7 +19,7 @@ public class OwnerOrderResponse {
     private final String requestNotes;
     private final List<OrderItemResponse> items;
 
-    private OwnerOrderResponse(Order order) {
+    private OwnerOrderResponse(Order order, List<OrderItemResponse> items) {
         this.orderId = order.getId();
         this.status = order.getStatus();
         this.totalAmount = order.getTotalAmount();
@@ -27,12 +27,16 @@ public class OwnerOrderResponse {
         this.createdAt = order.getCreatedAt();
         this.customerName = order.getCustomer().getName();
         this.requestNotes = order.getRequestNotes();
-        this.items = order.getOrderItems().stream()
-                .map(OrderItemResponse::from)
-                .toList();
+        this.items = items;
     }
 
     public static OwnerOrderResponse from(Order order) {
-        return new OwnerOrderResponse(order);
+        return new OwnerOrderResponse(order, order.getOrderItems().stream()
+                .map(OrderItemResponse::from)
+                .toList());
+    }
+
+    public static OwnerOrderResponse from(Order order, List<OrderItemResponse> items) {
+        return new OwnerOrderResponse(order, items);
     }
 }
