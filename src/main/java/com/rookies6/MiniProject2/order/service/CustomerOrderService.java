@@ -46,7 +46,14 @@ public class CustomerOrderService {
 
         Order order = orderRepository.findByIdAndCustomerId(orderId, customerId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND, orderId));
-        return OrderResponse.from(order);
+
+        List<OrderItemResponse> items = orderItemRepository
+                .findAllWithMenuItemByOrderIdIn(List.of(orderId))
+                .stream()
+                .map(OrderItemResponse::from)
+                .toList();
+
+        return OrderResponse.from(order, items);
     }
 
     @Transactional
