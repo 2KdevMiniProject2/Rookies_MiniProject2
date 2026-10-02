@@ -51,3 +51,14 @@ export const fetchOrder = async (orderId) => {
     const response = await apiClient.get(`/api/customers/${customerId}/orders/${orderId}`);
     return toOrder(response.data);
 };
+
+/* 주문 취소 — 손님 본인 주문, 접수 대기(PENDING)일 때만 가능
+   PATCH /api/customers/{customerId}/orders/{orderId}/cancel → 204 (본문 없음)
+   이미 수락된 주문이면 409 */
+export const cancelOrder = async (orderId) => {
+    const customerId = useAuthStore.getState().user?.id;
+    if (!customerId) {
+        throw new Error('로그인 사용자 정보가 없습니다.');
+    }
+    await apiClient.patch(`/api/customers/${customerId}/orders/${orderId}/cancel`);
+};

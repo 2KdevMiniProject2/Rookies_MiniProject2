@@ -85,8 +85,8 @@ export default function DashboardPage() {
         {/* 사장님 메뉴 탭: 매장 정보 수정(파트 A), 메뉴 관리(파트 B) 주소는 각 파트와 맞출 것 */}
         <nav className="dashboard__tabs">
           <NavLink to={`/owner/stores/${storeId}/orders`} className="dashboard__tab">주문 대시보드</NavLink>
-          <NavLink to="/owner/store" className="dashboard__tab">매장 정보 수정</NavLink>
-          <NavLink to="/owner/menus" className="dashboard__tab">메뉴 관리</NavLink>
+          <NavLink to={`/owner/stores/${storeId}/edit`} className="dashboard__tab">매장 정보 수정</NavLink>
+          <NavLink to={`/owner/stores/${storeId}/menus`} className="dashboard__tab">메뉴 관리</NavLink>
         </nav>
       </header>
 

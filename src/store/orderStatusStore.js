@@ -8,7 +8,7 @@
    --------------------------------------------------------- */
 import { create } from "zustand";
 
-import { fetchOrder } from "../api/orderApi";
+import { fetchOrder, cancelOrder } from "../api/orderApi";
 
 export const useOrderStatusStore = create((set, get) => ({
     order: null,
@@ -34,4 +34,22 @@ export const useOrderStatusStore = create((set, get) => ({
             set({ loading: false });
         }
     },
+
+    // 주문 취소 → 성공하면 다시 불러와서 "취소됨" 화면으로
+    cancelMyOrder: async (orderId) => {
+        try {
+            await cancelOrder(orderId);
+            await get().loadOrder(orderId);
+        } catch (error) {
+            console.error("주문 취소 실패:", error);
+            // 409 = 그 사이 사장님이 수락함 → 서버 문구가 어려워서 우리 문구로
+            const message = error.response?.status === 409
+                ? "사장님이 이미 주문을 수락해서 취소할 수 없어요."
+                : error.response?.data?.message ?? "주문을 취소하지 못했어요.";
+            await get().loadOrder(orderId);   // 바뀐 상태(조리 중 등)로 화면 맞추기
+            set({ error: message });          // 다시 불러온 뒤에 문구를 넣어야 안 지워짐
+        }
+    },
+
 }));
+
