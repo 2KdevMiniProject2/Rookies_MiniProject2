@@ -42,17 +42,11 @@ export const getOwnerOrders = async (storeId) => {
   return response.data.content.map(toOrder).reverse();
 };
 
-/* 상태 변경 — 파트 C 사장님 전용 API (지우님 구현 · Postman 테스트 완료)
-   PATCH /api/owner/orders/{orderId}/status?ownerId=1   body { "status": "ACCEPTED" }
-   - 이 사장님 가게의 주문만 바뀜 (남의 가게 주문이면 404)
-   - 순서가 틀리면 409 (예: 접수 대기 → 바로 픽업 완료)
-   ownerId: 지금은 가게 정보의 ownerId를 넣음.
-            로그인(JWT)이 붙으면 백엔드가 토큰에서 꺼내도록 바뀔 예정 */
-export const updateOrderStatus = async (orderId, status, ownerId) => {
+/* 상태 변경 — 파트 C 사장님 전용 API */
+export const updateOrderStatus = async (orderId, status) => {
   await apiClient.patch(
     `/api/owner/orders/${orderId}/status`,   // 주소
-    { status },                              // 보낼 데이터 (body)
-    { params: { ownerId } }                  // 주소 뒤 ?ownerId=1
+    { status },                              // 보낼 데이터 (body)                 // 주소 뒤 ?ownerId=1
   );
 };
 

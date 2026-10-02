@@ -24,9 +24,9 @@ export const useDashboardStore = create((set, get) => ({
   },
 
   // 상태 변경 후 목록 다시 불러오기
-  changeStatus: async (storeId, orderId, status, ownerId) => {
+  changeStatus: async (storeId, orderId, status) => {
     try {
-      await updateOrderStatus(orderId, status, ownerId);
+      await updateOrderStatus(orderId, status);
       await get().fetchDashboard(storeId);
     } catch (error) {
       console.error("상태 변경 실패:", error);

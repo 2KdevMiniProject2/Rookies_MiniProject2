@@ -27,7 +27,7 @@ export default function DashboardPage() {
   const params = useParams();
   const storeId = Number(params.storeId);
 
-  // 가게 정보 (이름 · ownerId) — 이 화면에서만 쓰는 값이라 useState
+  // 가게 정보 (가게 이름) — 이 화면에서만 쓰는 값이라 useState
   const [store, setStore] = useState(null);
 
   useEffect(() => {
@@ -61,8 +61,7 @@ export default function DashboardPage() {
   }, [fetchDashboard, storeId]);
 
   const handleChange = (orderId, nextStatus) => {
-    if (!store) return;
-    changeStatus(storeId, orderId, nextStatus, store.ownerId);
+    changeStatus(storeId, orderId, nextStatus);
   };
 
   // 수동 새로고침: 5초를 기다리지 않고 바로 다시 불러오기
