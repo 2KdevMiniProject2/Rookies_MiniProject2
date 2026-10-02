@@ -26,21 +26,43 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByStoreIdAndStatus(@Param("storeId") Long storeId,
                                        @Param("status") Order.OrderStatus status,
                                        Pageable pageable);
+
     // ===== 파트 C =====
 
-    // [사장님 주문 목록] 손님·주문 품목·메뉴까지 한 번에 조회 (N+1 방지), 최신순
-    @Query("SELECT DISTINCT o FROM Order o " +
-            "JOIN FETCH o.customer " +
-            "LEFT JOIN FETCH o.orderItems oi " +
-            "LEFT JOIN FETCH oi.menuItem " +
-            "WHERE o.store.id = :storeId " +
-            "ORDER BY o.createdAt DESC")
-    List<Order> findAllWithItemsByStoreId(@Param("storeId") Long storeId);
+    // [사장님 대시보드] 진행 중 주문은 날짜 상관없이 전부, 끝난 주문은 오늘 들어온 것만
+    @Query(value = "SELECT o FROM Order o JOIN FETCH o.customer " +
+                   "WHERE o.store.id = :storeId " +
+                   "AND (o.status IN :activeStatuses OR (o.createdAt >= :start AND o.createdAt < :end))",
+           countQuery = "SELECT COUNT(o) FROM Order o " +
+                        "WHERE o.store.id = :storeId " +
+                        "AND (o.status IN :activeStatuses OR (o.createdAt >= :start AND o.createdAt < :end))")
+    Page<Order> findDashboardOrders(@Param("storeId") Long storeId,
+                                    @Param("activeStatuses") List<Order.OrderStatus> activeStatuses,
+                                    @Param("start") LocalDateTime start,
+                                    @Param("end") LocalDateTime end,
+                                    Pageable pageable);
 
+    // [사장님 대시보드 + 상태 필터] 위 조건에 특정 상태만 추가로 걸러냄
+    @Query(value = "SELECT o FROM Order o JOIN FETCH o.customer " +
+                   "WHERE o.store.id = :storeId AND o.status = :status " +
+                   "AND (o.status IN :activeStatuses OR (o.createdAt >= :start AND o.createdAt < :end))",
+           countQuery = "SELECT COUNT(o) FROM Order o " +
+                        "WHERE o.store.id = :storeId AND o.status = :status " +
+                        "AND (o.status IN :activeStatuses OR (o.createdAt >= :start AND o.createdAt < :end))")
+    Page<Order> findDashboardOrdersByStatus(@Param("storeId") Long storeId,
+                                            @Param("status") Order.OrderStatus status,
+                                            @Param("activeStatuses") List<Order.OrderStatus> activeStatuses,
+                                            @Param("start") LocalDateTime start,
+                                            @Param("end") LocalDateTime end,
+                                            Pageable pageable);
+
+    // [상태 변경 권한 확인] 이 사장님 가게의 주문일 때만 조회됨
     Optional<Order> findByIdAndStoreOwnerId(Long orderId, Long ownerId);
 
+    // [손님 본인 주문 확인] 주문한 손님 본인일 때만 조회됨
     Optional<Order> findByIdAndCustomerId(Long orderId, Long customerId);
 
+    // [오늘 매출] 기간 내 특정 상태 주문의 금액 합계, 주문이 없으면 0
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0L) FROM Order o " +
             "WHERE o.store.id = :storeId " +
             "AND o.status = :status " +
@@ -50,6 +72,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                                         @Param("start") LocalDateTime start,
                                         @Param("end") LocalDateTime end);
 
+    // [오늘 매출] 기간 내 특정 상태 주문 건수
     @Query("SELECT COUNT(o) FROM Order o " +
             "WHERE o.store.id = :storeId " +
             "AND o.status = :status " +
