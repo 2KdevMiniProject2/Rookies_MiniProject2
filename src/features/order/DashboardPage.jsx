@@ -178,15 +178,16 @@ function OrderCard({ order, onChange }) {
       </div>
 
       <ul className="order__info">
-        <li>
-          {order.customerName} · {order.customerPhone}
-        </li>
+        <li className="order__customer">{order.customerName}</li>
         <li>픽업 요청 {hhmm(order.pickupTime)}</li>
-        {order.items.map((item, index) => (
-          <li key={index}>
+        {order.items.map((item) => (
+          <li key={item.menuItemId}>
             {item.menuName} × {item.quantity}
           </li>
         ))}
+        {order.requestNotes && (
+          <li className="order__notes">요청 · {order.requestNotes}</li>
+        )}
         <li className="order__price">{won(order.totalPrice)}</li>
       </ul>
 

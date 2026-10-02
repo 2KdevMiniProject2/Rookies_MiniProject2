@@ -456,3 +456,16 @@
     height: 44px;
   }
 }
+
+/* 주문 카드 — 손님 이름 · 요청사항 */
+.order__customer {
+  font-weight: 600;
+  color: var(--order-text);
+}
+
+.order__notes {
+  padding: 6px 10px;
+  font-size: 13px;
+  background: var(--order-fill);
+  border-radius: 6px;
+}
