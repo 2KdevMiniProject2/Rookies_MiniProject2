@@ -1,0 +1,139 @@
+/* =========================================================
+   공용 상단 헤더 — 메인 홈(StoreListPage.module.css) 헤더와 같은 값
+   메인 홈 헤더를 바꾸면 여기도 같이 바꿀 것
+   ========================================================= */
+
+.header {
+  /* 메인 홈 --home-* 와 같은 값 */
+  --header-bg: #ffffff;
+  --header-text: #111111;
+  --header-border: #e0e0e0;
+  --header-border-strong: #8c8c8c;
+  --header-button-bg: #ececec;
+  --header-button-border: #bdbdbd;
+  --header-accent: #ed5821;
+  --header-on-accent: #ffffff;
+  --content-max: 1400px;
+  --gutter: 32px;
+
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-sizing: border-box;
+  /* #root(1126px) 밖으로 화면 전체 폭 — 메인 홈과 같은 breakout */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  /* 배경·하단선은 화면 끝까지, 내용은 --content-max 안에 정렬 */
+  padding: 14px max(var(--gutter), calc((100vw - var(--content-max)) / 2));
+  text-align: left;
+  color: var(--header-text);
+  background: color-mix(in srgb, var(--header-bg) 85%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--header-border);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* logo.svg 안쪽 여백만큼 음수 margin으로 상쇄 (메인 홈과 같은 값) */
+.logo .logoImage {
+  height: 60px;
+  margin: -9px 0 -7px -13px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--header-text);
+}
+
+/* 로그인 · 로그아웃: 포인트 컬러 바탕 + 흰 글자 */
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--header-on-accent);
+  background: var(--header-accent);
+  border: 1px solid var(--header-accent);
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+/* 호버 시 밝게 하면 흰 글자 대비가 떨어지므로 살짝 어둡게 */
+.navButton:hover {
+  filter: brightness(0.92);
+}
+
+/* 마이페이지 동그란 아이콘 버튼 */
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--header-text);
+  background: transparent;
+  border: 1px solid var(--header-button-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.iconButton svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.iconButton:hover {
+  background: var(--header-button-bg);
+  border-color: var(--header-border-strong);
+}
+
+.header button:focus-visible,
+.header a:focus-visible {
+  outline: 2px solid var(--header-text);
+  outline-offset: 2px;
+}
+
+/* 모바일 (640px 이하 — 메인 홈과 같은 기준) */
+@media (max-width: 640px) {
+  .header {
+    --gutter: 16px;
+    gap: 12px;
+    padding-block: 12px;
+  }
+
+  .logo .logoImage {
+    height: 52px;
+    margin: -7px 0 -6px -11px;
+  }
+
+  /* 폰에서는 이름을 숨겨 버튼이 한 줄에 들어가게 */
+  .userName {
+    display: none;
+  }
+}

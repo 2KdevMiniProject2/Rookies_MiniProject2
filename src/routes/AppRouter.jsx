@@ -9,6 +9,7 @@ import OrderStatusPage from '../features/order/OrderStatusPage';
 import StoreOrderPage from '../features/order/StoreOrderPage';
 import CartPage from '../features/order/CartPage';
 
+import Header from '../components/common/Header';
 import MyPage from '../features/auth/MyPage';
 import StoreRegisterPage from '../features/store/StoreRegisterPage';
 import MenuRegisterPage from '../features/store/MenuRegisterPage';
@@ -23,13 +24,13 @@ function AppRouter() {
         <Route path="/" element={<StoreListPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupForm />} />
-        <Route path="/stores/:storeId" element={<StoreOrderPage />} />
+        <Route path="/stores/:storeId" element={<><Header /><StoreOrderPage /></>} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/mypage/profile" element={<UserInfoPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/orders/:orderId" element={<OrderStatusPage />} />
+          <Route path="/cart" element={<><Header /><CartPage /></>} />
+          <Route path="/orders/:orderId" element={<><Header /><OrderStatusPage /></>} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['OWNER']} />}>
