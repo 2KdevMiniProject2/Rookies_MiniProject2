@@ -59,7 +59,7 @@ public class SecurityConfig {
                         // 1. 로그인, 회원가입은 토큰 없이 호출할 수 있어야 한다
                         .requestMatchers("/api/auth/**").permitAll()
                         // 2. 가게 목록, 메뉴 목록 조회는 비로그인 손님도 둘러볼 수 있어야 한다 (GET 허용)
-                        .requestMatchers(HttpMethod.GET, "/api/stores/**", "/api/menus/**", "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/stores/**", "/api/menus/**", "/images/**").permitAll()
                         // 3. 그 외 API 요청은 로그인(토큰 인증) 필요
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
