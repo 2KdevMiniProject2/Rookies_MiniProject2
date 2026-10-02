@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>매장 목록</title></head>
+<body style="font-family:sans-serif;">
+<div th:replace="~{admin/fragments :: nav}"></div>
+<div style="padding:20px">
+    <h1>매장 목록 (<span th:text="${page.totalElements}"></span>개)</h1>
+    <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+        <thead><tr><th>ID</th><th>이름</th><th>주소</th><th>카테고리</th><th>영업시간</th><th>사장님</th></tr></thead>
+        <tbody>
+        <tr th:each="store : ${page.content}">
+            <td th:text="${store.id}"></td>
+            <td th:text="${store.name}"></td>
+            <td th:text="${store.address}"></td>
+            <td th:text="${store.category}"></td>
+            <td th:text="${store.openTime + ' ~ ' + store.closeTime}"></td>
+            <td th:text="${store.ownerName}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="margin-top:12px">
+        <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+           th:href="@{/admin/stores(page=${i})}"
+           th:text="${i + 1}"
+           style="margin-right:8px"></a>
+    </div>
+</div>
+</body>
+</html>

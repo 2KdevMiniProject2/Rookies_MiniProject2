@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="nav" style="padding:12px 20px;background:#222;color:#fff;">
+    <a th:href="@{/admin/users}" style="color:#fff;margin-right:16px;">회원 목록</a>
+    <a th:href="@{/admin/stores}" style="color:#fff;margin-right:16px;">매장 목록</a>
+    <form th:action="@{/admin/logout}" method="post" style="display:inline">
+        <button type="submit">로그아웃</button>
+    </form>
+</nav>
+</body>
+</html>

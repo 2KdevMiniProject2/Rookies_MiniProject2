@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -50,17 +51,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // JWT 를 쓰는 REST API 이므로 CSRF 토큰이 필요 없다
+                .securityMatcher("/api/**", "/images/**")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. 로그인, 회원가입은 토큰 없이 호출할 수 있어야 한다
                         .requestMatchers("/api/auth/**").permitAll()
-                        // 2. 가게 목록, 메뉴 목록 조회는 비로그인 손님도 둘러볼 수 있어야 한다 (GET 허용)
                         .requestMatchers(HttpMethod.GET, "/api/stores/**", "/api/menus/**", "/images/**").permitAll()
-                        // 3. 그 외 API 요청은 로그인(토큰 인증) 필요
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -71,6 +70,26 @@ public class SecurityConfig {
                 .build();
     }
 
+    @Bean
+    @Order(2)
+    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/login").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().permitAll())
+                .formLogin(login -> login
+                        .loginPage("/admin/login")
+                        .loginProcessingUrl("/admin/login-process")
+                        .defaultSuccessUrl("/admin/users", true)
+                        .permitAll())
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/admin/login?error=forbidden"))
+                .logout(logout -> logout
+                        .logoutUrl("/admin/logout")
+                        .logoutSuccessUrl("/admin/login?logout"))
+                .build();
+    }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
             throws Exception {

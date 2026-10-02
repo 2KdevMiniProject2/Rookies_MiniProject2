@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>관리자 로그인</title></head>
+<body style="font-family:sans-serif;max-width:360px;margin:80px auto;">
+<h1>관리자 로그인</h1>
+<div th:if="${param.error != null}">
+    <p th:if="${param.error[0] == 'forbidden'}" style="color:red;">
+        관리자 권한이 없는 계정입니다.
+    </p>
+    <p th:unless="${param.error[0] == 'forbidden'}" style="color:red;">
+        이메일 또는 비밀번호가 올바르지 않습니다.
+    </p>
+</div>
+<div th:if="${param.logout != null}" style="color:green;">
+    로그아웃 되었습니다.
+</div>
+<form th:action="@{/admin/login-process}" method="post">
+    <div><label>이메일<br><input type="email" name="username" required style="width:100%"></label></div>
+    <div style="margin-top:8px"><label>비밀번호<br><input type="password" name="password" required style="width:100%"></label></div>
+    <button type="submit" style="margin-top:12px">로그인</button>
+</form>
+</body>
+</html>
