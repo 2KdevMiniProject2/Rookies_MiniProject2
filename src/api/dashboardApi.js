@@ -53,24 +53,10 @@ export const updateOrderStatus = async (orderId, status, ownerId) => {
   );
 };
 
-// GET /api/owner/sales/today  (storeId)  → { totalSales, orderCount }
+//오늘 매출 조회 api 추가 후 반영
+// GET /api/owner/stores/${storeId}/sales/today  (storeId)  → { totalSales, orderCount }
+// 픽업 완료(COMPLETED) 주문만, 오늘 픽업 완료 (백엔드 계산)
 export const getTodaySales = async (storeId) => {
-  const orders = await getOwnerOrders(storeId);
-  const today = todayText();
-  const todayOrders = orders.filter(
-    (order) => order.pickupTime.startsWith(today) && order.status !== "REJECTED"
-  );
-  return {
-    totalSales: todayOrders.reduce((sum, order) => sum + order.totalPrice, 0),
-    orderCount: todayOrders.length,
-  };
-};
-
-// 분리 필요
-// 오늘 날짜 "YYYY-MM-DD" (내 컴퓨터 시간 기준)
-const todayText = () => {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${now.getFullYear()}-${month}-${day}`;
+  const response = await apiClient.get(`/api/owner/stores/${storeId}/sales/today`);
+  return response.data;
 };
