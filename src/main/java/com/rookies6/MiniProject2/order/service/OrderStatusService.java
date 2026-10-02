@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,17 +19,28 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class OrderStatusService {
 
+    // 진행 중 상태: 날짜 상관없이 대시보드에 계속 표시
+    private static final List<Order.OrderStatus> ACTIVE_STATUSES = List.of(
+            Order.OrderStatus.PENDING,
+            Order.OrderStatus.ACCEPTED,
+            Order.OrderStatus.READY
+    );
+
     private final OrderRepository orderRepository;
     private final StoreRepository storeRepository;
 
-    // [사장님] 가게 주문 목록 조회 (최신순)
+    // [사장님] 대시보드 주문 목록 조회
+    // 진행 중 주문은 전부, 끝난 주문(완료·거절·취소)은 오늘 들어온 것만
     public List<OwnerOrderResponse> getOwnerOrders(Long ownerId, Long storeId) {
         // 이 사장님 소유의 영업 중인 가게인지 확인. 없는 가게이거나 남의 가게면 404
         if (!storeRepository.existsByIdAndOwnerIdAndDeletedAtIsNull(storeId, ownerId)) {
             throw new BusinessException(ErrorCode.STORE_NOT_FOUND, storeId);
         }
 
-        return orderRepository.findAllWithItemsByStoreId(storeId).stream()
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+
+        return orderRepository.findDashboardOrdersByStoreId(storeId, ACTIVE_STATUSES, start, end).stream()
                 .map(OwnerOrderResponse::from)
                 .toList();
     }
