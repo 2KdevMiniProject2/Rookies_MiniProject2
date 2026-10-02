@@ -95,7 +95,7 @@ export default function DashboardPage() {
         <h2 className="dashboard__section-title">오늘의 영업 요약</h2>
         <div className="summary">
           <div className="summary__item">
-            <p className="summary__label">오늘 들어온 주문</p>
+            <p className="summary__label">오늘 픽업 완료된 주문</p>
             <p className="summary__value">{sales.orderCount}건</p>
           </div>
           <div className="summary__item">
