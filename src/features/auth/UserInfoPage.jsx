@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/client';
+import { fetchOrders } from '../../api/orderApi';
 import { useAuthStore } from '../../store/authStore';
 import Logo from '../../components/common/Logo';
 import './UserInfoPage.css';
@@ -147,6 +148,31 @@ function UserInfoPage() {
         }
     };
 
+    const handleOrderStatusClick = async () => {
+        try {
+            const result = await fetchOrders({
+                page: 0,
+                size: 10,
+            });
+
+            const activeOrder = result.orders.find((order) =>
+                ['PENDING', 'ACCEPTED', 'READY'].includes(order.status)
+            );
+
+            const targetOrder = activeOrder || result.orders[0];
+
+            if (!targetOrder) {
+                window.alert('확인할 주문이 없습니다.');
+                return;
+            }
+
+            navigate(`/orders/${targetOrder.id}`);
+        } catch (error) {
+            console.error('주문 현황 조회 실패:', error);
+            window.alert('주문 현황을 불러오지 못했습니다.');
+        }
+    };
+
     const handleLogout = () => {
         logout();
         navigate('/login');
@@ -202,7 +228,7 @@ function UserInfoPage() {
                             마이페이지
                         </button>
 
-                        {user.role === 'OWNER' && (
+                        {user.role === 'OWNER' ? (
                             <>
                                 <button
                                     type="button"
@@ -223,6 +249,22 @@ function UserInfoPage() {
                                     onClick={() => navigate('/owner/stores')}
                                 >
                                     가게별 메뉴 관리
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={handleOrderStatusClick}
+                                >
+                                    주문 현황
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/cart')}
+                                >
+                                    장바구니
                                 </button>
                             </>
                         )}

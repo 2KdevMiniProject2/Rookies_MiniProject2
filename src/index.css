@@ -115,10 +115,4 @@ code {
 }
 
 
-/* 팀 공통 브랜드 로고 - 사장님 관리 화면 사이드바 */
-.owner-sidebar-logo {
-  height: 52px;
-  width: auto;
-  max-width: 160px;
-  margin: -4px 0 20px -7px;
-}
+

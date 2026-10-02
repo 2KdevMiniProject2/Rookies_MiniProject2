@@ -398,6 +398,16 @@ function MyPage() {
                                         <article
                                             className="order-history-card"
                                             key={order.id}
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-label={`주문 ${order.id} 현황 보기`}
+                                            onClick={() => navigate(`/orders/${order.id}`)}
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter' || event.key === ' ') {
+                                                    event.preventDefault();
+                                                    navigate(`/orders/${order.id}`);
+                                                }
+                                            }}
                                         >
                                             <div className="order-history-top">
                                                 <div>

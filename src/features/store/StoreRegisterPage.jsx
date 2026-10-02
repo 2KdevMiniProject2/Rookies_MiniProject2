@@ -178,8 +178,6 @@ function StoreRegisterPage() {
                                     <option value="분식">분식</option>
                                     <option value="일식">일식</option>
                                     <option value="치킨">치킨</option>
-                                    <option value="편의점">편의점</option>
-                                    <option value="기타">기타</option>
                                 </select>
                             </div>
 
