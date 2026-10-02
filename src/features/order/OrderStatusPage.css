@@ -543,3 +543,22 @@
     border-top: 1px solid var(--order-border);
   }
 }
+
+/* 다른 페이지로 나가는 링크 — 새로고침 아래 작은 글씨 */
+.order-status__links {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--order-text-muted);
+}
+
+.order-status__links a {
+  color: var(--order-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.order-status__links a:hover {
+  color: var(--order-accent);
+}

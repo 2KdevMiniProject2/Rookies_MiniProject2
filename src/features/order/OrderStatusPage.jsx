@@ -236,6 +236,11 @@ function OrderStatusPage() {
                         {refreshing ? "불러오는 중…" : "실시간 상태 새로고침"}
                     </button>
                     <span className="order-status__hint">5초마다 자동으로 새로고침돼요</span>
+                    <nav className="order-status__links">
+                        <Link to="/">메인으로 가기</Link>
+                        <span aria-hidden="true">·</span>
+                        <Link to="/mypage">내 주문 내역</Link>
+                    </nav>
                 </div>
             </div>
         </div>
