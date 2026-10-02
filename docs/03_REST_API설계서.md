@@ -2,8 +2,8 @@
 
 - **팀명**: Rookies_MiniProject2 (소상공인 예약/주문 관리 SaaS)
 - **작성자**: 인선 (Part B — 메뉴/주문 도메인)
-- **문서버전**: v2.0 (컨트롤러별 상세 포맷으로 전면 개편)
-- **작성일**: 2026-10-01
+- **문서버전**: v2.2 (비로그인 공개 엔드포인트 목록 보정)
+- **작성일**: 2026-10-02 (최초 v2.0: 2026-10-01, v2.1/v2.2: 2026-10-02)
 - **API 베이스 URL**: `http://localhost:8080`
 - **포맷**: JSON (UTF-8)
 - **인증**: JWT Bearer (`Authorization: Bearer <token>`)
@@ -35,8 +35,12 @@
 - **사용자 식별은 클라이언트가 보낸 id가 아니라 토큰에서 직접 추출한다.** 커스텀 애너테이션 `@CurrentUser`(`@AuthenticationPrincipal` 기반)가 `UserInfoUserDetails`에서 로그인한 `User` 엔티티를 바로 꺼내주며, 컨트롤러는 이 값만 신뢰한다.
 - 인가는 두 단계로 이루어진다.
   1. **역할 기반**: `@PreAuthorize("hasRole('OWNER')")` / `hasRole('ADMIN')` — 메서드 단위로 역할이 부족하면 403.
-  2. **리소스 소유권 검증**: 경로의 `{id}`/`{storeId}`/`{customerId}` 등이 토큰의 로그인 사용자(또는 그 사용자가 소유한 리소스)와 일치하는지 서비스 레이어에서 직접 대조 — 불일치 시 `USER_ACCESS_DENIED`/`STORE_ACCESS_DENIED` (403).
-- 비로그인(공개) 엔드포인트: 회원가입, 로그인, 매장 목록/상세 조회(GET), 매장 메뉴 목록 조회(GET). 그 외 전부 토큰 필요.
+  2. **리소스 소유권 검증**: 경로의 `{id}`/`{storeId}`/`{customerId}` 등이 토큰의 로그인 사용자(또는 그 사용자가 소유한 리소스)와 일치하는지 서비스 레이어에서 직접 대조.
+- 소유권 불일치 시의 응답은 엔드포인트별로 두 가지 컨벤션이 섞여 있다 (현재 팀 컨벤션 통일 전 상태):
+  - **403 `STORE_ACCESS_DENIED`/`USER_ACCESS_DENIED`**: 매장/회원이 존재한다는 사실은 알려주되 "당신 소유가 아니다"로 응답 (Store/Menu 도메인 다수)
+  - **404 `STORE_NOT_FOUND`**: 존재 여부 자체를 노출하지 않음 (`OwnerOrderController`/`SalesController`의 매장 소유권 검사가 이 방식) — 보안상 더 안전한 선택이라 신규 엔드포인트는 이쪽으로 통일 중
+- 비로그인(공개) 엔드포인트: 회원가입, 로그인, 매장 목록/상세 조회(GET), 매장 메뉴 목록 조회(GET), 메뉴 이미지 정적 리소스 조회(`GET /images/**`). 그 외 전부 토큰 필요.
+  > 참고: `SecurityConfig`의 공개 GET 허용 목록은 `/api/stores/**`, `/api/menus/**`, `/images/**` 세 패턴이다. `WebConfig`가 업로드된 이미지를 `/images/**` 경로로 정적 서빙하므로, 이 패턴이 실제 서빙 경로와 반드시 일치해야 한다 — 과거 이 목록에 `/uploads/**`(디스크 저장 폴더명과 혼동)로 잘못 적혀 있었던 적이 있는데, 당시엔 맨 마지막 `.anyRequest().permitAll()` catch-all 덕분에 우연히 동작했을 뿐 의도한 규칙이 걸린 게 아니었다. 2026-10-02 코드 리뷰에서 발견 및 수정 완료 (6장 변경 이력 참고).
 
 ## 3) 에러 응답 규약
 
@@ -449,7 +453,7 @@ curl -X DELETE "http://localhost:8080/api/menus/10" \
 
 ### OrderController (`menu/controller/OrderController.java`)
 
-> 참고: 클래스 레벨 `@RequestMapping`이 없음(보안 이슈 아님).
+> 참고: 클래스 레벨 `@RequestMapping`이 없음(보안 이슈 아님). 손님의 주문 생성만 담당 — 매장별 주문 목록 조회는 `OwnerOrderController`로 통합되었다 (아래 참고).
 
 #### POST `/api/orders` — createOrder
 
@@ -483,21 +487,6 @@ curl -X POST "http://localhost:8080/api/orders" \
   -H "Authorization: Bearer <JWT_TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{"storeId":1,"items":[{"menuItemId":10,"quantity":2}],"pickupTime":"2026-10-02T18:30:00","requestNotes":"빵 바삭하게 부탁드려요"}'
-```
-
-#### GET `/api/stores/{storeId}/orders` — getOrdersByStore
-
-- **Consumes**: N/A / **Produces**: application/json
-- **Auth**: Bearer JWT, OWNER 본인 소유 매장만
-- **Path Params**: `storeId` (Long) — required
-- **Query Params**: `status`(선택, `PENDING`/`ACCEPTED`/`READY`/`COMPLETED`/`REJECTED`/`CANCELLED`), `page`(기본 0), `size`(기본 10), `sort`(기본 `createdAt`)
-
-**Response Type**: `ResponseEntity<Page<OrderResponse>>`
-**Status Codes**: 200 OK / 401 / 403 (`STORE_ACCESS_DENIED`) / 404 (`STORE_NOT_FOUND`)
-
-```bash
-curl -X GET "http://localhost:8080/api/stores/1/orders?status=PENDING&page=0&size=10" \
-  -H "Authorization: Bearer <JWT_TOKEN>"
 ```
 
 ---
@@ -554,6 +543,38 @@ curl -X PATCH "http://localhost:8080/api/customers/3/orders/100/cancel" \
 ### OwnerOrderController (`order/controller/OwnerOrderController.java`)
 
 - **Base Path**: `/api/owner`
+- 클래스 레벨 `@PreAuthorize("hasRole('OWNER')")` — 이 컨트롤러의 모든 메서드는 OWNER만 호출 가능.
+- 매장 소유권 검증은 `storeRepository.existsByIdAndOwnerIdAndDeletedAtIsNull`로 수행 — 존재하지 않는 매장이든 타인 소유 매장이든 구분 없이 **404**로 응답한다 (2절의 404 컨벤션 참고).
+
+#### GET `/stores/{storeId}/orders` — getOrders
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER 본인 소유 매장만
+- **Path Params**: `storeId` (Long) — required
+- **Query Params**: `status`(선택, `PENDING`/`ACCEPTED`/`READY`/`COMPLETED`/`REJECTED`/`CANCELLED`), `page`(기본 0), `size`(기본 10), `sort`(기본 `createdAt`)
+
+**Response Type**: `ResponseEntity<Page<OwnerOrderResponse>>` — 손님 이름, 주문 생성시각, 요청사항, 품목까지 포함한 사장님용 상세 응답
+```json
+{
+  "content": [
+    {
+      "orderId": 100, "status": "PENDING", "totalAmount": 10500,
+      "pickupTime": "2026-10-02T18:30:00", "createdAt": "2026-10-02T17:50:12",
+      "customerName": "김손님", "requestNotes": "빵 바삭하게 부탁드려요",
+      "items": [ { "menuItemId": 10, "menuName": "소금빵", "quantity": 2, "orderPrice": 3500 } ]
+    }
+  ],
+  "totalElements": 1, "totalPages": 1, "number": 0, "size": 10
+}
+```
+**Status Codes**: 200 OK / 401 / 403 (OWNER 아님) / 404 (`STORE_NOT_FOUND` — 존재하지 않거나 본인 소유가 아닌 매장)
+
+```bash
+curl -X GET "http://localhost:8080/api/owner/stores/1/orders?status=PENDING&page=0&size=10" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+> 이전 버전(v2.0)에서는 같은 기능이 `menu.controller.OrderController`의 `GET /api/stores/{storeId}/orders`(403 `STORE_ACCESS_DENIED`, `OrderResponse` 반환)로 별도 존재했다. 팀 코드 리뷰에서 두 엔드포인트가 중복 구현된 것으로 확인되어 이 엔드포인트로 통합하고, 구버전 엔드포인트는 삭제했다 (6장 변경 이력 참고).
 
 #### PATCH `/orders/{orderId}/status` — updateStatus
 
@@ -567,13 +588,39 @@ curl -X PATCH "http://localhost:8080/api/customers/3/orders/100/cancel" \
 허용 값: `ACCEPTED`, `REJECTED`, `READY`, `COMPLETED` (상태 머신 규칙은 도메인 설계서 4.4 참고)
 
 **Response Type**: `ResponseEntity<Void>`
-**Status Codes**: 200 OK / 400 (`status` 누락) / 401 / 403 (OWNER 아님, 본인 매장 아님) / 404 (`ORDER_NOT_FOUND`) / 409 (`INVALID_ORDER_STATUS`)
+**Status Codes**: 200 OK / 400 (`status` 누락) / 401 / 403 (OWNER 아님) / 404 (`ORDER_NOT_FOUND` — 존재하지 않거나 본인 매장 주문이 아님) / 409 (`INVALID_ORDER_STATUS`)
 
 ```bash
 curl -X PATCH "http://localhost:8080/api/owner/orders/100/status" \
   -H "Authorization: Bearer <JWT_TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{"status":"ACCEPTED"}'
+```
+
+---
+
+### SalesController (`order/controller/SalesController.java`)
+
+- **Base Path**: `/api/owner`
+- 클래스 레벨 `@PreAuthorize("hasRole('OWNER')")`, 매장 소유권 검증은 `OwnerOrderController`와 동일한 404 컨벤션.
+
+#### GET `/stores/{storeId}/sales/today` — getTodaySales
+
+- **Consumes**: N/A / **Produces**: application/json
+- **Auth**: Bearer JWT, OWNER 본인 소유 매장만
+- **Path Params**: `storeId` (Long) — required
+
+**Response Type**: `ResponseEntity<SalesSummaryResponse>` — 오늘 0시~내일 0시 사이 `COMPLETED`(픽업 완료) 주문만 집계
+```json
+{ "totalSales": 21000, "orderCount": 2 }
+```
+오늘 완료된 주문이 없으면 `{ "totalSales": 0, "orderCount": 0 }` (서버 쿼리가 `COALESCE(SUM(...), 0)` 처리 — `null`이 내려오지 않음).
+
+**Status Codes**: 200 OK / 401 / 403 (OWNER 아님) / 404 (`STORE_NOT_FOUND`)
+
+```bash
+curl -X GET "http://localhost:8080/api/owner/stores/1/sales/today" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
 ```
 
 ---
@@ -596,5 +643,7 @@ curl -X PATCH "http://localhost:8080/api/owner/orders/100/status" \
 
 ## 6) 변경 이력
 
+- v2.2 (2026-10-02): 팀 코드 리뷰에서 `SecurityConfig`의 공개 GET 허용 경로가 `/uploads/**`(실제 서빙 경로는 `WebConfig` 기준 `/images/**`)로 잘못 설정돼 있던 것을 발견, 수정 확인. 2장 인증/권한의 비로그인 엔드포인트 목록에 `/images/**`(메뉴 이미지 정적 리소스)를 누락분으로 추가.
+- v2.1 (2026-10-02): 팀 코드 리뷰에서 발견된 중복 엔드포인트 통합 — `menu.controller.OrderController.getOrdersByStore`(`GET /api/stores/{storeId}/orders`)를 삭제하고 `OwnerOrderController.getOrders`(`GET /api/owner/stores/{storeId}/orders`)로 일원화. 응답을 `OrderResponse`→`OwnerOrderResponse`로, 매장 소유권 실패 응답을 403→404로 통일. 신규 `SalesController`(오늘 매출 조회 API) 문서 추가. 인증/권한 절에 403/404 컨벤션 차이 설명 추가.
 - v2.0 (2026-10-01): 도메인별 표 형식(v1.0)에서 컨트롤러별 상세 + cURL 예시 포맷으로 전면 개편. Menu/Order API의 `@CurrentUser` 전환 완료분 반영.
 - v1.0 (2026-10-01): 최초 작성 (도메인별 요약 표 + 요청/응답 스펙).
