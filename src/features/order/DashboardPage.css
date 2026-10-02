@@ -370,6 +370,13 @@
   border: 1px dashed var(--order-border-strong);
 }
 
+.badge--cancelled {
+  color: var(--order-text-muted);
+  text-decoration: line-through;
+  background: var(--order-fill);
+  border: 1px dashed var(--order-border-strong);
+}
+
 /* ---------- 픽업 완료 · 거절된 주문 ---------- */
 
 .done {

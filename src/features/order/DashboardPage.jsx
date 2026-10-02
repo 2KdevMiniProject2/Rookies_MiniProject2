@@ -17,6 +17,7 @@ const STATUS = {
   READY: { label: "픽업 대기", next: "COMPLETED", action: "픽업 완료" },
   COMPLETED: { label: "픽업 완료" },
   REJECTED: { label: "거절됨" },
+  CANCELLED: { label: "취소됨" },
 };
 
 const won = (amount) => `${amount.toLocaleString()}원`;
@@ -75,7 +76,7 @@ export default function DashboardPage() {
   const pending = orders.filter((order) => order.status === "PENDING");
   const cooking = orders.filter((order) => order.status === "ACCEPTED");
   const ready = orders.filter((order) => order.status === "READY");
-  const done = orders.filter((order) => order.status === "COMPLETED" || order.status === "REJECTED");
+  const done = orders.filter((order) => order.status === "COMPLETED" || order.status === "REJECTED" || order.status === "CANCELLED");
 
   return (
     <div className="dashboard">
