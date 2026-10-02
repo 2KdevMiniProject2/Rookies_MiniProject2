@@ -4,6 +4,7 @@ import com.rookies6.MiniProject2.menu.dto.OrderCreateRequest;
 import com.rookies6.MiniProject2.menu.dto.OrderResponse;
 import com.rookies6.MiniProject2.menu.entity.Order;
 import com.rookies6.MiniProject2.menu.service.OrderService;
+import com.rookies6.MiniProject2.order.dto.OwnerOrderResponse;
 import com.rookies6.MiniProject2.security.annotation.CurrentUser;
 import com.rookies6.MiniProject2.user.entity.User;
 import jakarta.validation.Valid;
@@ -28,15 +29,5 @@ public class OrderController {
             @Valid @RequestBody OrderCreateRequest request) {
         OrderResponse response = orderService.createOrder(currentUser.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @PreAuthorize("hasRole('OWNER')")
-    @GetMapping("/api/stores/{storeId}/orders")
-    public ResponseEntity<Page<OrderResponse>> getOrdersByStore(
-            @PathVariable Long storeId,
-            @CurrentUser User currentUser,
-            @RequestParam(required = false) Order.OrderStatus status,
-            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(orderService.getOrdersByStore(storeId, currentUser.getId(), status, pageable));
     }
 }

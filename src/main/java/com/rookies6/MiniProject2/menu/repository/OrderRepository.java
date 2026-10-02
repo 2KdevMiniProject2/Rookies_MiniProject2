@@ -14,12 +14,18 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // ===== 파트 B =====
-    Page<Order> findByStoreId(Long storeId, Pageable pageable);
 
     Page<Order> findByCustomerId(Long customerId, Pageable pageable);
 
-    Page<Order> findByStoreIdAndStatus(Long storeId, Order.OrderStatus status, Pageable pageable);
+    @Query(value = "SELECT o FROM Order o JOIN FETCH o.customer WHERE o.store.id = :storeId",
+            countQuery = "SELECT COUNT(o) FROM Order o WHERE o.store.id = :storeId")
+    Page<Order> findByStoreId(@Param("storeId") Long storeId, Pageable pageable);
 
+    @Query(value = "SELECT o FROM Order o JOIN FETCH o.customer WHERE o.store.id = :storeId AND o.status = :status",
+            countQuery = "SELECT COUNT(o) FROM Order o WHERE o.store.id = :storeId AND o.status = :status")
+    Page<Order> findByStoreIdAndStatus(@Param("storeId") Long storeId,
+                                       @Param("status") Order.OrderStatus status,
+                                       Pageable pageable);
     // ===== 파트 C =====
 
     // [사장님 주문 목록] 손님·주문 품목·메뉴까지 한 번에 조회 (N+1 방지), 최신순
