@@ -161,16 +161,56 @@ npm run dev   # http://localhost:5173
 
 **백엔드** (`backend_main`)
 
-| 담당자 | 담당 도메인 | 주요 작업 |
-|-----|---|---|
-| 현준 | 회원 / 매장 / 인증 | User·Store 도메인 API, JWT 인증(`JwtService`·`JwtAuthenticationFilter`·`SecurityConfig`), `@CurrentUser` 어노테이션, 매장 키워드 검색, 사장님 1:N 다중 매장 조회, `/images/**` 정적 리소스 경로 수정 |
-| 인선 | 메뉴 / 주문 생성 / 손님 주문 | 프로젝트 초기 세팅, 메뉴 CRUD + 이미지 업로드, 손님 주문 생성·취소·조회, N+1 조회 최적화, 소프트 삭제, 에러 코드 정리 |
-| 지우 | 사장님 주문 관리 / 매출 | `Order` 상태 전이 로직, 사장님 주문 목록 조회 API, 주문 상태 변경 API, 당일 매출 조회 API, 대시보드 조회 범위 로직 |
+<table>
+<colgroup>
+<col style="width:13%"><col style="width:20%"><col style="width:67%">
+</colgroup>
+<thead>
+<tr><th>담당자</th><th>담당 도메인</th><th>주요 작업</th></tr>
+</thead>
+<tbody>
+<tr>
+<td style="white-space:nowrap">현준<br>(Part A)</td>
+<td>회원 / 매장 / 인증</td>
+<td>User·Store 도메인 API, JWT 인증(<code>JwtService</code>·<code>JwtAuthenticationFilter</code>·<code>SecurityConfig</code>), <code>@CurrentUser</code> 어노테이션, 매장 키워드 검색, 사장님 1:N 다중 매장 조회, <code>/images/**</code> 정적 리소스 경로 수정</td>
+</tr>
+<tr>
+<td style="white-space:nowrap">인선<br>(Part B)</td>
+<td>메뉴 / 주문 생성 / 손님 주문</td>
+<td>프로젝트 초기 세팅, 메뉴 CRUD + 이미지 업로드, 손님 주문 생성·취소·조회, N+1 조회 최적화, 소프트 삭제, 에러 코드 정리</td>
+</tr>
+<tr>
+<td style="white-space:nowrap">지우<br>(Part C)</td>
+<td>사장님 주문 관리 / 매출</td>
+<td><code>Order</code> 상태 전이 로직, 사장님 주문 목록 조회 API, 주문 상태 변경 API, 당일 매출 조회 API, 대시보드 조회 범위 로직</td>
+</tr>
+</tbody>
+</table>
 
 **프론트엔드** (`frontend_main`)
 
-| 담당자 | 담당 도메인 | 주요 작업 |
-|-----|---|---|
-| 본영 | 주문(Order) — 장바구니 · 주문 현황 · 사장님 대시보드 | 주문 페이지, 장바구니(픽업 시간·요청사항), 손님 주문 상태 페이지, 사장님 주문 대시보드, 매출 연동 + 단위 테스트 |
-| 영서 | 매장(Store) — 매장/메뉴 관리, 마이페이지 | 매장 등록·수정·삭제, 메뉴 등록, 이미지 업로드 연결, 마이페이지 |
-| 승호 | 인증(Auth) · 공통 UI | 로그인/회원가입 구현 및 인증 연동, 메인 홈 디자인 통일, 매장 검색 기능 수정 |
+<table>
+<colgroup>
+<col style="width:13%"><col style="width:30%"><col style="width:57%">
+</colgroup>
+<thead>
+<tr><th>GitHub</th><th>담당 도메인</th><th>주요 작업</th></tr>
+</thead>
+<tbody>
+<tr>
+<td style="white-space:nowrap"><a href="https://github.com/9bonyo2">@9bonyo2</a></td>
+<td>주문(Order) — 장바구니 · 주문 현황 · 사장님 대시보드</td>
+<td>주문 페이지, 장바구니(픽업 시간·요청사항), 손님 주문 상태 페이지, 사장님 주문 대시보드, 매출 연동 + 단위 테스트</td>
+</tr>
+<tr>
+<td style="white-space:nowrap"><a href="https://github.com/sodamz">@sodamz</a></td>
+<td>매장(Store) — 매장/메뉴 관리, 마이페이지</td>
+<td>매장 등록·수정·삭제, 메뉴 등록, 이미지 업로드 연결, 마이페이지</td>
+</tr>
+<tr>
+<td style="white-space:nowrap"><a href="https://github.com/kdb1828-hub">@kdb1828-hub</a></td>
+<td>인증(Auth) · 공통 UI</td>
+<td>로그인/회원가입 구현 및 인증 연동, 메인 홈 디자인 통일, 매장 검색 기능 수정</td>
+</tr>
+</tbody>
+</table>
