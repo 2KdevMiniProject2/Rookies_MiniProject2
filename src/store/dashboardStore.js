@@ -19,7 +19,11 @@ export const useDashboardStore = create((set, get) => ({
       set({ orders, sales, loading: false, error: null });
     } catch (error) {
       console.error("대시보드 불러오기 실패:", error);
-      set({ loading: false, error: "주문 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요." });
+      const serverMessage = error.response?.data?.message?.split(".")[0];
+      set({
+        loading: false,
+        error: serverMessage ? `${serverMessage}.` : "주문 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
+      });
     }
   },
 
