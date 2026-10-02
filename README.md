@@ -2,165 +2,175 @@
 
 카페·베이커리 등 소상공인 매장의 메뉴 등록, 손님 주문, 주문 상태 관리, 매출 확인을 지원하는 앱입니다.
 
+이 저장소는 브랜치 단위로 독립 개발됩니다. 백엔드는 `backend_main`, 프론트엔드는 `frontend_main` 브랜치에서 각자 진행하며, 이 `main` 브랜치는 전체 프로젝트를 한눈에 보기 위한 통합 소개 문서(이 README)만 가지고 있습니다. 실제 소스 코드는 각 브랜치에서 확인해주세요.
+
+## 이 서비스는 무엇을 하나요?
+
+동네 카페·베이커리 사장님이 전화로 주문을 받는 대신, 앱으로 메뉴를 올려두고 손님이 직접 주문·픽업 예약을 할 수 있게 해주는 서비스입니다. 결제는 다루지 않으며, 주문은 매장에서 직접 수령·결제하는 것을 전제로 합니다.
+
+**사장님(OWNER)이 쓰는 흐름**
+
+1. 회원가입 후 본인 매장을 등록하고, 메뉴(이름/가격/사진)를 올립니다.
+2. 손님이 주문을 넣으면 사장님 화면에서 실시간으로 확인하고, `수락 → 준비완료 → 픽업완료` 순서로 상태를 바꿔가며 처리합니다. 재료 소진 등으로 못 만들면 `거절`도 가능합니다.
+3. 오늘 하루 얼마를 벌었는지 매출 조회로 바로 확인할 수 있습니다.
+
+**손님(USER)이 쓰는 흐름**
+
+1. 로그인 없이도 매장 목록과 메뉴를 둘러볼 수 있습니다(카테고리/이름 검색 지원).
+2. 회원가입·로그인 후, 원하는 메뉴를 담아 주문하고 픽업 희망 시각을 지정합니다.
+3. 주문 상태(접수대기 → 수락 → 준비완료 → 픽업완료)를 실시간으로 확인할 수 있고, 아직 사장님이 수락하기 전(접수대기 상태)이면 직접 취소할 수 있습니다.
+
+이 흐름을 지원하기 위한 백엔드(REST API, JWT 인증)와 프론트엔드(React SPA)가 각각 `backend_main`/`frontend_main` 브랜치에서 개발됩니다.
+
 ## 목차
 
 - [주요 기능](#주요-기능)
 - [기술 스택](#기술-스택)
-- [프로젝트 구조](#프로젝트-구조)
-- [실행 방법](#실행-방법)
+- [저장소 구조 (브랜치 전략)](#저장소-구조-브랜치-전략)
+- [로컬 실행 방법](#로컬-실행-방법)
 - [API 문서](#api-문서)
 - [팀 구성](#팀-구성)
 
 ## 주요 기능
 
-### 회원 
-- 회원가입 / 로그인 (사장님 `OWNER`, 손님 `USER` 역할 구분)
-- 회원 정보 조회 / 수정 / 탈퇴
-- *(설계 예정)* 로그인 로직을 `AuthController`/`AuthService`로 분리 — 현재는 `UserController`에 포함되어 있고, 로그인 응답의 액세스 토큰도 JWT 적용 전까지 임시 문자열로 발급됨
+### 회원
+- 회원가입 / 로그인 (JWT 발급, 사장님 `OWNER` / 손님 `USER` / 관리자 `ADMIN` 역할 구분)
+- 회원 정보 조회 / 수정 / 탈퇴(소프트 삭제)
 
-### 매장 
-- 매장 등록 / 목록 조회(카테고리 필터링 + 페이징) / 단건 조회 / 정보 수정 / 소프트 삭제
-- 매장 대표 이미지 업로드 (메뉴 이미지 업로드 엔드포인트 공용 사용)
+### 매장
+- 매장 등록 / 목록 조회(카테고리 필터링 + 키워드 검색 + 페이징) / 단건 조회 / 정보 수정 / 소프트 삭제
+- 매장 대표 이미지 업로드 (메뉴 이미지 업로드 엔드포인트와 공용 사용)
 - 사장님 본인 소유 매장만 수정·삭제 가능하도록 소유권 검증
 
 ### 메뉴
 - 메뉴 등록 / 목록 조회(페이징) / 수정 / 품절 처리 / 소프트 삭제
-- 메뉴 이미지 업로드
+- 메뉴 이미지 업로드 (`GET /images/**`로 정적 서빙)
 - 사장님 본인 소유 매장의 메뉴만 관리 가능하도록 소유권 검증
 
 ### 주문 — 손님 측
-- 주문 생성
-- 내 주문 목록 조회(페이징) / 상세 조회
-- 주문 취소 (접수 대기 상태에서만 가능)
+- 주문 생성 (서버 측 금액 계산, 주문 시점 메뉴 가격 스냅샷)
+- 내 주문 목록(페이징) / 단건 조회
+- 주문 취소 (접수대기 상태에서만 가능)
 
 ### 주문 — 사장님 측
-- 매장별 주문 목록 조회(상태 필터링 + 페이징) — Part B 구현, `OrderController`
-- 주문 상태 변경(수락/거절/준비완료/픽업완료) — Part C 구현, `OwnerOrderController`
-- *(설계 예정)* 오늘 매출 요약 조회 — `SalesController`/`SalesService`, 아직 미구현. 관련 집계 쿼리(`OrderRepository.sumTotalAmountByStoreAndPeriod` 등)는 준비돼 있으나 호출하는 곳이 없음
+- 매장별 주문 목록 조회 (상태 필터링 + 페이징, N+1 안전 조회) — Part C 구현
+- 주문 상태 변경(수락/거절/준비완료/픽업완료) — Part C 구현
+- 당일 매출 조회 (픽업 완료 주문 합계, 주문이 없으면 0) — Part C 구현
 
-주문 상태 흐름: `PENDING → ACCEPTED → READY → COMPLETED`, 그 외 `REJECTED`(사장님 거절/취소), `CANCELLED`(손님 취소)
+> 매장별 주문 목록 조회는 원래 Part B/C가 각자 중복 구현했으나, 팀 코드 리뷰에서 발견되어 Part C 구현(`OwnerOrderController`) 기준으로 통합했습니다.
+
+주문 상태 흐름: `PENDING → ACCEPTED → READY → COMPLETED`, 그 외 `REJECTED`(사장님, PENDING/ACCEPTED에서 가능), `CANCELLED`(손님, PENDING에서만 가능)
+
+### 프론트엔드
+React 19 기반 SPA. 역할(role) 기반 라우트 가드(`ProtectedRoute`)로 화면 접근을 1차 제어하고, 최종 인가는 백엔드(`@PreAuthorize` + 소유권 검증)가 책임집니다.
+
+- **인증**: 로그인/회원가입 화면과 유효성 검사, 개발 중 빠른 확인용 모의 로그인 버튼(`import.meta.env.DEV`로만 노출)
+- **매장 탐색**: 메인 홈에서 카테고리/키워드로 매장 검색(0.3초 디바운스, 응답 지연 시 꼬임 방지), 영업시간 기준 영업중/종료 배지(자정을 넘기는 영업시간도 처리), 페이지네이션
+- **사장님 매장/메뉴 관리**: 매장 등록·수정, 메뉴 등록·품절 처리·이미지 업로드 화면
+- **장바구니·주문**: 메뉴 담기(수량 조절), 픽업 가능 시간 슬롯 자동 생성(지금+15분부터 10분 단위, 영업시간 내 최대 8칸), 요청사항(255자 제한) 입력, 주문 후 상태 추적 화면으로 자동 이동
+- **주문 상태 추적**: 손님용 화면은 5초 주기로 폴링하며 접수대기→수락→준비완료→픽업완료 진행 바를 보여주고, 거절/취소는 별도 종료 상태로 표시
+- **사장님 대시보드**: 접수대기/수락/준비완료 주문을 칸반 형태로 보여주며 수락·거절·상태 진행 버튼 제공(거절은 확인창으로 보호), 당일 매출 요약 타일, 픽업완료·거절 내역은 접어서 모아보기
+- 예약/결제/리뷰/즐겨찾기/신고/관리자/알림 화면은 폴더와 라우트만 먼저 갖춰둔 상태로, 다음 스프린트 구현 대상입니다.
 
 ## 기술 스택
 
 | 구분 | 내용 |
 |---|---|
-| 언어/런타임 | Java 17 |
-| 프레임워크 | Spring Boot 4.0.8 (Web MVC, Data JPA, Validation, Security, Actuator) |
-| ORM | Hibernate (Spring Data JPA) |
-| DB | MariaDB |
-| 인증 | JWT (jjwt 0.12.7) |
-| 빌드 도구 | Maven |
-| 기타 | Lombok, Spring Boot Admin Client |
+| **백엔드** | Java 17, Spring Boot 4.0.8 (Web MVC, Data JPA, Validation, Security, Actuator), Hibernate, MariaDB, JWT(jjwt 0.12.7), Maven, Lombok |
+| **프론트엔드** | React 19, Vite, JavaScript, react-router-dom, axios, zustand (전역 상태 관리) |
 
-## 프로젝트 구조
+## 저장소 구조 (브랜치 전략)
 
-도메인/파트별로 패키지가 구성되어 있습니다.
+| 브랜치 | 역할 |
+|---|---|
+| `main` | 프로젝트 통합 소개 (이 README만 존재) |
+| `backend_main` | 백엔드 전체 소스 + 설계 문서(`docs/`) |
+| `frontend_main` | 프론트엔드 전체 소스 |
+
+두 저장소(브랜치)는 REST API 설계서(`backend_main`의 `docs/03_REST_API설계서.md`)를 계약(contract)으로 삼아 독립적으로 개발됩니다. 프론트엔드는 백엔드 주소를 하드코딩하지 않고 환경변수(`VITE_API_BASE_URL`)로만 참조합니다.
+
+백엔드 패키지는 도메인/파트별로 구성돼 있습니다 (자세한 트리는 `backend_main`의 README 참고).
 
 ```
 com.rookies6.MiniProject2
-├── common          # 공통 설정, 예외 처리, Base 엔티티
-│   ├── config       # SecurityConfig, WebConfig
-│   ├── entity       # BaseEntity, BaseCreatedEntity
-│   ├── exception    # ErrorCode, BusinessException, GlobalExceptionHandler
-│   └── runner       # 초기 더미 데이터 자동 생성(DataInitRunner)
-├── user            # 회원, 매장 도메인 (Part A)
-│   ├── controller   # UserController, StoreController
-│   ├── service
-│   ├── entity       # User, Store, StoreDetail
-│   ├── dto
-│   └── repository
-├── menu            # 메뉴, 주문 생성/사장님 목록조회 도메인 (Part B)
-│   ├── controller   # MenuController, OrderController
-│   ├── service       # MenuService, OrderService, ImageUploadService
-│   ├── entity       # MenuItem, Order, OrderItem
-│   ├── dto
-│   └── repository
-└── order           # 손님 주문 조회/취소(Part B), 사장님 주문 상태변경/매출(Part C)
-    ├── controller   # CustomerOrderController(B), OwnerOrderController(C)
-    ├── service       # CustomerOrderService(B), OrderStatusService(C)
-    └── dto
+├── common   # 공통 설정/예외처리/Base 엔티티
+├── security # JWT 인증/인가
+├── user     # 회원·매장 도메인 (Part A)
+├── menu     # 메뉴·주문 생성 도메인 (Part B)
+└── order    # 손님 주문조회/취소(Part B) + 사장님 주문관리/매출(Part C)
 ```
 
-## 실행 방법
+프론트엔드는 기능 기반(vertical-slice) 구조입니다 (자세한 트리는 `frontend_main`의 README 참고).
 
-### 사전 준비
-- JDK 17
-- MariaDB (DB명: `reservation_db`)
+```
+src
+├── api/        # axios 인스턴스
+├── store/      # zustand 전역 상태
+├── routes/     # 라우팅 + 역할 기반 접근 제어
+└── features/   # auth, store, order, reservation, payment, review, favorite, report, admin, notification
+```
 
-### 1. DB 스키마 및 더미데이터 생성
+## 로컬 실행 방법
 
-`src/main/resources/dummy-data.sql`을 `reservation_db`에 실행합니다. (기존 테이블을 모두 삭제하고 새로 생성하니 주의)
+백엔드와 프론트엔드를 각각 별도 브랜치로 체크아웃해 따로 실행합니다. 백엔드를 먼저 띄운 뒤 프론트엔드를 실행하는 순서를 권장합니다.
+
+### 1) 백엔드 (`backend_main`)
+
+사전 준비: JDK 17, MariaDB(DB명 `reservation_db`)
 
 ```bash
+# 1. DB 스키마+더미데이터 생성 (기존 테이블 삭제 후 재생성되니 주의)
 mysql -u root -p reservation_db < src/main/resources/dummy-data.sql
-```
 
-### 2. 로컬 설정 파일 생성
+# 2. src/main/resources/application-local.properties 직접 생성(.gitignore 대상)
+#    spring.datasource.url / username / password 채우기
 
-`src/main/resources/application-local.properties` 파일을 만들고(이미 `.gitignore`에 등록되어 있어 커밋되지 않습니다), 아래 내용을 채웁니다.
+# 3. JWT 서명 비밀키 환경변수 설정
+export JWT_SECRET=팀에서_공유받은_값
 
-```properties
-spring.datasource.url=jdbc:mariadb://localhost:3306/reservation_db
-spring.datasource.username=root
-spring.datasource.password=본인의_DB_비밀번호
-
-JWT_SECRET=팀에서_공유받은_값_또는_직접_생성한_랜덤값
-```
-
-### 3. 실행
-
-```bash
+# 4. 실행 (http://localhost:8080)
 ./mvnw spring-boot:run
 ```
 
-기본적으로 `local` 프로파일로 동작하며, `http://localhost:8080`에서 API 서버가 뜹니다.
-
-### 더미 계정
-
-`dummy-data.sql` 실행 시 아래 계정이 함께 생성됩니다 (비밀번호 모두 `1234`).
+더미데이터 실행 시 아래 계정이 생성됩니다 (비밀번호 모두 `1234`).
 
 | 이메일 | 역할 |
 |---|---|
 | owner@rookie.com | OWNER |
 | customer@rookie.com | USER |
+| admin@rookie.com | ADMIN |
+
+### 2) 프론트엔드 (`frontend_main`)
+
+사전 준비: Node.js 18 이상
+
+```bash
+npm install
+npm run dev   # http://localhost:5173
+```
+
+`.env.development`의 `VITE_API_BASE_URL`이 `http://localhost:8080`(백엔드 기본 포트)을 가리키는지 확인하세요. 백엔드 `SecurityConfig`의 CORS 허용 origin도 `http://localhost:5173`으로 맞춰져 있습니다.
 
 ## API 문서
 
-전체 엔드포인트 목록과 요청/응답 형식은 [REST API 설계서](./docs/api-spec.md)를 참고하세요. *(문서 경로는 팀에서 정한 위치로 수정)*
+전체 엔드포인트와 요청/응답 스펙, 에러 코드 전체 목록은 `backend_main` 브랜치의 `docs/03_REST_API설계서.md`를 참고하세요. 같은 폴더에 도메인 설계서(`01_도메인설계서.md`)와 Entity 설계서(`02_Entity설계서.md`)도 Markdown + PDF로 함께 들어있습니다.
 
-현재 실제로 구현되어 동작하는 주요 엔드포인트:
-
-| 파트 | 도메인 | Method | URL | 설명 |
-|---|---|---|---|---|
-| A | 회원 | POST | `/api/auth/signup` | 회원가입 |
-| A | 회원 | POST | `/api/auth/login` | 로그인 (임시 토큰 발급) |
-| A | 회원 | GET/PATCH/DELETE | `/api/users/{id}` | 회원 조회/수정/탈퇴 |
-| A | 매장 | GET | `/api/stores` | 매장 목록 (페이징, 카테고리 필터) |
-| A | 매장 | POST | `/api/stores` | 매장 등록 |
-| A | 매장 | PUT | `/api/stores/{storeId}` | 매장 정보 수정 |
-| A | 매장 | DELETE | `/api/stores/{storeId}` | 매장 삭제 |
-| B | 메뉴 | GET | `/api/stores/{storeId}/menus` | 매장별 메뉴 목록 |
-| B | 메뉴 | POST/PATCH/DELETE | `/api/menus/**` | 메뉴 등록/수정/품절처리/삭제 |
-| B | 주문 | POST | `/api/orders` | 주문 생성 |
-| B | 주문 | GET | `/api/stores/{storeId}/orders` | 사장님용 매장별 주문 목록 |
-| B | 주문 | GET | `/api/customers/{customerId}/orders` | 손님 주문 목록 |
-| B | 주문 | PATCH | `/api/customers/{customerId}/orders/{orderId}/cancel` | 손님 주문 취소 |
-| C | 주문 | PATCH | `/api/owner/orders/{orderId}/status` | 주문 상태 변경 |
-
-설계는 됐지만 아직 구현 전인 것:
-
-| 파트 | 기능 | 비고 |
-|---|---|---|
-| A | 로그인 로직 `AuthController`/`AuthService` 분리 | 현재 `UserController`에 포함 |
-| C | 오늘 매출 요약 조회 (`SalesController`) | 집계 쿼리는 준비됨 |
+모든 에러 응답은 `{ "status", "message", "timestamp", "errors" }` 형식이며, 매장 소유권 불일치 시 엔드포인트별로 403(존재는 알리되 접근 차단)과 404(존재 자체를 숨김) 두 컨벤션이 현재 공존합니다 — 신규 엔드포인트는 404로 통일 중입니다.
 
 ## 팀 구성
 
-| 파트 | 담당 도메인 | 담당자 |
+**백엔드** (`backend_main`)
+
+| 담당자 | 담당 도메인 | 주요 작업 |
 |---|---|---|
-| Part A | 회원 / 매장 / 인증 | 현준 |
-| Part B | 메뉴 / 손님 주문 | 인선 |
-| Part C | 사장님 주문 관리 / 매출 | 지우 |
-| 메인 및 로그인 화면 |  |  |
-|                     |   |   |
-|                      |    |   |
+| 현준 | 회원 / 매장 / 인증 | User·Store 도메인 API, JWT 인증(`JwtService`·`JwtAuthenticationFilter`·`SecurityConfig`), `@CurrentUser` 어노테이션, 매장 키워드 검색, 사장님 1:N 다중 매장 조회, `/images/**` 정적 리소스 경로 수정 |
+| 인선 | 메뉴 / 주문 생성 / 손님 주문 | 프로젝트 초기 세팅, 메뉴 CRUD + 이미지 업로드, 손님 주문 생성·취소·조회, N+1 조회 최적화, 소프트 삭제, 에러 코드 정리 |
+| 지우 | 사장님 주문 관리 / 매출 | `Order` 상태 전이 로직, 사장님 주문 목록 조회 API, 주문 상태 변경 API, 당일 매출 조회 API, 대시보드 조회 범위 로직 |
+
+**프론트엔드** (`frontend_main`)
+
+| GitHub | 담당 도메인 | 주요 작업 |
+|---|---|---|
+| 본영 | 주문(Order) — 장바구니 · 주문 현황 · 사장님 대시보드 | 주문 페이지, 장바구니(픽업 시간·요청사항), 손님 주문 상태 페이지, 사장님 주문 대시보드, 매출 연동 + 단위 테스트 |
+| 영서 | 매장(Store) — 매장/메뉴 관리, 마이페이지 | 매장 등록·수정·삭제, 메뉴 등록, 이미지 업로드 연결, 마이페이지 |
+| 승호 | 인증(Auth) · 공통 UI | 로그인/회원가입 구현 및 인증 연동, 메인 홈 디자인 통일, 매장 검색 기능 수정 |
