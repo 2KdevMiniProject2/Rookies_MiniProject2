@@ -484,3 +484,81 @@
     height: 48px;
   }
 }
+
+/* ---------- 주문 취소 (금액 오른쪽 3번째 칸) ---------- */
+
+.order-status__detail--cancelable {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.order-status__cancel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 160px;
+  padding-left: 32px;
+  border-left: 1px solid var(--order-border);
+}
+
+/* 테두리만 있는 보조 버튼 — 주황 새로고침보다 덜 눈에 띄게 */
+.order-status__button--cancel {
+  color: var(--order-accent);
+  background: var(--order-accent-soft);
+  border: 1px solid var(--order-accent-soft);
+}
+
+.order-status__button--cancel:hover:not(:disabled) {
+  border-color: var(--order-accent);
+}
+
+/* 접수 대기가 아닐 때 — 눌리지 않음 */
+.order-status__button--cancel:disabled {
+  color: var(--order-text-muted);
+  background: var(--order-fill);
+  border-color: var(--order-border);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.order-status__cancel-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--order-text-muted);
+}
+
+/* 폰: 취소 칸을 아래로 */
+@media (max-width: 640px) {
+  .order-status__detail--cancelable {
+    grid-template-columns: 1fr;
+  }
+
+  .order-status__cancel {
+    max-width: none;
+    padding: 16px 0 0;
+    border-left: none;
+    border-top: 1px solid var(--order-border);
+  }
+}
+
+/* 다른 페이지로 나가는 링크 — 새로고침 아래 작은 글씨 */
+.order-status__links {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--order-text-muted);
+}
+
+.order-status__links a {
+  color: var(--order-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.order-status__links a:hover {
+  color: var(--order-accent);
+}

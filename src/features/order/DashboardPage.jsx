@@ -85,8 +85,8 @@ export default function DashboardPage() {
         {/* 사장님 메뉴 탭: 매장 정보 수정(파트 A), 메뉴 관리(파트 B) 주소는 각 파트와 맞출 것 */}
         <nav className="dashboard__tabs">
           <NavLink to={`/owner/stores/${storeId}/orders`} className="dashboard__tab">주문 대시보드</NavLink>
-          <NavLink to="/owner/store" className="dashboard__tab">매장 정보 수정</NavLink>
-          <NavLink to="/owner/menus" className="dashboard__tab">메뉴 관리</NavLink>
+          <NavLink to={`/owner/stores/${storeId}/edit`} className="dashboard__tab">매장 정보 수정</NavLink>
+          <NavLink to={`/owner/stores/${storeId}/menus`} className="dashboard__tab">메뉴 관리</NavLink>
         </nav>
       </header>
 
@@ -95,7 +95,7 @@ export default function DashboardPage() {
         <h2 className="dashboard__section-title">오늘의 영업 요약</h2>
         <div className="summary">
           <div className="summary__item">
-            <p className="summary__label">오늘 들어온 주문</p>
+            <p className="summary__label">오늘 픽업 완료된 주문</p>
             <p className="summary__value">{sales.orderCount}건</p>
           </div>
           <div className="summary__item">
@@ -178,15 +178,16 @@ function OrderCard({ order, onChange }) {
       </div>
 
       <ul className="order__info">
-        <li>
-          {order.customerName} · {order.customerPhone}
-        </li>
+        <li className="order__customer">{order.customerName}</li>
         <li>픽업 요청 {hhmm(order.pickupTime)}</li>
-        {order.items.map((item, index) => (
-          <li key={index}>
+        {order.items.map((item) => (
+          <li key={item.menuItemId}>
             {item.menuName} × {item.quantity}
           </li>
         ))}
+        {order.requestNotes && (
+          <li className="order__notes">요청 · {order.requestNotes}</li>
+        )}
         <li className="order__price">{won(order.totalPrice)}</li>
       </ul>
 

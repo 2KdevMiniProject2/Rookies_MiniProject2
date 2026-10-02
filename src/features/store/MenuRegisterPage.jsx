@@ -362,11 +362,31 @@ function MenuRegisterPage() {
         navigate('/login');
     };
 
+    const handleLogoClick = () => {
+        navigate('/');
+    };
+
+    const handleLogoKeyDown = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            navigate('/');
+        }
+    };
+
     return (
         <main className="menu-register-page">
             <div className="menu-register-layout">
                 <aside className="menu-register-sidebar">
-                    <Logo className="owner-sidebar-logo" />
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        aria-label="메인 화면으로 이동"
+                        onClick={handleLogoClick}
+                        onKeyDown={handleLogoKeyDown}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <Logo className="owner-sidebar-logo" />
+                    </div>
 
                     <strong>사장님 마이페이지</strong>
 

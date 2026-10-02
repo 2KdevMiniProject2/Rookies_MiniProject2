@@ -334,3 +334,80 @@
     font-size: 14px;
     line-height: 1.6;
 }
+/* 사장님 주문 대시보드 연결 */
+.owner-dashboard-store-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.owner-dashboard-store-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.owner-dashboard-store-card > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.owner-dashboard-store-card strong {
+    color: #111111;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.owner-dashboard-store-card span {
+    color: #777777;
+    font-size: 12px;
+}
+
+.owner-dashboard-store-card button,
+.owner-dashboard-empty button {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    border: 1px solid var(--brand-accent);
+    border-radius: 10px;
+    background: var(--brand-accent);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.owner-dashboard-store-card button:hover,
+.owner-dashboard-empty button:hover {
+    background: var(--brand-accent-hover);
+    border-color: var(--brand-accent-hover);
+}
+
+.owner-dashboard-message {
+    margin-top: 18px;
+    padding: 20px;
+    border: 1px dashed #cccccc;
+    border-radius: 12px;
+    color: #888888;
+    text-align: center;
+    font-size: 13px;
+}
+
+.owner-dashboard-empty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 18px;
+    padding: 18px;
+    border: 1px dashed #cccccc;
+    border-radius: 12px;
+    color: #777777;
+    font-size: 13px;
+}

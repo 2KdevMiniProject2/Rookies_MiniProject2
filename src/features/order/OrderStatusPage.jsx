@@ -64,12 +64,15 @@ function OrderStatusPage() {
 
     // 화면 전용 값 — 이 버튼에서만 쓰므로 useState 에 둔다
     const [refreshing, setRefreshing] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
 
     // store 에서 필요한 것만 하나씩 꺼내기
     const storedOrder = useOrderStatusStore((state) => state.order);
     const loading = useOrderStatusStore((state) => state.loading);
     const error = useOrderStatusStore((state) => state.error);
     const loadOrder = useOrderStatusStore((state) => state.loadOrder);
+    //주문 취소 버튼 추가
+    const cancelMyOrder = useOrderStatusStore((state) => state.cancelMyOrder);
 
     // store 에 다른 주문이 남아 있을 수 있으므로, 주소의 주문 번호와 같을 때만 쓴다
     const order = storedOrder?.id === Number(orderId) ? storedOrder : null;
@@ -88,6 +91,14 @@ function OrderStatusPage() {
         setRefreshing(true);
         await loadOrder(orderId);
         setRefreshing(false);
+    }
+
+    // 주문 취소 버튼 추가 — 접수 대기일 때만 버튼 활성화
+    async function handleCancel() {
+        if (!window.confirm(`#${order.id} 주문을 취소할까요? 되돌릴 수 없어요.`)) return;
+        setCancelling(true);
+        await cancelMyOrder(orderId);
+        setCancelling(false);
     }
 
     // 불러오는 중 / 못 불러옴
@@ -116,6 +127,15 @@ function OrderStatusPage() {
     const pickupText = formatPickup(order.pickupTime);
     const fillPercent = (info.step / (STEPS.length - 1)) * 100;
 
+    // 주문 취소 버튼 추가 — 사장님이 수락하기 전(접수 대기)에만 가능
+    // 주문 취소 버튼 접수 대기 상태에서만 활성화, 나머지 상태에선 비활성 + 이유 문구
+    const canCancel = order.status === "PENDING";
+    const cancelHint = canCancel
+        ? "사장님 수락 전까지만 취소할 수 있어요"
+        : order.status === "CANCELLED"
+            ? "취소된 주문이에요"
+            : "이미 진행된 주문은 취소할 수 없어요";
+
     return (
         <div className="order-status">
             <div className="order-status__card">
@@ -133,7 +153,7 @@ function OrderStatusPage() {
                 <div className="order-status__pickup">
                     <span className="order-status__pickup-icon">
                         <svg viewBox="0 0 24 24" width="26" height="26" fill="none"
-                             stroke="currentColor" strokeWidth="2">
+                            stroke="currentColor" strokeWidth="2">
                             <circle cx="12" cy="12" r="9" />
                             <path d="M12 7v5l3 2" />
                         </svg>
@@ -173,8 +193,8 @@ function OrderStatusPage() {
                 {/* 새로고침 중 에러가 나면 지난 정보는 그대로 두고 한 줄로 알린다 */}
                 {error && <p className="order-status__error">{error}</p>}
 
-                {/* 주문 내역 */}
-                <div className="order-status__detail">
+                {/* 주문 내역 — 취소 추가 */}
+                <div className="order-status__detail order-status__detail--cancelable">
                     <ul className="order-status__items">
                         {order.items.map((item) => (
                             <li key={item.menuItemId} className="order-status__item">
@@ -190,6 +210,19 @@ function OrderStatusPage() {
                             결제 금액 : {order.totalPrice.toLocaleString("ko-KR")}원
                         </p>
                     </div>
+
+                    {/* 주문 취소 추가 — 금액 오른쪽 칸 */}
+                    <div className="order-status__cancel">
+                        <button
+                            type="button"
+                            className="order-status__button order-status__button--cancel"
+                            onClick={handleCancel}
+                            disabled={!canCancel || cancelling}
+                        >
+                            {cancelling ? "취소 중…" : "주문 취소"}
+                        </button>
+                        <p className="order-status__cancel-hint">{cancelHint}</p>
+                    </div>
                 </div>
 
                 {/* 새로고침 */}
@@ -203,6 +236,11 @@ function OrderStatusPage() {
                         {refreshing ? "불러오는 중…" : "실시간 상태 새로고침"}
                     </button>
                     <span className="order-status__hint">5초마다 자동으로 새로고침돼요</span>
+                    <nav className="order-status__links">
+                        <Link to="/">메인으로 가기</Link>
+                        <span aria-hidden="true">·</span>
+                        <Link to="/mypage">내 주문 내역</Link>
+                    </nav>
                 </div>
             </div>
         </div>

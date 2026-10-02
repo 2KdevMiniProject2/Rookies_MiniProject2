@@ -27,7 +27,11 @@ function OwnerStoreListPage() {
                     `/api/stores/owner/${ownerId}`
                 );
 
-                setStores(response.data);
+                const storeList = Array.isArray(response.data)
+                    ? response.data
+                    : response.data.content || [];
+
+                setStores(storeList);
             } catch (error) {
                 console.error('가게 목록 조회 실패:', error);
                 setError('가게 목록을 불러오지 못했습니다.');
@@ -43,6 +47,17 @@ function OwnerStoreListPage() {
     const handleLogout = () => {
         logout();
         navigate('/login');
+    };
+
+    const handleLogoClick = () => {
+        navigate('/');
+    };
+
+    const handleLogoKeyDown = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            navigate('/');
+        }
     };
 
     const handleDeleteStore = async (storeId, storeName) => {
@@ -81,7 +96,16 @@ function OwnerStoreListPage() {
         <main className="owner-store-list-page">
             <div className="owner-store-list-layout">
                 <aside className="owner-store-list-sidebar">
-                    <Logo className="owner-sidebar-logo" />
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        aria-label="메인 화면으로 이동"
+                        onClick={handleLogoClick}
+                        onKeyDown={handleLogoKeyDown}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <Logo className="owner-sidebar-logo" />
+                    </div>
 
                     <strong>사장님 마이페이지</strong>
 
@@ -91,6 +115,13 @@ function OwnerStoreListPage() {
                             onClick={() => navigate('/mypage')}
                         >
                             마이페이지
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => navigate('/mypage#owner-dashboard-section')}
+                        >
+                            주문 대시보드
                         </button>
 
                         <button
@@ -191,6 +222,18 @@ function OwnerStoreListPage() {
                                             </div>
 
                                             <div className="owner-store-card-actions">
+                                                <button
+                                                    type="button"
+                                                    className="owner-store-menu-button"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/owner/stores/${store.id}/orders`
+                                                        )
+                                                    }
+                                                >
+                                                    주문 대시보드
+                                                </button>
+
                                                 <button
                                                     type="button"
                                                     className="owner-store-menu-button"

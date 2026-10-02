@@ -172,7 +172,21 @@ function UserInfoPage() {
         <main className="user-info-page">
             <div className="user-info-layout">
                 <aside className="user-info-sidebar">
-                    <Logo className="owner-sidebar-logo" />
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        aria-label="메인 화면으로 이동"
+                        onClick={() => navigate('/')}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                navigate('/');
+                            }
+                        }}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <Logo className="owner-sidebar-logo" />
+                    </div>
 
                     <strong>
                         {user.role === 'OWNER'
@@ -192,6 +206,13 @@ function UserInfoPage() {
                             <>
                                 <button
                                     type="button"
+                                    onClick={() => navigate('/mypage#owner-dashboard-section')}
+                                >
+                                    주문 대시보드
+                                </button>
+
+                                <button
+                                    type="button"
                                     onClick={() => navigate('/stores/register')}
                                 >
                                     가게 등록
@@ -204,12 +225,6 @@ function UserInfoPage() {
                                     가게별 메뉴 관리
                                 </button>
                             </>
-                        )}
-
-                        {user.role === 'USER' && (
-                            <button type="button">
-                                이용내역
-                            </button>
                         )}
 
                         <button

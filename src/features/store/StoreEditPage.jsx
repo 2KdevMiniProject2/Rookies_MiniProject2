@@ -124,7 +124,21 @@ function StoreEditPage() {
         <main className="store-register-page">
             <div className="store-register-layout">
                 <aside className="store-register-sidebar">
-                    <Logo className="owner-sidebar-logo" />
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        aria-label="메인 화면으로 이동"
+                        onClick={() => navigate('/')}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                navigate('/');
+                            }
+                        }}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <Logo className="owner-sidebar-logo" />
+                    </div>
 
                     <strong>사장님 마이페이지</strong>
 
@@ -134,6 +148,13 @@ function StoreEditPage() {
                             onClick={() => navigate('/mypage')}
                         >
                             마이페이지
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => navigate('/mypage#owner-dashboard-section')}
+                        >
+                            주문 대시보드
                         </button>
 
                         <button

@@ -6,20 +6,19 @@
 
 import apiClient from "./client"; // 팀 공통 axios (baseURL = http://localhost:8080)
 
-const USE_MOCK = false;
+//const USE_MOCK = false;
 
-// 주문 목록은 10개씩 페이지
-const ORDER_PAGE_SIZE = 100;
-
-/* 백엔드 OrderResponse: { orderId, status, totalAmount, pickupTime, items: [{ menuItemId, menuName, quantity, orderPrice }] }
-   손님 이름 · 전화번호는 아직 백엔드 응답에 없음 → null (화면에서 숨김) */
+/* 백엔드 OwnerOrderResponse → 화면에서 쓰는 모양
+   { orderId, status, totalAmount, pickupTime, createdAt, customerName, requestNotes,
+     items: [{ menuItemId, menuName, quantity, orderPrice }] } */
 const toOrder = (response) => ({
   id: response.orderId,
   status: response.status,
   pickupTime: response.pickupTime,
+  createdAt: response.createdAt,
   totalPrice: response.totalAmount,
-  customerName: response.customerName ?? null,
-  customerPhone: response.customerPhone ?? null,
+  customerName: response.customerName,
+  requestNotes: response.requestNotes ?? "",
   items: response.items.map((item) => ({
     menuItemId: item.menuItemId,
     menuName: item.menuName,
@@ -33,10 +32,14 @@ export const getStore = async (storeId) => {
   return response.data; // { id, name, address, category, ... }
 };
 
-// GET /api/stores/{storeId}/orders?size=100  → Page<OrderResponse> (목록은 content 안에)
+// 사장님 주문 목록 — GET /api/owner/stores/{storeId}/orders (OWNER, 내 가게만) → Page
+// 최신 100건을 받아서(desc) 화면에는 먼저 들어온 주문이 위로 오게함
+// (오래된 순으로 100건을 받으면 완료 주문이 쌓였을 때 새 주문이 잘림)
 export const getOwnerOrders = async (storeId) => {
-  const response = await apiClient.get(`/api/stores/${storeId}/orders`, {params: { size: 100 },});
-  return response.data.content.map(toOrder);
+  const response = await apiClient.get(`/api/owner/stores/${storeId}/orders`, {
+    params: { size: 100, sort: "createdAt,desc" },
+  });
+  return response.data.content.map(toOrder).reverse();
 };
 
 /* 상태 변경 — 파트 C 사장님 전용 API (지우님 구현 · Postman 테스트 완료)
@@ -53,24 +56,10 @@ export const updateOrderStatus = async (orderId, status, ownerId) => {
   );
 };
 
-// GET /api/owner/sales/today  (storeId)  → { totalSales, orderCount }
+//오늘 매출 조회 api 추가 후 반영
+// GET /api/owner/stores/${storeId}/sales/today  (storeId)  → { totalSales, orderCount }
+// 픽업 완료(COMPLETED) 주문만, 오늘 픽업 완료 (백엔드 계산)
 export const getTodaySales = async (storeId) => {
-  const orders = await getOwnerOrders(storeId);
-  const today = todayText();
-  const todayOrders = orders.filter(
-    (order) => order.pickupTime.startsWith(today) && order.status !== "REJECTED"
-  );
-  return {
-    totalSales: todayOrders.reduce((sum, order) => sum + order.totalPrice, 0),
-    orderCount: todayOrders.length,
-  };
-};
-
-// 분리 필요
-// 오늘 날짜 "YYYY-MM-DD" (내 컴퓨터 시간 기준)
-const todayText = () => {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${now.getFullYear()}-${month}-${day}`;
+  const response = await apiClient.get(`/api/owner/stores/${storeId}/sales/today`);
+  return response.data;
 };
