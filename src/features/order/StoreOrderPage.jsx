@@ -7,10 +7,11 @@
    --------------------------------------------------------- */
 
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { fetchStore, fetchMenus } from "../../api/storeOrderApi";
 import { useAuthStore } from "../../store/authStore";
+import { useCartStore } from "../../store/cartStore";
 
 import "./StoreOrderPage.css";
 
@@ -26,7 +27,6 @@ const hhmm = (time) => (time ? time.slice(0, 5) : "--:--");
 function StoreOrderPage() {
     const { storeId } = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
     // 장바구니는 로그인해야 볼 수 있음 → 로그인 전이면 버튼이 로그인 화면으로 보냄
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -36,27 +36,21 @@ function StoreOrderPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    /* =====================================================
-       [나중에 분리 → store/cartStore.js]
-       장바구니 — 장바구니 페이지와 같이 써야 하므로 나중에 zustand 로 옮길 예정
-       cartItems: [{ menuItemId, name, price, quantity }]
-       장바구니에서 [메뉴 더 담기] 로 돌아오면 location.state 로 담은 메뉴를 다시 받는다
-       ===================================================== */
-    const [cartItems, setCartItems] = useState(location.state?.cartItems ?? []);
+    /* ── 장바구니 — store/cartStore.js (zustand, 장바구니 페이지와 공유) ── */
+    const cartStoreId = useCartStore((state) => state.store?.id);
+    const allCartItems = useCartStore((state) => state.cartItems);
+    const addToCart = useCartStore((state) => state.addToCart);
 
-    function addToCart(menu) {
-        setCartItems((prevItems) => {
-            const found = prevItems.find((cartItem) => cartItem.menuItemId === menu.id);
-            if (found) {
-                // 이미 담긴 메뉴면 수량만 1 늘린다
-                return prevItems.map((cartItem) =>
-                    cartItem.menuItemId === menu.id
-                        ? { ...cartItem, quantity: cartItem.quantity + 1 }
-                        : cartItem
-                );
-            }
-            return [...prevItems, { menuItemId: menu.id, name: menu.name, price: menu.price, quantity: 1 }];
-        });
+    // 장바구니에 다른 가게 메뉴가 들어 있으면, 이 가게 화면에서는 0개로 보이게
+    const cartItems = cartStoreId === Number(storeId) ? allCartItems : [];
+
+    // 담기 — 다른 가게 메뉴가 담겨 있으면 한 번 물어본다 (주문 1건 = 가게 1곳)
+    function handleAdd(menu) {
+        const hasOtherStoreItems = allCartItems.length > 0 && cartStoreId !== store.id;
+        if (hasOtherStoreItems && !window.confirm("다른 가게 메뉴가 담겨 있어요. 비우고 이 가게 메뉴를 담을까요?")) {
+            return;
+        }
+        addToCart(store, menu);
     }
 
     // 담은 개수 · 총 금액은 저장하지 않고 cartItems 에서 계산 (어긋날 일이 없게)
@@ -195,7 +189,7 @@ function StoreOrderPage() {
                                             <button
                                                 type="button"
                                                 className="store-order__add"
-                                                onClick={() => addToCart(menu)}
+                                                onClick={() => handleAdd(menu)}
                                                 disabled={menu.soldOut}
                                                 aria-label={`${menu.name} 담기`}
                                             >
@@ -226,7 +220,7 @@ function StoreOrderPage() {
                         className="store-order__cart-button"
                         onClick={() =>
                             isAuthenticated
-                                ? navigate(CART_PATH, { state: { store, cartItems } })
+                                ? navigate(CART_PATH)
                                 : navigate("/login")
                         }
                         disabled={totalCount === 0}

@@ -3,7 +3,7 @@
    주문 페이지에서 [장바구니 보기] 를 누르면 오는 화면입니다.
 
      ① 주문 보내기        → api/cartApi.js
-     ② 장바구니 데이터     → store/cartStore.js   (지금은 주문 페이지에서 location.state 로 받음)
+     ② 장바구니 데이터     → store/cartStore.js   (zustand · 주문 페이지와 공유 · 새로고침해도 유지)
      ③ 화면 조각          → components/CartItemRow.jsx · PickupTimePicker.jsx
 
    사용하는 백엔드 API
@@ -13,10 +13,11 @@
    --------------------------------------------------------- */
 
 import { useMemo, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import apiClient from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
+import { useCartStore } from "../../store/cartStore";
 
 import "./CartPage.css";
 
@@ -66,19 +67,17 @@ function makePickupSlots(openTime, closeTime) {
 }
 
 function CartPage() {
-    const location = useLocation();
     const navigate = useNavigate();
 
     // 로그인한 손님 (이 페이지는 ProtectedRoute 안이라 항상 로그인 상태)
     const user = useAuthStore((state) => state.user);
 
-    /* =====================================================
-       [나중에 분리 → store/cartStore.js]
-       주문 페이지가 navigate("/cart", { state: { store, cartItems } }) 로 넘겨준 값
-       새로고침하면 사라짐 → cartStore(zustand) 로 옮기면 해결
-       ===================================================== */
-    const store = location.state?.store ?? null;
-    const [cartItems, setCartItems] = useState(location.state?.cartItems ?? []);
+    /* ── 장바구니 — store/cartStore.js (zustand, 주문 페이지와 공유) ── */
+    const store = useCartStore((state) => state.store);
+    const cartItems = useCartStore((state) => state.cartItems);
+    const changeQuantity = useCartStore((state) => state.changeQuantity);
+    const removeItem = useCartStore((state) => state.removeItem);
+    const clearCart = useCartStore((state) => state.clearCart);
 
     const [pickupSlot, setPickupSlot] = useState(null); // 고른 픽업 시간 (Date)
     const [requestNotes, setRequestNotes] = useState("");
@@ -94,28 +93,9 @@ function CartPage() {
     const totalCount = cartItems.reduce((sum, cartItem) => sum + cartItem.quantity, 0);
     const totalPrice = cartItems.reduce((sum, cartItem) => sum + cartItem.price * cartItem.quantity, 0);
 
-    /* ── 수량 · 삭제 ── */
-    function changeQuantity(menuItemId, amount) {
-        setCartItems((prevItems) =>
-            prevItems
-                .map((cartItem) =>
-                    cartItem.menuItemId === menuItemId
-                        ? { ...cartItem, quantity: cartItem.quantity + amount }
-                        : cartItem
-                )
-                .filter((cartItem) => cartItem.quantity > 0) // 0개가 되면 빼기
-        );
-    }
-
-    function removeItem(menuItemId) {
-        setCartItems((prevItems) => prevItems.filter((cartItem) => cartItem.menuItemId !== menuItemId));
-    }
-
-    // 메뉴 더 담기: 지금 장바구니를 들고 주문 페이지로 돌아간다
     function goBackToMenus() {
-        navigate(`/stores/${store.id}`, { state: { cartItems } });
+        navigate(`/stores/${store.id}`);
     }
-
     /* =====================================================
        [나중에 분리 → api/cartApi.js]
        주문 보내기 — POST /api/orders
@@ -141,15 +121,16 @@ function CartPage() {
                 },
                 { params: { customerId: user.id } }
             );
-            // 주문 성공 → 주문 상태 페이지로 (뒤로가기로 장바구니에 다시 오지 않게 replace)
+            // 주문 성공 → 장바구니 비우고 주문 상태 페이지로 (뒤로가기로 장바구니에 다시 오지 않게 replace)
+            clearCart();
             navigate(`/orders/${response.data.orderId}`, { replace: true });
-        } catch (submitError) {
+            } catch (submitError) {
             console.error("주문 실패:", submitError);
             // 서버 문구 예) "품절된 메뉴가 포함되어 있습니다: 크루아상"
             setError(submitError.response?.data?.message ?? "주문을 보내지 못했어요. 다시 시도해주세요.");
-        } finally {
+            } finally {
             setSubmitting(false);
-        }
+            }
     }
 
     /* ── 빈 장바구니 ── */
